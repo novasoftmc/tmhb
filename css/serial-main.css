@@ -20,7 +20,7 @@
 body {
   background-color: var(--background-color);
   color: var(--text-color);
-  padding: 10px;
+  padding: 0;
   max-width: 768px;
   margin: 0 auto;
 }
@@ -1464,11 +1464,11 @@ body.dark-theme #main-title {
 
 /* === PAGE-SPECIFIC FOOTER SPACING === */
 body footer {
-    margin-top: 45vh;
+    margin-top: 72vh;
 }
 
 @media (max-width: 768px) {
   body {
-    max-width: 495px;  /* Keep narrow on mobile */
+    max-width: 500px;  /* Keep narrow on mobile */
   }
 }

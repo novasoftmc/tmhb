@@ -3212,8 +3212,8 @@ const eventHandlers = (function () {
           resizeStartY = e.clientY;
 
           const rect = element.getBoundingClientRect();
-          dragStartLeft = rect.left;
-          dragStartTop = rect.top;
+          dragStartLeft = rect.left + window.pageXOffset;
+          dragStartTop = rect.top + window.pageYOffset;
 
           e.preventDefault();
           return;
@@ -3224,8 +3224,8 @@ const eventHandlers = (function () {
         dragStartY = e.clientY;
 
         const rect = element.getBoundingClientRect();
-        dragStartLeft = rect.left;
-        dragStartTop = rect.top;
+        dragStartLeft = rect.left + window.pageXOffset;
+        dragStartTop = rect.top + window.pageYOffset;
 
         // Set explicit dimensions to prevent layout shift
         const currentWidth = element.style.width;
@@ -3296,7 +3296,7 @@ const eventHandlers = (function () {
           element.style.height = newHeight + "px";
           element.style.left = newLeft + "px";
           element.style.top = newTop + "px";
-          element.style.position = "fixed";
+          element.style.position = "absolute";
 
           // Scale text if this is countdown box
           if (element.id === "countdown-box") {
@@ -3313,25 +3313,20 @@ const eventHandlers = (function () {
         const dx = e.clientX - dragStartX;
         const dy = e.clientY - dragStartY;
 
-        const newLeft = Math.max(
-          0,
-          Math.min(window.innerWidth - element.offsetWidth, dragStartLeft + dx)
-        );
-        const newTop = Math.max(
-          0,
-          Math.min(window.innerHeight - element.offsetHeight, dragStartTop + dy)
-        );
+        const newLeft = Math.max(0, dragStartLeft + dx);
+        const newTop = Math.max(0, dragStartTop + dy);
 
         element.style.left = newLeft + "px";
         element.style.top = newTop + "px";
-        element.style.position = "fixed";
+        element.style.position = "absolute";
+
         // Update edit button position if this is the notes display
         if (element.id === "timer-notes-display") {
           const editBtn = document.getElementById("notes-edit-btn");
           if (editBtn && editBtn.parentElement.id === "timer-notes-wrapper") {
             const rect = element.getBoundingClientRect();
             const btnWidth = 70; // Fixed button width
-            editBtn.style.position = "fixed";
+            editBtn.style.position = "absolute";
             editBtn.style.width = btnWidth + "px";
             editBtn.style.right = "auto"; // Clear any right positioning
             editBtn.style.left = rect.right - btnWidth - 5 + "px";
@@ -3426,7 +3421,7 @@ const eventHandlers = (function () {
           element.style.height = newHeight + "px";
           element.style.left = newLeft + "px";
           element.style.top = newTop + "px";
-          element.style.position = "fixed";
+          element.style.position = "absolute";
 
           // Scale text if this is countdown box
           if (element.id === "countdown-box") {
@@ -3441,25 +3436,20 @@ const eventHandlers = (function () {
         const dx = e.touches[0].clientX - dragStartX;
         const dy = e.touches[0].clientY - dragStartY;
 
-        const newLeft = Math.max(
-          0,
-          Math.min(window.innerWidth - element.offsetWidth, dragStartLeft + dx)
-        );
-        const newTop = Math.max(
-          0,
-          Math.min(window.innerHeight - element.offsetHeight, dragStartTop + dy)
-        );
+        const newLeft = Math.max(0, dragStartLeft + dx);
+        const newTop = Math.max(0, dragStartTop + dy);
 
         element.style.left = newLeft + "px";
         element.style.top = newTop + "px";
-        element.style.position = "fixed";
+        element.style.position = "absolute";
+
         // Update edit button position if this is the notes display
         if (element.id === "timer-notes-display") {
           const editBtn = document.getElementById("notes-edit-btn");
           if (editBtn && editBtn.parentElement.id === "timer-notes-wrapper") {
             const rect = element.getBoundingClientRect();
             const btnWidth = 70; // Fixed button width
-            editBtn.style.position = "fixed";
+            editBtn.style.position = "absolute";
             editBtn.style.width = btnWidth + "px";
             editBtn.style.right = "auto"; // Clear any right positioning
             editBtn.style.left = rect.right - btnWidth - 5 + "px";
