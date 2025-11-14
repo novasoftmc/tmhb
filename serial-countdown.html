@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Free online countdown timer with multiple timers, customizable progress bars, and sound alerts. Perfect for workouts, cooking, presentations, and time management." />
+    <meta name="keywords" content="countdown timer, multiple timers, progress bar, visual timer, sound alerts timer, online timer, interval timer, workout timer, cooking timer, presentation timer, time management tool" />
+    <meta property="og:title" content="Multiple Countdown Timers with Progress Bar - Visual Timer Tool" />
+    <meta property="og:description" content="Free online countdown timer with multiple timers, customizable progress bars, and sound alerts. Perfect for workouts, cooking, presentations, and time management." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://yourdomain.com/" />
+    <meta property="og:image" content="https://yourdomain.com/timer-preview.jpg" />
+    <link rel="canonical" href="https://yourdomain.com/" />
+    <title>Countdown Timers with Progress Bar and Sound Alerts - Audio Visual Timer Tool</title>
+    
+    <link rel="stylesheet" href="css/shared-nav.css" />
+    <link rel="stylesheet" href="css/serial-main.css" />
+    <link rel="stylesheet" href="css/shared-footer.css" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Multiple Countdown Timers",
+      "applicationCategory": "UtilityApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "Free online countdown timer with multiple timers, customizable progress bars, and sound alerts.",
+      "browserRequirements": "Requires JavaScript"
+    }
+    </script>
+  </head>
+
+  <body>
+    <a href="#main-page" class="skip-link">Skip to main content</a>
+    
+    <!-- Shared Header Navigation -->
+    <nav class="main-header-nav">
+        <!-- Row 1: Main tabs and theme toggle -->
+        <div class="header-row-1" id="headerRow1">
+            <div class="header-left">
+                <a href="index.html">
+                    <img src="apple-touch-icon.png" alt="Home" class="home-icon">
+                </a>
+                <div class="header-main-tabs">
+                    <button class="header-main-tab active" id="countdownMainTab" data-mode="countdown">Countdown</button>
+                    <button class="header-main-tab" id="stopwatchMainTab" data-mode="stopwatch">Stopwatch</button>
+                </div>
+            </div>
+            <div class="theme-toggle-container">
+                <svg class="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+                <div class="theme-toggle-switch" id="themeToggle">
+                    <div class="theme-toggle-slider"></div>
+                </div>
+                <svg class="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+            </div>
+        </div>
+        
+        <!-- Row 2: Sub-tabs (Countdown options) -->
+        <div class="header-row-2" id="headerRow2">
+            <a href="serial-countdown.html" class="header-sub-tab active">Serial Countdown</a>
+            <a href="parallel-countdown.html" class="header-sub-tab">Multiple Countdown</a>
+            <a href="pomodoro-countdown.html" class="header-sub-tab">Pomodoro Timer</a>
+        </div>
+    </nav>
+
+    <noscript>
+      <div style="padding: 20px; background: #f44336; color: white; text-align: center; font-size: 1.2rem;">
+        <strong>JavaScript Required:</strong> This countdown timer application requires JavaScript to function. Please enable JavaScript in your browser settings.
+      </div>
+    </noscript>
+    <!-- Main Page -->
+    <main id="main-page" class="page">
+      <h1 id="main-title" style="text-align: center; font-size: 1.5rem; margin: 10px 0 15px 0; color: #2c3e50; font-weight: 600;">Free Online Serial Bar Timer</h1>
+      <h2 class="hidden">Main Timer Functions</h2> 
+      <div class="container">
+        <div class="time-setter" id="main-timer">
+          <div class="timer-label-left">
+            <label for="timer-label-input" class="hidden">Timer name</label>
+            <input
+              type="text"
+              id="timer-label-input"
+              tabindex="0"
+              value="Timer 1"
+              placeholder="Enter timer name..."
+              maxlength="30"
+              aria-label="Timer name"
+            />
+          </div>
+
+          <!-- Sound icon -->
+          <div
+            class="sound-icon"
+            id="sound-icon"
+            tabindex="0"
+            title="Sound muted"
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <line x1="23" y1="9" x2="17" y2="15"></line>
+              <line x1="17" y1="9" x2="23" y2="15"></line>
+            </svg>
+          </div>
+          <div class="time-unit">
+            <div
+              class="time-value"
+              id="hours"
+              tabindex="0"
+              role="textbox"
+              aria-label="Hours"
+            >
+              0h
+            </div>
+            <div class="time-label">HOURS</div>
+          </div>
+          <div class="arrow-buttons">
+            <button
+              class="arrow-btn"
+              id="hour-up"
+              name="hourUp"
+              tabindex="0"
+              aria-label="Increase hours"
+            >
+              ↑
+            </button>
+            <button
+              class="arrow-btn"
+              id="hour-down"
+              name="hourDown"
+              tabindex="-0"
+              aria-label="Decrease hours"
+            >
+              ↓
+            </button>
+          </div>
+
+          <div class="time-unit">
+            <div
+              class="time-value"
+              id="minutes"
+              tabindex="0"
+              role="textbox"
+              aria-label="Minutes"
+            >
+              00m
+            </div>
+            <div class="time-label">MINUTES</div>
+          </div>
+          <div class="arrow-buttons">
+            <button
+              class="arrow-btn"
+              id="minute-up"
+              name="minuteUp"
+              tabindex="-0"
+              aria-label="Increase minutes"
+            >
+              ↑
+            </button>
+            <button
+              class="arrow-btn"
+              id="minute-down"
+              name="minuteDown"
+              tabindex="-0"
+              aria-label="Decrease minutes"
+            >
+              ↓
+            </button>
+          </div>
+
+          <div class="time-unit">
+            <div class="time-value" id="seconds" tabindex="0">00s</div>
+            <div class="time-label">SECONDS</div>
+          </div>
+          <div class="arrow-buttons">
+            <button
+              class="arrow-btn"
+              id="second-up"
+              name="secondUp"
+              tabindex="-0"
+              aria-label="Increse seconds"
+            >
+              ↑
+            </button>
+            <button
+              class="arrow-btn"
+              id="second-down"
+              name="secondDown"
+              tabindex="-0"
+              aria-label="Decrease seconds"
+            >
+              ↓
+            </button>
+          </div>
+          <!-- Color and Direction icons -->
+          <div class="timer-controls-left">
+            <div class="direction-indicator" id="main-direction-indicator">
+              <button
+                class="dir-btn-mini"
+                data-dir="left"
+                id="main-dir-left"
+                name="directionLeft"
+                style="background-color: #eee"
+                aria-label="Progress bar left to right"
+              >
+                ←
+              </button>
+              <button
+                class="dir-btn-mini selected"
+                data-dir="right"
+                id="main-dir-right"
+                name="directionRight"
+                style="background-color: #3498db; opacity: 0.5"
+                aria-label="Progress bar right to left"
+              >
+                →
+              </button>
+            </div>
+            <div
+              class="color-indicator"
+              id="main-color-indicator"
+              title="Timer color"
+              style="background-color: #3498db; opacity: 0.5"
+              role="button"
+              aria-label="Change timer color"
+            ></div>
+          </div>
+        </div>
+        </div>
+
+        <!-- Timer control buttons - outside time-setter so they can be shown independently -->
+        <div class="buttons-hover-wrapper">
+        <div class="main-timer-buttons" id="main-timer-buttons-container" style="position: relative; margin: 0 auto; width: fit-content;">
+          <button class="start-btn" id="start-btn" name="startTimer" aria-label="Start timer">
+            START >
+          </button>
+          <button
+            class="pause-btn"
+            id="pause-btn"
+            name="pauseTimer"
+            style="display: none"
+            aria-label="Pause timer"
+          >
+            PAUSE ||
+          </button>
+          <button
+            class="stop-reset-btn"
+            id="stop-reset-btn"
+            name="stopResetTimer"
+            style="display: none"
+            aria-label="Stop and reset timer"
+          >
+            STOP ■
+          </button>
+        </div>
+        </div>
+
+
+        <div style="text-align: center;">
+          <div class="button-hover-wrapper">
+            <button
+              class="advanced-btn"
+              id="advanced-btn"
+              name="advancedButton"
+              aria-label="Open advanced settings"
+            >
+              (ADVANCED)
+            </button>
+          </div>
+        </div>
+
+       <!-- Notes display (only shown if Timer 1 has notes) -->
+        <div
+          class="timer-notes-display draggable-element"
+          id="timer-notes-display"
+          style="display: none"
+        >
+          <div class="resize-handle top"></div>
+          <div class="resize-handle bottom"></div>
+          <div class="resize-handle left"></div>
+          <div class="resize-handle right"></div>
+          <div class="resize-handle top-left"></div>
+          <div class="resize-handle top-right"></div>
+          <div class="resize-handle bottom-left"></div>
+          <div class="resize-handle bottom-right"></div>
+        </div> 
+
+        <div class="countdown-box draggable-element" id="countdown-box">
+          <div class="current-timer-info" id="current-timer-info">Timer 1</div>
+          <div class="countdown-display" id="countdown-display">00:00:00</div>
+          <div class="resize-handle top"></div>
+          <div class="resize-handle bottom"></div>
+          <div class="resize-handle left"></div>
+          <div class="resize-handle right"></div>
+          <div class="resize-handle top-left"></div>
+          <div class="resize-handle top-right"></div>
+          <div class="resize-handle bottom-left"></div>
+          <div class="resize-handle bottom-right"></div>
+        </div>
+
+        <!-- Image display (only shown if Timer 1 has image) -->
+        <div
+          class="timer-image-display draggable-element"
+          id="timer-image-display"
+          style="display: none"
+        >
+          <img id="timer-image-main" src="" alt="Custom timer image for your language learning project, knowledgde quiz and other projects" />
+          <div class="resize-handle top"></div>
+          <div class="resize-handle bottom"></div>
+          <div class="resize-handle left"></div>
+          <div class="resize-handle right"></div>
+          <div class="resize-handle top-left"></div>
+          <div class="resize-handle top-right"></div>
+          <div class="resize-handle bottom-left"></div>
+          <div class="resize-handle bottom-right"></div>
+        </div>
+
+        <div
+          class="progress-container draggable-element"
+          id="progress-container"
+        >
+          <div class="progress-bar" id="progress-bar"></div>
+          <!-- Resize handles -->
+          <div class="resize-handle top"></div>
+          <div class="resize-handle bottom"></div>
+          <div class="resize-handle left"></div>
+          <div class="resize-handle right"></div>
+          <div class="resize-handle top-left"></div>
+          <div class="resize-handle top-right"></div>
+          <div class="resize-handle bottom-left"></div>
+          <div class="resize-handle bottom-right"></div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Advanced Settings Page -->
+    <section id="settings-page" class="page hidden">
+      <div class="container">
+        <h1 style="text-align: center; font-size: 1.3rem; margin: 10px 0 15px 0; color: #2c3e50; font-weight: 600;">Advanced Timer Settings</h1>
+        <h2 class="hidden">Advanced Timer Functions</h2>
+        <h3 class="hidden">Timer Configuration</h3>
+        <div id="timer-boxes-container">
+          <!-- Timer boxes will be added here dynamically -->
+        </div>
+
+        <button
+          class="add-timer-btn"
+          id="add-timer-btn"
+          name="addTimer"
+          aria-label="Add new timer"
+        >
+          +
+        </button>
+
+        <div class="visibility-section">
+          <h3 style="font-weight: bold; margin-bottom: 9px; text-align: center; font-size: 1rem;">Display Options While Timer is Running</h3>
+          <div class="visibility-option">
+            <input type="checkbox" id="show-main-title" checked />
+            <label for="show-main-title">Show Main Title</label>
+          </div>
+          <div class="visibility-option">
+            <input type="checkbox" id="show-time-setter" checked />
+            <label for="show-time-setter">Show time setter box</label>
+          </div>
+          <div class="visibility-option">
+            <input type="checkbox" id="show-start-btn" checked />
+            <label for="show-start-btn">Show start/stop button</label>
+          </div>
+          <div class="visibility-option">
+            <input type="checkbox" id="show-advanced-btn" checked />
+            <label for="show-advanced-btn">Show advanced button</label>
+          </div>
+          <div class="visibility-option">
+            <input type="checkbox" id="show-countdown" checked />
+            <label for="show-countdown">Show digital countdown display</label>
+          </div>
+          <div class="visibility-option">
+            <input type="checkbox" id="show-timer-info" checked />
+            <label for="show-timer-info">Show current timer label</label>
+          </div>
+          <div class="visibility-option">
+            <input type="checkbox" id="show-notes" checked />
+            <label for="show-notes">Show input text</label>
+          </div>
+          <div class="visibility-option">
+            <input type="checkbox" id="show-image" checked />
+            <label for="show-image">Show image</label>
+          </div>
+          <div class="visibility-option">
+            <input type="checkbox" id="show-progress-bar" checked />
+            <label for="show-progress-bar">Show progress bar</label>
+          </div>
+        </div>
+
+        <button
+          class="close-settings-btn"
+          id="close-settings-btn"
+          name="closeSettings"
+          aria-label="Close settings and return to main screen"
+        >
+          CLOSE SETTINGS
+        </button>
+      </div>
+    </section>
+
+    <!-- Enhanced Color Picker Modal -->
+    <div id="color-modal" class="color-modal">
+      <div class="color-modal-content">
+        <h3>Select a Color</h3>
+        <div class="color-picker-container">
+          <div class="main-color-picker" id="main-color-picker">
+            <div class="slider-handle" id="color-handle"></div>
+          </div>
+          <div class="hue-slider" id="hue-slider">
+            <div class="slider-handle" id="hue-handle"></div>
+          </div>
+        </div>
+
+        <div
+          id="color-preview"
+          style="
+            margin-top: 10px;
+            height: 30px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            background-color: rgba(52, 152, 219, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            font-size: 0.9rem;
+            font-weight: bold;
+          "
+        >
+          Transparency
+        </div>
+
+        <div class="alpha-slider" id="alpha-slider">
+          <div class="slider-handle" id="alpha-handle"></div>
+        </div>
+
+        <button
+          class="close-color-modal"
+          id="close-color-modal"
+          name="closeColorPicker"
+          aria-label="Apply selected color"
+        >
+          Apply Color
+        </button>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>About Timer Tools</h3>
+                    <p>
+                        A comprehensive collection of professional timing tools designed to help you 
+                        manage time effectively, whether for fitness, productivity, cooking, or any 
+                        time-sensitive activity.
+                    </p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Features</h3>
+                    <ul>
+                        <li>✓ Customizable colors & alerts</li>
+                        <li>✓ Add notes & images</li>
+                        <li>✓ Visual progress bars</li>
+                        <li>✓ Mobile-friendly design</li>
+                        <li>✓ No installation required</li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Use Cases</h3>
+                    <ul>
+                        <li>🏋️ Workout & Fitness</li>
+                        <li>🍳 Cooking & Baking</li>
+                        <li>📊 Presentations & Meetings</li>
+                        <li>📚 Study Sessions</li>
+                        <li>⚡ Productivity & Time Management</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 Timer Tools. All rights reserved. | Free to use for personal and commercial purposes.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/serial-main.js"></script>
+    <script src="js/shared-nav.js"></script>
+  </body>
+</html>

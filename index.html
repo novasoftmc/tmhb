@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Professional timer tools collection - countdown timers and stopwatches for productivity, workouts, cooking, presentations, and time management.">
+    <meta name="keywords" content="countdown timer, Pomodoro timer, stopwatch, interval timer, multiple timers, online timer, productivity tools">
+    <title>Timer Tools - Countdown Timers & Stopwatches</title>
+
+    <link rel="icon" type="image/png" href="favicon.png" />
+    
+     <link rel="stylesheet" href="css/shared-nav.css" />
+     <link rel="stylesheet" href="css/shared-footer.css" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            width: 100%;
+        }
+        
+        /* Page Title Section */
+        .page-title-section {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 40px 0;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        
+        .page-title-section h1 {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .page-title-section .subtitle {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+        
+        /* Dark theme for title section */
+        body.dark-theme .page-title-section {
+            background: rgba(30, 30, 30, 0.95);
+        }
+        
+        body.dark-theme .page-title-section h1 {
+            color: #e0e0e0;
+        }
+        
+        body.dark-theme .page-title-section .subtitle {
+            color: #b0b0b0;
+        }
+        
+        /* Navigation Bar */
+        .nav-bar {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+        
+        .nav-tabs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0;
+        }
+        
+        .nav-tab {
+            text-decoration: none;
+            padding: 25px 20px;
+            text-align: center;
+            background: white;
+            color: #2c3e50;
+            border: none;
+            border-right: 1px solid #ecf0f1;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-tab:last-child {
+            border-right: none;
+        }
+        
+        .nav-tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .nav-tab:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .nav-tab:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+        }
+        
+        .nav-tab-icon {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+        .nav-tab-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+            display: block;
+            margin-bottom: 5px;
+            color: #34495e;
+        }
+        
+        .nav-tab-desc {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            display: block;
+        }
+        
+        /* Color coding for different timer types */
+        .nav-tab:nth-child(1):hover { background: linear-gradient(135deg, rgba(52, 152, 219, 0.1), rgba(52, 152, 219, 0.05)); }
+        .nav-tab:nth-child(2):hover { background: linear-gradient(135deg, rgba(46, 204, 113, 0.1), rgba(46, 204, 113, 0.05)); }
+        .nav-tab:nth-child(3):hover { background: linear-gradient(135deg, rgba(155, 89, 182, 0.1), rgba(155, 89, 182, 0.05)); }
+        .nav-tab:nth-child(4):hover { background: linear-gradient(135deg, rgba(230, 126, 34, 0.1), rgba(230, 126, 34, 0.05)); }
+        
+        /* Info Section */
+        .info-section {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .welcome-title {
+            font-size: 1.8rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .info-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #34495e;
+            margin-bottom: 20px;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .feature-card {
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:nth-child(2) { border-left-color: #2ecc71; }
+        .feature-card:nth-child(3) { border-left-color: #9b59b6; }
+        .feature-card:nth-child(4) { border-left-color: #e67e22; }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-title {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .feature-desc {
+            color: #7f8c8d;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+                
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .nav-tabs {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-tab {
+                border-right: none;
+                border-bottom: 1px solid #ecf0f1;
+            }
+            
+            .nav-tab:last-child {
+                border-bottom: none;
+            }
+            
+            .info-section {
+                padding: 25px;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Shared Header Navigation -->
+    <nav class="main-header-nav">
+        <!-- Row 1: Main tabs and theme toggle -->
+        <div class="header-row-1" id="headerRow1">
+            <div class="header-left">
+                <a href="index.html">
+                    <img src="apple-touch-icon.png" alt="Home" class="home-icon">
+                </a>
+                <div class="header-main-tabs">
+                    <button class="header-main-tab active" id="countdownMainTab" data-mode="countdown">Countdown</button>
+                    <button class="header-main-tab" id="stopwatchMainTab" data-mode="stopwatch">Stopwatch</button>
+                </div>
+            </div>
+            <div class="theme-toggle-container">
+                <svg class="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+                <div class="theme-toggle-switch" id="themeToggle">
+                    <div class="theme-toggle-slider"></div>
+                </div>
+                <svg class="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+            </div>
+        </div>
+        
+        <!-- Row 2: Sub-tabs (Countdown options) -->
+        <div class="header-row-2" id="headerRow2">
+            <a href="serial-countdown.html" class="header-sub-tab active">Serial Countdown</a>
+            <a href="parallel-countdown.html" class="header-sub-tab">Multiple Countdown</a>
+            <a href="pomodoro-countdown.html" class="header-sub-tab">Pomodoro Timer</a>
+        </div>
+    </nav>
+    
+    <!-- Page Title Section -->
+    <section class="page-title-section">
+        <div class="container">
+            <h1>⏱️ Timer Tools Collection</h1>
+            <p class="subtitle">Professional timing solutions for every need</p>
+        </div>
+    </section>
+    
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Navigation Bar -->
+        <nav class="nav-bar">
+            <div class="nav-tabs">
+                <a href="serial-countdown.html" class="nav-tab">
+                    <span class="nav-tab-icon">⏳</span>
+                    <span class="nav-tab-title">Serial Countdown</span>
+                    <span class="nav-tab-desc">Sequential timers</span>
+                </a>
+                
+                <a href="parallel-countdown.html" class="nav-tab">
+                    <span class="nav-tab-icon">⏲️</span>
+                    <span class="nav-tab-title">Parallel Countdown</span>
+                    <span class="nav-tab-desc">Multiple Simultaneous</span>
+                </a>
+
+                <a href="pomodoro-countdown.html" class="nav-tab">
+                    <span class="nav-tab-icon">⌚</span>
+                    <span class="nav-tab-title">Pomodoro Timer</span>
+                    <span class="nav-tab-desc">Focused Intervals</span>
+                </a>
+                
+                <a href="parallel-stopwatch.html" class="nav-tab">
+                    <span class="nav-tab-icon">⏱️</span>
+                    <span class="nav-tab-title">Stopwatch</span>
+                    <span class="nav-tab-desc">Track one or several activities</span>
+                </a>
+                
+                
+            </div>
+        </nav>
+        
+        <!-- Info Section -->
+        <section class="info-section">
+            <h2 class="welcome-title">Welcome to Your Complete Timing Solution</h2>
+            
+            <p class="info-text">
+                Whether you're managing workout intervals, tracking cooking times, running presentations, 
+                or organizing your daily tasks, our suite of timer tools provides everything you need. 
+                Each tool is designed with precision, flexibility, and ease of use in mind.
+            </p>
+            
+            <p class="info-text">
+                Choose the timer type that best fits your needs - run timers one after another for structured 
+                routines, or track multiple activities simultaneously. All tools feature customizable colors, 
+                sound alerts, notes, and images to help you stay organized and focused.
+            </p>
+            
+            <!-- Feature Cards -->
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-title">🎯 Serial Countdown</div>
+                    <div class="feature-desc">
+                        Perfect for workout circuits, cooking recipes, or any sequential task. 
+                        Timers run one after another automatically with visual progress tracking.
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-title">⚡ Parallel Countdown</div>
+                    <div class="feature-desc">
+                        Monitor multiple countdown timers at once. Ideal for multitasking, 
+                        managing different projects, or coordinating simultaneous activities.
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-title">📝 Pomodoro Timer</div>
+                    <div class="feature-desc">
+                        Break work into 25-minute focused sessions with 5-minute breaks. 
+                        It boosts productivity and concentration. 
+                        Ideal for tasks that require sustained attention, like studying, writing, or coding.
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-title">📊 Multiple Stopwatch</div>
+                    <div class="feature-desc">
+                        Track multiple activities simultaneously. Great for comparing performance, 
+                        timing different participants, or monitoring parallel processes.
+                    </div>
+                </div>
+                
+                
+            </div>
+        </section>
+    </main>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>About Timer Tools</h3>
+                    <p>
+                        A comprehensive collection of professional timing tools designed to help you 
+                        manage time effectively, whether for fitness, productivity, cooking, or any 
+                        time-sensitive activity.
+                    </p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Features</h3>
+                    <ul>
+                        <li>✓ Customizable colors & alerts</li>
+                        <li>✓ Add notes & images</li>
+                        <li>✓ Visual progress bars</li>
+                        <li>✓ Mobile-friendly design</li>
+                        <li>✓ No installation required</li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Use Cases</h3>
+                    <ul>
+                        <li>🏋️ Workout & Fitness</li>
+                        <li>🍳 Cooking & Baking</li>
+                        <li>📊 Presentations & Meetings</li>
+                        <li>📚 Study Sessions</li>
+                        <li>⚡ Productivity & Time Management</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 Timer Tools. All rights reserved. | Free to use for personal and commercial purposes.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/shared-nav.js"></script>
+</body>
+</html>
