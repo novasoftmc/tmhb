@@ -1933,11 +1933,11 @@ const timerLogic = (function () {
         );
       }
 
-      // Auto-remove message after 9 seconds
+      // Auto-remove message after 5 seconds
       setTimeout(() => {
         const msg = document.getElementById("completion-message");
         if (msg) msg.remove();
-      }, 9000);
+      }, 5000);
 
       // Ensure only START button is visible
       uiManager.updateButtonVisibility(false, false);
