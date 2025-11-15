@@ -3000,6 +3000,48 @@ const eventHandlers = (function () {
     // Close settings button
     elements.closeSettingsBtn.addEventListener("click", uiManager.showMainPage);
 
+    // Keyboard shortcuts
+    document.addEventListener("keydown", (e) => {
+      // Only work when on main page (not settings page)
+      const isOnMainPage = !elements.settingsPage.classList.contains("hidden");
+      if (isOnMainPage) return;
+
+      // Don't trigger if user is typing in an input/textarea/contenteditable
+      const activeElement = document.activeElement;
+      const isTyping = 
+        activeElement.tagName === "INPUT" ||
+        activeElement.tagName === "TEXTAREA" ||
+        activeElement.isContentEditable;
+      
+      if (isTyping) return;
+
+      // Space: Start/Resume timer
+      if (e.code === "Space") {
+        e.preventDefault(); // Prevent page scroll
+        const isRunning = state.getIsRunning();
+        const isPaused = state.getIsPaused();
+        
+        if (!isRunning || isPaused) {
+          // Start or resume the timer
+          timerLogic.startTimer();
+        } else {
+          // Pause the timer
+          timerLogic.startTimer(); // Same function handles pause
+        }
+      }
+      
+      // Escape or Backspace: Reset timer (only when paused)
+      if (e.code === "Escape" || e.code === "Backspace") {
+        const isPaused = state.getIsPaused();
+        
+        if (isPaused) {
+          e.preventDefault(); // Prevent browser back navigation on Backspace
+          timerLogic.stopResetTimer();
+        }
+      }
+    });
+
+    
     // Visibility settings
     document
       .getElementById("show-main-title")
