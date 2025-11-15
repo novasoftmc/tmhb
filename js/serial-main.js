@@ -360,6 +360,9 @@ const uiManager = (function () {
     elements.settingsPage.classList.add("hidden");
     elements.mainPage.classList.remove("hidden");
 
+    // Scroll to top of page
+    window.scrollTo(0, 0);
+
     // Reset notes display to allow auto-resize
     const notesDisplay = document.getElementById("timer-notes-display");
     if (notesDisplay) {
