@@ -460,67 +460,36 @@ const uiManager = (function () {
                     ${removeBtn}
 
                     <div class="timer-label-left">
-                        <label for="timer${index}_name" class="hidden">Timer ${
-      index + 1
-    } name</label>
-                        <input type="text" class="timer-name-input" data-timer-index="${index}" value="${
-      timerData.name || "Timer " + (index + 1)
-    }" placeholder="Enter timer name..." maxlength="30" name="timer${index}_name" id="timer${index}_name" aria-label="Timer ${
-      index + 1
-    } name">
+                        <label for="timer${index}_name" class="hidden">Timer ${index + 1} name</label>
+                        <input type="text" class="timer-name-input" data-timer-index="${index}" value="${timerData.name || "Timer " + (index + 1)}" placeholder="Enter timer name..." maxlength="30" name="timer${index}_name" id="timer${index}_name" aria-label="Timer ${index + 1} name">
                     </div> 
                     
+                    <!-- Preset time display -->
+                    <div class="preset-time-display" data-timer-index="${index}">${timerData.hours.toString().padStart(2, "0")}:${timerData.minutes.toString().padStart(2, "0")}:${timerData.seconds.toString().padStart(2, "0")}</div>
+
                     <!-- Direction and Color controls on LEFT -->
                     <div class="timer-controls-left">
                         <span class="timer-controls-label">Progress Bar</span>
                         <div class="timer-controls-icons">
                             <div class="direction-indicator" data-timer-index="${index}">
-                            <button class="dir-btn-mini ${
-                              timerData.direction === "left" ? "selected" : ""
-                            }" data-dir="left" data-timer-index="${index}" style="${
-      timerData.direction === "left"
-        ? `background-color: ${timerData.color}; opacity: ${
-            timerData.alpha || 0.5
-          };`
-        : ""
-    }" aria-label="Timer ${index + 1} progress left to right">←</button>
-                            <button class="dir-btn-mini ${
-                              timerData.direction === "right" ? "selected" : ""
-                            }" data-dir="right" data-timer-index="${index}" style="${
-      timerData.direction === "right"
-        ? `background-color: ${timerData.color}; opacity: ${
-            timerData.alpha || 0.5
-          };`
-        : ""
-    }" aria-label="Timer ${index + 1} progress right to left">→</button>
+                                <button class="dir-btn-mini ${timerData.direction === "left" ? "selected" : ""}" data-dir="left" data-timer-index="${index}" style="${timerData.direction === "left" ? `background-color: ${timerData.color}; opacity: ${timerData.alpha || 0.5};` : ""}" aria-label="Timer ${index + 1} progress left to right">←</button>
+                                <button class="dir-btn-mini ${timerData.direction === "right" ? "selected" : ""}" data-dir="right" data-timer-index="${index}" style="${timerData.direction === "right" ? `background-color: ${timerData.color}; opacity: ${timerData.alpha || 0.5};` : ""}" aria-label="Timer ${index + 1} progress right to left">→</button>
+                            </div>
+                            <div class="color-indicator" data-timer-index="${index}" title="Timer color" style="background-color: ${timerData.color}; opacity: ${timerData.alpha || 0.5};" role="button" aria-label="Change timer ${index + 1} color"></div>
                         </div>
-                        <div class="color-indicator" data-timer-index="${index}" title="Timer color" style="background-color: ${
-      timerData.color
-    }; opacity: ${
-      timerData.alpha || 0.5
-    };" role="button" aria-label="Change timer ${index + 1} color"></div>
                     </div>
-                  </div>
                     
                     <!-- Time controls -->
                     <div class="time-unit">
-                        <div class="time-value" data-timer-index="${index}" data-unit="hours" role="textbox" aria-label="Timer ${
-      index + 1
-    } hours">${timerData.hours}h</div>
+                        <div class="time-value" data-timer-index="${index}" data-unit="hours" role="textbox" aria-label="Timer ${index + 1} hours">${timerData.hours}h</div>
                     </div>
                     <div class="arrow-buttons">
-                        <button class="arrow-btn" data-timer-index="${index}" data-unit="hours" data-direction="up" aria-label="Increase timer ${
-      index + 1
-    } hours">↑</button>
-                        <button class="arrow-btn" data-timer-index="${index}" data-unit="hours" data-direction="down" aria-label="Decrease timer ${
-      index + 1
-    } hours">↓</button>
+                        <button class="arrow-btn" data-timer-index="${index}" data-unit="hours" data-direction="up" aria-label="Increase timer ${index + 1} hours">↑</button>
+                        <button class="arrow-btn" data-timer-index="${index}" data-unit="hours" data-direction="down" aria-label="Decrease timer ${index + 1} hours">↓</button>
                     </div>
                     
                     <div class="time-unit">
-                        <div class="time-value" data-timer-index="${index}" data-unit="minutes" role="textbox" aria-label="Timer ${
-      index + 1
-    } minutes">${timerData.minutes.toString().padStart(2, "0")}m</div>
+                        <div class="time-value" data-timer-index="${index}" data-unit="minutes" role="textbox" aria-label="Timer ${index + 1} minutes">${timerData.minutes.toString().padStart(2, "0")}m</div>
                     </div>
                     <div class="arrow-buttons">
                         <button class="arrow-btn" data-timer-index="${index}" data-unit="minutes" data-direction="up">↑</button>
@@ -528,9 +497,7 @@ const uiManager = (function () {
                     </div>
                     
                     <div class="time-unit">
-                        <div class="time-value" data-timer-index="${index}" data-unit="seconds" role="textbox" aria-label="Timer ${
-      index + 1
-    } seconds">${timerData.seconds.toString().padStart(2, "0")}s</div>
+                        <div class="time-value" data-timer-index="${index}" data-unit="seconds" role="textbox" aria-label="Timer ${index + 1} seconds">${timerData.seconds.toString().padStart(2, "0")}s</div>
                     </div>
                     <div class="arrow-buttons seconds-arrows">
                         <button class="arrow-btn" data-timer-index="${index}" data-unit="seconds" data-direction="up">↑</button>
@@ -543,59 +510,23 @@ const uiManager = (function () {
                             <div style="font-weight: bold; margin-bottom: 2px;">Beeps before end:</div>
                             <div style="display: flex; flex-direction: row; gap: 2px; align-items: center;">
                                 <label style="display: flex; align-items: center; gap: 3px; cursor: pointer;">
-                                    <input type="checkbox" class="beep-checkbox" data-type="timer" data-index="${
-                                      index + 1
-                                    }" data-seconds="5" ${
-      timerData.beepAt === 5 ? "checked" : ""
-    } style="width: 12px; height: 12px;">
+                                    <input type="checkbox" class="beep-checkbox" data-type="timer" data-index="${index + 1}" data-seconds="5" ${timerData.beepAt === 5 ? "checked" : ""} style="width: 12px; height: 12px;">
                                     <span>5s</span>
                                 </label>
                                 <label style="display: flex; align-items: center; gap: 3px; cursor: pointer;">
-                                    <input type="checkbox" class="beep-checkbox" data-type="timer" data-index="${
-                                      index + 1
-                                    }" data-seconds="10" ${
-      timerData.beepAt === 10 ? "checked" : ""
-    } style="width: 12px; height: 12px;">
+                                    <input type="checkbox" class="beep-checkbox" data-type="timer" data-index="${index + 1}" data-seconds="10" ${timerData.beepAt === 10 ? "checked" : ""} style="width: 12px; height: 12px;">
                                     <span>10s</span>
                                 </label>
-                            </div>                            
-                          </div>
-
-                        <!-- Speaker button placed below checkboxes -->
-                        <div class="sound-icon advanced-sound-icon ${
-                          timerData.beepAt > 0 ? "active" : ""
-                        }" 
-                            data-timer-index="${index}" 
-                            title="Sound ${
-                              timerData.beepAt > 0 ? "enabled" : "muted"
-                            }" 
-                            style="cursor: pointer; flex-shrink: 0; margin-top: 4px;">
-                            ${
-                              timerData.beepAt > 0
-                                ? `
-                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-                                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-                                </svg>
-                            `
-                                : `
-                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-                                    <line x1="23" y1="9" x2="17" y2="15"></line>
-                                    <line x1="17" y1="9" x2="23" y2="15"></line>
-                                </svg>
-                            `
-                            }
+                            </div>
+                        </div>
+                        <div class="sound-icon advanced-sound-icon ${timerData.beepAt > 0 ? "active" : ""}" data-timer-index="${index}" title="Sound ${timerData.beepAt > 0 ? "enabled" : "muted"}" style="cursor: pointer; flex-shrink: 0; margin-top: 4px;">
+                            ${timerData.beepAt > 0 ? `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>` : `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>`}
                         </div>
                     </div>
                     
                     <!-- Bottom control container -->
                     <div class="time-setter-bottom-controls">
-                        <!-- Buttons will be added here later -->
                     </div>
-
-                    </div>
-                
                 `;
 
     wrapper.appendChild(box);
@@ -2108,6 +2039,16 @@ const settingsManager = (function () {
       }
 
       state.setTimers(timers);
+
+      // Update main page preset display if Timer 1
+      if (index === 0) {
+        const mainPresetDisplay = document.getElementById(
+          "preset-time-display"
+        );
+        if (mainPresetDisplay) {
+          mainPresetDisplay.textContent = updatePresetTimeDisplay(timer);
+        }
+      }
     } else {
       const pauses = state.getPauses();
       const pause = pauses[index - 1];
@@ -2142,6 +2083,16 @@ const settingsManager = (function () {
       }
 
       state.setTimers(timers);
+
+      // Update main page preset display if Timer 1
+      if (index === 0) {
+        const mainPresetDisplay = document.getElementById(
+          "preset-time-display"
+        );
+        if (mainPresetDisplay) {
+          mainPresetDisplay.textContent = updatePresetTimeDisplay(timer);
+        }
+      }
     } else {
       const pauses = state.getPauses();
       const pause = pauses[index - 1];
@@ -2728,12 +2679,12 @@ const eventHandlers = (function () {
   // Edit time unit by converting to input field
   function editTimeUnit(unit) {
     const element = elements[unit];
-    
+
     // Prevent multiple inputs from being created
-    if (element.querySelector('input')) {
+    if (element.querySelector("input")) {
       return;
     }
-    
+
     const currentValue = parseInt(element.textContent) || 0;
 
     const input = document.createElement("input");
@@ -2746,7 +2697,7 @@ const eventHandlers = (function () {
 
     // Prevent blur from firing when clicking arrows
     let isUsingArrows = false;
-    
+
     input.addEventListener("mousedown", (e) => {
       if (e.target === input) {
         isUsingArrows = false;
@@ -2831,6 +2782,23 @@ const eventHandlers = (function () {
     // Update countdown display
     const totalSeconds = timerLogic.calculateTotalSeconds(timers[0]);
     uiManager.updateCountdownDisplay(totalSeconds);
+
+    // Update preset time display with user set time
+    const staticDisplay = document.getElementById("preset-time-display");
+    if (staticDisplay) {
+      const h = timers[0].hours.toString().padStart(2, "0");
+      const m = timers[0].minutes.toString().padStart(2, "0");
+      const s = timers[0].seconds.toString().padStart(2, "0");
+      staticDisplay.textContent = `${h}:${m}:${s}`;
+    }
+  }
+
+  // Helper function to update preset time display
+  function updatePresetTimeDisplay(timer) {
+    const h = timer.hours.toString().padStart(2, "0");
+    const m = timer.minutes.toString().padStart(2, "0");
+    const s = timer.seconds.toString().padStart(2, "0");
+    return `${h}:${m}:${s}`;
   }
 
   // Handle color selection
@@ -3015,11 +2983,11 @@ const eventHandlers = (function () {
 
       // Don't trigger if user is typing in an input/textarea/contenteditable
       const activeElement = document.activeElement;
-      const isTyping = 
+      const isTyping =
         activeElement.tagName === "INPUT" ||
         activeElement.tagName === "TEXTAREA" ||
         activeElement.isContentEditable;
-      
+
       if (isTyping) return;
 
       // Space: Start/Resume timer
@@ -3027,7 +2995,7 @@ const eventHandlers = (function () {
         e.preventDefault(); // Prevent page scroll
         const isRunning = state.getIsRunning();
         const isPaused = state.getIsPaused();
-        
+
         if (!isRunning || isPaused) {
           // Start or resume the timer
           timerLogic.startTimer();
@@ -3036,11 +3004,11 @@ const eventHandlers = (function () {
           timerLogic.startTimer(); // Same function handles pause
         }
       }
-      
+
       // Escape or Backspace: Reset timer (only when paused)
       if (e.code === "Escape" || e.code === "Backspace") {
         const isPaused = state.getIsPaused();
-        
+
         if (isPaused) {
           e.preventDefault(); // Prevent browser back navigation on Backspace
           timerLogic.stopResetTimer();
@@ -3048,7 +3016,6 @@ const eventHandlers = (function () {
       }
     });
 
-    
     // Visibility settings
     document
       .getElementById("show-main-title")
