@@ -52,44 +52,15 @@ body {
 
 .time-setter {
   display: flex;
-  justify-content: space-between;
-  align-items: stretch;
-  gap: 0;
-  padding: 40px 0 42px 0;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 40px 20px 42px 20px;
   border: 1px solid #ddd;
   border-radius: 8px 8px 0 0;
   /* Only round top corners */
   background-color: white;
   position: relative;
-}
-
-.time-setter-left-section,
-.time-setter-right-section {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 2px 12px;
-  min-width: 60px;
-}
-
-.time-setter-left-section {
-  border-right: 2px solid #ddd;
-  margin-right: 0;
-}
-
-.time-setter-right-section {
-  border-left: 2px solid #ddd;
-  margin-left: 0;
-}
-
-.time-setter-center-section {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-  padding: 0 10px;
 }
 
 .time-setter-bottom-controls {
@@ -99,7 +70,6 @@ body {
   right: 0;
   width: 100%;
   min-height: 35px;
-  margin-top: 3px;
   border-top: 1px solid #ddd;
   background-color: white;
   display: flex;
@@ -1355,11 +1325,6 @@ body.dark-theme .timer-notes-display {
     background-color: #4e4e4e;
     border-color: #404040;
     color: #e0e0e0;
-}
-
-body.dark-theme .time-setter-left-section,
-body.dark-theme .time-setter-right-section {
-  border-color: #404040;
 }
 
 body.dark-theme .time-setter-bottom-controls {
