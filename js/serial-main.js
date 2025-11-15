@@ -471,8 +471,10 @@ const uiManager = (function () {
                     </div> 
                     
                     <!-- Direction and Color controls on LEFT -->
-                    <div class="timer-controls-left" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 5px; align-items: center;">
-                        <div class="direction-indicator" data-timer-index="${index}">
+                    <div class="timer-controls-left">
+                        <span class="timer-controls-label">Progress Bar</span>
+                        <div class="timer-controls-icons">
+                            <div class="direction-indicator" data-timer-index="${index}">
                             <button class="dir-btn-mini ${
                               timerData.direction === "left" ? "selected" : ""
                             }" data-dir="left" data-timer-index="${index}" style="${
@@ -498,6 +500,7 @@ const uiManager = (function () {
       timerData.alpha || 0.5
     };" role="button" aria-label="Change timer ${index + 1} color"></div>
                     </div>
+                  </div>
                     
                     <!-- Time controls -->
                     <div class="time-unit">
@@ -537,8 +540,8 @@ const uiManager = (function () {
                     <!-- Sound icon and beep settings on RIGHT -->
                     <div style="position: absolute; right: 10px; top: 55%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: center; gap: 6px;">
                         <div style="font-size: 0.65rem; text-align: center; line-height: 1.1;">
-                            <div style="font-weight: bold; margin-bottom: 2px;">Beeps:</div>
-                            <div style="display: flex; flex-direction: column; gap: 2px; align-items: center;">
+                            <div style="font-weight: bold; margin-bottom: 2px;">Beeps before end:</div>
+                            <div style="display: flex; flex-direction: row; gap: 2px; align-items: center;">
                                 <label style="display: flex; align-items: center; gap: 3px; cursor: pointer;">
                                     <input type="checkbox" class="beep-checkbox" data-type="timer" data-index="${
                                       index + 1
@@ -555,9 +558,8 @@ const uiManager = (function () {
     } style="width: 12px; height: 12px;">
                                     <span>10s</span>
                                 </label>
-                            </div>
-                            <div style="font-size: 0.6rem; margin-top: 2px;">before end</div>
-                        </div>
+                            </div>                            
+                          </div>
 
                         <!-- Speaker button placed below checkboxes -->
                         <div class="sound-icon advanced-sound-icon ${
@@ -587,6 +589,11 @@ const uiManager = (function () {
                         </div>
                     </div>
                     
+                    <!-- Bottom control container -->
+                    <div class="time-setter-bottom-controls">
+                        <!-- Buttons will be added here later -->
+                    </div>
+
                     </div>
                 
                 `;

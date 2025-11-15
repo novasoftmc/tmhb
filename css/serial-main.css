@@ -55,12 +55,28 @@ body {
   justify-content: center;
   align-items: center;
   gap: 8px;
-  padding: 40px 20px 27px 20px;
+  padding: 40px 20px 42px 20px;
   border: 1px solid #ddd;
   border-radius: 8px 8px 0 0;
   /* Only round top corners */
   background-color: white;
   position: relative;
+}
+
+.time-setter-bottom-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  min-height: 35px;
+  border-top: 1px solid #ddd;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 5px;
 }
 
 .timer-box-wrapper {
@@ -155,8 +171,8 @@ body {
 
 .sound-icon svg {
   display: block;
-  width: 32px;
-  height: 32px;
+  width: 27px;
+  height: 27px;
 }
 
 .advanced-sound-icon {
@@ -173,14 +189,28 @@ body {
   transform: translateY(-50%);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 2px;
+  align-items: center;
+}
+
+.timer-controls-label {
+  font-size: 0.63rem;
+  padding: 1px;
+  color: #555;
+  white-space: nowrap;
+}
+
+.timer-controls-icons {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
   align-items: center;
 }
 
 .color-indicator {
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
+  width: 32px;
+  height: 27px;
+  border-radius: 7px;
   border: 2px solid #ddd;
   cursor: pointer;
   transition: all 0.2s;
@@ -188,8 +218,8 @@ body {
   align-items: center;
   justify-content: center;
   color: white;
-  font-weight: bold;
-  font-size: 0.7rem;
+  /* font-weight: bold; */
+  font-size: 0.6rem;
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
 }
 
@@ -211,8 +241,8 @@ body {
 }
 
 .direction-indicator .dir-btn-mini {
-  width: 20px;
-  height: 40px;
+  width: 16px;
+  height: 27px;
   border: 2px solid #ddd;
   display: flex;
   align-items: center;
@@ -1297,6 +1327,13 @@ body.dark-theme .timer-notes-display {
     color: #e0e0e0;
 }
 
+body.dark-theme .time-setter-bottom-controls {
+  background-color: #4e4e4e;
+  border-top: 2px solid;
+  border-top-color: #404040;
+  
+}
+
 body.dark-theme .current-timer-info {
     color: #ffffff;
 }
@@ -1354,6 +1391,10 @@ body.dark-theme .sound-reminders-title {
 }
 
 body.dark-theme .sound-reminders-row span {
+    color: #d0d0d0;
+}
+
+body.dark-theme .timer-controls-label {
     color: #d0d0d0;
 }
 
