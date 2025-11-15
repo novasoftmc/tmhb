@@ -470,75 +470,78 @@ const uiManager = (function () {
     } name">
                     </div> 
                     
-                    <!-- Direction and Color controls on LEFT -->
-                    <div class="timer-controls-left">
+                    <!-- LEFT SECTION -->
+                    <div class="time-setter-left-section">
                         <span class="timer-controls-label">Progress Bar</span>
                         <div class="timer-controls-icons">
                             <div class="direction-indicator" data-timer-index="${index}">
-                            <button class="dir-btn-mini ${
-                              timerData.direction === "left" ? "selected" : ""
-                            }" data-dir="left" data-timer-index="${index}" style="${
+                                <button class="dir-btn-mini ${
+                                  timerData.direction === "left" ? "selected" : ""
+                                }" data-dir="left" data-timer-index="${index}" style="${
       timerData.direction === "left"
         ? `background-color: ${timerData.color}; opacity: ${
             timerData.alpha || 0.5
           };`
         : ""
     }" aria-label="Timer ${index + 1} progress left to right">←</button>
-                            <button class="dir-btn-mini ${
-                              timerData.direction === "right" ? "selected" : ""
-                            }" data-dir="right" data-timer-index="${index}" style="${
+                                <button class="dir-btn-mini ${
+                                  timerData.direction === "right" ? "selected" : ""
+                                }" data-dir="right" data-timer-index="${index}" style="${
       timerData.direction === "right"
         ? `background-color: ${timerData.color}; opacity: ${
             timerData.alpha || 0.5
           };`
         : ""
     }" aria-label="Timer ${index + 1} progress right to left">→</button>
-                        </div>
-                        <div class="color-indicator" data-timer-index="${index}" title="Timer color" style="background-color: ${
+                            </div>
+                            <div class="color-indicator" data-timer-index="${index}" title="Timer color" style="background-color: ${
       timerData.color
     }; opacity: ${
       timerData.alpha || 0.5
     };" role="button" aria-label="Change timer ${index + 1} color"></div>
+                        </div>
                     </div>
-                  </div>
                     
-                    <!-- Time controls -->
-                    <div class="time-unit">
-                        <div class="time-value" data-timer-index="${index}" data-unit="hours" role="textbox" aria-label="Timer ${
+                    <!-- CENTER SECTION -->
+                    <div class="time-setter-center-section">
+                        <!-- Time controls -->
+                        <div class="time-unit">
+                            <div class="time-value" data-timer-index="${index}" data-unit="hours" role="textbox" aria-label="Timer ${
       index + 1
     } hours">${timerData.hours}h</div>
-                    </div>
-                    <div class="arrow-buttons">
-                        <button class="arrow-btn" data-timer-index="${index}" data-unit="hours" data-direction="up" aria-label="Increase timer ${
+                        </div>
+                        <div class="arrow-buttons">
+                            <button class="arrow-btn" data-timer-index="${index}" data-unit="hours" data-direction="up" aria-label="Increase timer ${
       index + 1
     } hours">↑</button>
-                        <button class="arrow-btn" data-timer-index="${index}" data-unit="hours" data-direction="down" aria-label="Decrease timer ${
+                            <button class="arrow-btn" data-timer-index="${index}" data-unit="hours" data-direction="down" aria-label="Decrease timer ${
       index + 1
     } hours">↓</button>
-                    </div>
-                    
-                    <div class="time-unit">
-                        <div class="time-value" data-timer-index="${index}" data-unit="minutes" role="textbox" aria-label="Timer ${
+                        </div>
+                        
+                        <div class="time-unit">
+                            <div class="time-value" data-timer-index="${index}" data-unit="minutes" role="textbox" aria-label="Timer ${
       index + 1
     } minutes">${timerData.minutes.toString().padStart(2, "0")}m</div>
-                    </div>
-                    <div class="arrow-buttons">
-                        <button class="arrow-btn" data-timer-index="${index}" data-unit="minutes" data-direction="up">↑</button>
-                        <button class="arrow-btn" data-timer-index="${index}" data-unit="minutes" data-direction="down">↓</button>
-                    </div>
-                    
-                    <div class="time-unit">
-                        <div class="time-value" data-timer-index="${index}" data-unit="seconds" role="textbox" aria-label="Timer ${
+                        </div>
+                        <div class="arrow-buttons">
+                            <button class="arrow-btn" data-timer-index="${index}" data-unit="minutes" data-direction="up">↑</button>
+                            <button class="arrow-btn" data-timer-index="${index}" data-unit="minutes" data-direction="down">↓</button>
+                        </div>
+                        
+                        <div class="time-unit">
+                            <div class="time-value" data-timer-index="${index}" data-unit="seconds" role="textbox" aria-label="Timer ${
       index + 1
     } seconds">${timerData.seconds.toString().padStart(2, "0")}s</div>
-                    </div>
-                    <div class="arrow-buttons seconds-arrows">
-                        <button class="arrow-btn" data-timer-index="${index}" data-unit="seconds" data-direction="up">↑</button>
-                        <button class="arrow-btn" data-timer-index="${index}" data-unit="seconds" data-direction="down">↓</button>
+                        </div>
+                        <div class="arrow-buttons seconds-arrows">
+                            <button class="arrow-btn" data-timer-index="${index}" data-unit="seconds" data-direction="up">↑</button>
+                            <button class="arrow-btn" data-timer-index="${index}" data-unit="seconds" data-direction="down">↓</button>
+                        </div>
                     </div>
                     
-                    <!-- Sound icon and beep settings on RIGHT -->
-                    <div style="position: absolute; right: 10px; top: 55%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: center; gap: 6px;">
+                    <!-- RIGHT SECTION -->
+                    <div class="time-setter-right-section">
                         <div style="font-size: 0.65rem; text-align: center; line-height: 1.1;">
                             <div style="font-weight: bold; margin-bottom: 2px;">Beeps before end:</div>
                             <div style="display: flex; flex-direction: row; gap: 2px; align-items: center;">
@@ -559,7 +562,7 @@ const uiManager = (function () {
                                     <span>10s</span>
                                 </label>
                             </div>                            
-                          </div>
+                        </div>
 
                         <!-- Speaker button placed below checkboxes -->
                         <div class="sound-icon advanced-sound-icon ${
@@ -569,7 +572,7 @@ const uiManager = (function () {
                             title="Sound ${
                               timerData.beepAt > 0 ? "enabled" : "muted"
                             }" 
-                            style="cursor: pointer; flex-shrink: 0; margin-top: 4px;">
+                            style="cursor: pointer; flex-shrink: 0; margin-top: 9px;">
                             ${
                               timerData.beepAt > 0
                                 ? `
