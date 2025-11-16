@@ -1380,6 +1380,10 @@ body.dark-theme .timer-label-left input {
     color: #e0e0e0;
 }
 
+body.dark-theme .arrow-btn {
+    color: #e0e0e0;
+}
+
 body.dark-theme .preset-time-display {
     background-color: #2a2a2a;
     border-color: #404040;
