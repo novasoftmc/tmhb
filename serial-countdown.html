@@ -220,36 +220,39 @@
           </div>
           <!-- Color and Direction icons -->
           <div class="timer-controls-left">
-            <div class="direction-indicator" id="main-direction-indicator">
-              <button
-                class="dir-btn-mini"
-                data-dir="left"
-                id="main-dir-left"
-                name="directionLeft"
-                style="background-color: #eee"
-                aria-label="Progress bar left to right"
-              >
-                ←
-              </button>
-              <button
-                class="dir-btn-mini selected"
-                data-dir="right"
-                id="main-dir-right"
-                name="directionRight"
+            <span class="timer-controls-label">Progress Bar</span>
+            <div class="timer-controls-icons">
+              <div class="direction-indicator" id="main-direction-indicator">
+                <button
+                  class="dir-btn-mini"
+                  data-dir="left"
+                  id="main-dir-left"
+                  name="directionLeft"
+                  style="background-color: #eee"
+                  aria-label="Progress bar left to right"
+                >
+                  ←
+                </button>
+                <button
+                  class="dir-btn-mini selected"
+                  data-dir="right"
+                  id="main-dir-right"
+                  name="directionRight"
+                  style="background-color: #3498db; opacity: 0.5"
+                  aria-label="Progress bar right to left"
+                >
+                  →
+                </button>
+              </div>
+              <div
+                class="color-indicator"
+                id="main-color-indicator"
+                title="Timer color"
                 style="background-color: #3498db; opacity: 0.5"
-                aria-label="Progress bar right to left"
-              >
-                →
-              </button>
+                role="button"
+                aria-label="Change progress bar color"
+              ></div>
             </div>
-            <div
-              class="color-indicator"
-              id="main-color-indicator"
-              title="Timer color"
-              style="background-color: #3498db; opacity: 0.5"
-              role="button"
-              aria-label="Change progress bar color"
-            ></div>
           </div>
           <!-- Bottom control container -->
         <div class="time-setter-bottom-controls" id="main-time-setter-bottom-controls"></div>
