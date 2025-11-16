@@ -141,6 +141,13 @@ body {
   z-index: 10;
 }
 
+/* === MOBILE RESPONSIVE === */
+@media (max-width: 768px) {
+  .preset-time-display {
+    right: 8px;
+  }
+}
+
 .timer-remove-btn {
   position: absolute;
   right: 6px;
