@@ -2102,6 +2102,15 @@ const settingsManager = (function () {
           mainPresetDisplay.textContent = updatePresetTimeDisplay(timer);
         }
       }
+
+      // Update advanced page preset display
+      const advPresetDisplay = document.querySelector(
+        `.preset-time-display[data-timer-index="${index - 1}"]`
+      );
+      if (advPresetDisplay) {
+        advPresetDisplay.textContent = updatePresetTimeDisplay(timer);
+      }
+
     } else {
       const pauses = state.getPauses();
       const pause = pauses[index - 1];
@@ -2757,7 +2766,13 @@ const eventHandlers = (function () {
     });
 
     input.addEventListener("keyup", (e) => {
-      if (e.key === "Enter") input.blur();
+      if (e.key === "Enter") {
+        e.preventDefault();
+        e.stopPropagation();
+        input.blur();
+        // Prevent focus from jumping to next element on mobile
+        document.activeElement.blur();
+      }
     });
 
     element.textContent = "";
