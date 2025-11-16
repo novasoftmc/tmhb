@@ -2099,18 +2099,14 @@ const settingsManager = (function () {
           "preset-time-display"
         );
         if (mainPresetDisplay) {
-          mainPresetDisplay.textContent = updatePresetTimeDisplay(timer);
+          const h = timer.hours.toString().padStart(2, "0");
+          const m = timer.minutes.toString().padStart(2, "0");
+          const s = timer.seconds.toString().padStart(2, "0");
+          mainPresetDisplay.textContent = `${h}:${m}:${s}`;
         }
       }
 
-      // Update advanced page preset display
-      const advPresetDisplay = document.querySelector(
-        `.preset-time-display[data-timer-index="${index - 1}"]`
-      );
-      if (advPresetDisplay) {
-        advPresetDisplay.textContent = updatePresetTimeDisplay(timer);
-      }
-
+      
     } else {
       const pauses = state.getPauses();
       const pause = pauses[index - 1];
@@ -2770,8 +2766,6 @@ const eventHandlers = (function () {
         e.preventDefault();
         e.stopPropagation();
         input.blur();
-        // Prevent focus from jumping to next element on mobile
-        document.activeElement.blur();
       }
     });
 
