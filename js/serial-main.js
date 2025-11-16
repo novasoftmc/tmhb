@@ -378,6 +378,15 @@ const uiManager = (function () {
     const totalSeconds = timerLogic.calculateTotalSeconds(timer1);
     updateCountdownDisplay(totalSeconds);
 
+    // Update preset time display
+    const presetDisplay = document.getElementById("preset-time-display");
+    if (presetDisplay) {
+      const h = timer1.hours.toString().padStart(2, "0");
+      const m = timer1.minutes.toString().padStart(2, "0");
+      const s = timer1.seconds.toString().padStart(2, "0");
+      presetDisplay.textContent = `${h}:${m}:${s}`;
+    }
+
     // Update notes and image display visibility directly
     const settings = state.getVisibilitySettings();
 
@@ -2041,7 +2050,7 @@ const settingsManager = (function () {
       state.setTimers(timers);
 
       // Update main page preset display if Timer 1
-      if (index === 0) {
+      if (index === 1) {
         const mainPresetDisplay = document.getElementById(
           "preset-time-display"
         );
@@ -2085,7 +2094,7 @@ const settingsManager = (function () {
       state.setTimers(timers);
 
       // Update main page preset display if Timer 1
-      if (index === 0) {
+      if (index === 1) {
         const mainPresetDisplay = document.getElementById(
           "preset-time-display"
         );

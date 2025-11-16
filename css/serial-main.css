@@ -54,7 +54,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
   padding: 40px 20px 42px 20px;
   border: 1px solid #ddd;
   border-radius: 8px 8px 0 0;
@@ -70,7 +70,7 @@ body {
   right: 0;
   width: 100%;
   min-height: 35px;
-  border-top: 1px solid #ddd;
+  border-top: 2px solid #ddd;
   background-color: white;
   display: flex;
   align-items: center;
@@ -310,10 +310,10 @@ body {
 
 .time-value {
   font-size: 1.35rem;
-  padding: 7px 11px;
+  padding: 5px 8px;
   border: 1px solid #ddd;
   border-radius: 5px;
-  min-width: 50px;
+  min-width: 42px;
   text-align: center;
   background-color: white;
   cursor: pointer;
@@ -369,7 +369,7 @@ body {
   border: none;
   font-size: 1rem;
   cursor: pointer;
-  padding: 2px 5px;
+  padding: 1px 3px;
 }
 
 .advanced-btn,

@@ -91,7 +91,7 @@
       <h1 id="main-title" style="text-align: center; font-size: 1.5rem; margin: 10px 0 15px 0; color: #2c3e50; font-weight: 600;">Free Online Serial Bar Timer</h1>
       <h2 class="hidden">Main Timer Functions</h2> 
       <div class="container">
-        <div class="time-setter" id="main-timer">
+        <div class="time-setter" id="main-timer" style="position: relative;">
           <div class="timer-label-left">
             <label for="timer-label-input" class="hidden">Timer name</label>
             <input
@@ -248,10 +248,14 @@
               title="Timer color"
               style="background-color: #3498db; opacity: 0.5"
               role="button"
-              aria-label="Change timer color"
+              aria-label="Change progress bar color"
             ></div>
           </div>
+          <!-- Bottom control container -->
+        <div class="time-setter-bottom-controls" id="main-time-setter-bottom-controls"></div>
         </div>
+        
+        
         </div>
 
         <!-- Timer control buttons - outside time-setter so they can be shown independently -->
