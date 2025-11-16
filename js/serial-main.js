@@ -516,7 +516,7 @@ const uiManager = (function () {
                     <!-- Sound icon and beep settings on RIGHT -->
                     <div style="position: absolute; right: 10px; top: 55%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: center; gap: 6px;">
                         <div style="font-size: 0.65rem; text-align: center; line-height: 1.1;">
-                            <div style="font-weight: bold; margin-bottom: 2px;">Beeps before end:</div>
+                            <div style="font-weight: bold; margin-bottom: 2px;">Final beeps:</div>
                             <div style="display: flex; flex-direction: row; gap: 2px; align-items: center;">
                                 <label style="display: flex; align-items: center; gap: 3px; cursor: pointer;">
                                     <input type="checkbox" class="beep-checkbox" data-type="timer" data-index="${index + 1}" data-seconds="5" ${timerData.beepAt === 5 ? "checked" : ""} style="width: 12px; height: 12px;">
