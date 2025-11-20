@@ -15,6 +15,19 @@
     transition: background 0.3s ease;
 }
 
+@media (max-width: 768px) {
+  .header-row-1 {
+    gap: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-row-1 {
+    gap: 10px;  /* even smaller gap on small phones */
+    padding: 5px 10px;  /* reduce side padding too */
+  }
+}
+
 .header-row-1.stopwatch-mode {
     background: linear-gradient(135deg, #e67e22 0%, #e74c3c 100%);
 }
