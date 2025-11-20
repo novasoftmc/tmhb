@@ -15,10 +15,11 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Update sub-tabs for countdown
         headerRow2.innerHTML = `
-            <a href="serial-countdown.html" class="header-sub-tab active">Serial Countdown</a>
-            <a href="parallel-countdown.html" class="header-sub-tab">Multiple Countdown</a>
-            <a href="pomodoro-countdown.html" class="header-sub-tab">Pomodoro Timer</a>
+            <a href="serial-countdown.html" class="header-sub-tab active">Serial&nbsp;Countdown</a>
+            <a href="parallel-countdown.html" class="header-sub-tab">Parallel&nbsp;Countdown</a>
+            <a href="pomodoro-countdown.html" class="header-sub-tab">Pomodoro&nbsp;Timer</a>
         `;
+        window.location.href = 'serial-countdown.html';
     });
     
     stopwatchTab.addEventListener('click', () => {

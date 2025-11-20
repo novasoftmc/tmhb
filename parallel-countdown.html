@@ -14,7 +14,7 @@
     <title>Countdown Timers with Progress Bar and Sound Alerts - Audio Visual Timer Tool</title>
     
     <link rel="stylesheet" href="css/shared-nav.css" />
-    <link rel="stylesheet" href="css/serial-main.css" />
+    <link rel="stylesheet" href="css/parallel-countdown.css" />
     <link rel="stylesheet" href="css/shared-footer.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
     <link rel="apple-touch-icon" href="apple-touch-icon.png" />
@@ -75,8 +75,8 @@
         
         <!-- Row 2: Sub-tabs (Countdown options) -->
         <div class="header-row-2" id="headerRow2">
-            <a href="serial-countdown.html" class="header-sub-tab active">Serial Countdown</a>
-            <a href="parallel-countdown.html" class="header-sub-tab">Parallel Countdown</a>
+            <a href="serial-countdown.html" class="header-sub-tab">Serial Countdown</a>
+            <a href="parallel-countdown.html" class="header-sub-tab active">Parallel Countdown</a>
             <a href="pomodoro-countdown.html" class="header-sub-tab">Pomodoro Timer</a>
         </div>
     </nav>
@@ -88,7 +88,7 @@
     </noscript>
     <!-- Main Page -->
     <main id="main-page" class="page">
-      <h1 id="main-title" style="text-align: center; font-size: 1.5rem; margin: 10px 0 15px 0; color: #2c3e50; font-weight: 600;">Free Online Serial Countdown Bar Timer</h1>
+      <h1 id="main-title" style="text-align: center; font-size: 1.5rem; margin: 10px 0 15px 0; color: #2c3e50; font-weight: 600;">Free Online Parallel Countdown Timer</h1>
       <h2 class="hidden">Main Timer Functions</h2> 
       <div class="container">
         <div class="time-setter" id="main-timer" style="position: relative;">
@@ -255,52 +255,22 @@
             </div>
           </div>
           <!-- Bottom control container -->
-        <div class="time-setter-bottom-controls" id="main-time-setter-bottom-controls"></div>
-        </div>
-        
-        
-        </div>
-
-        <!-- Timer control buttons - outside time-setter so they can be shown independently -->
-        <div class="buttons-hover-wrapper">
-        <div class="main-timer-buttons" id="main-timer-buttons-container" style="position: relative; margin: 0 auto; width: fit-content;">
-          <button class="start-btn" id="start-btn" name="startTimer" aria-label="Start timer">
-            START >
-          </button>
-          <button
-            class="pause-btn"
-            id="pause-btn"
-            name="pauseTimer"
-            style="display: none"
-            aria-label="Pause timer"
-          >
-            PAUSE ||
-          </button>
-          <button
-            class="stop-reset-btn"
-            id="stop-reset-btn"
-            name="stopResetTimer"
-            style="display: none"
-            aria-label="Stop and reset timer"
-          >
-            STOP ■
-          </button>
-        </div>
-        </div>
-
-
-        <div style="text-align: center;">
-          <div class="button-hover-wrapper">
-            <button
-              class="advanced-btn"
-              id="advanced-btn"
-              name="advancedButton"
-              aria-label="Open advanced settings"
-            >
-              (ADVANCED)
-            </button>
+        <!-- Bottom control container -->
+        <div class="time-setter-bottom-controls" id="main-time-setter-bottom-controls">
+          <div class="main-timer-buttons" id="main-timer-buttons-container">
+            <button class="start-btn" id="start-btn" name="startTimer" aria-label="Start timer">START ></button>
+            <button class="pause-btn" id="pause-btn" name="pauseTimer" style="display: none" aria-label="Pause timer">PAUSE ||</button>
+            <button class="stop-reset-btn" id="stop-reset-btn" name="stopResetTimer" style="display: none" aria-label="Stop and reset timer">STOP ■</button>
           </div>
+          <button class="advanced-btn" id="advanced-btn" name="advancedButton" aria-label="Open advanced settings">(ADVANCED)</button>
         </div>
+        </div>
+        
+        
+        </div>
+
+        
+        
 
        <!-- Notes display (only shown if Timer 1 has notes) -->
         <div

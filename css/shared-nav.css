@@ -8,7 +8,8 @@
 .header-row-1 {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
+    gap: 63px;
     padding: 5px 20px;
     background: linear-gradient(135deg, #3498db 0%, #2ecc71 100%);
     transition: background 0.3s ease;
@@ -121,7 +122,7 @@
 }
 
 .header-sub-tab {
-    padding: 1px 20px;
+    padding: 12px 20px;
     background: transparent;
     color: #555;
     border: none;
