@@ -265,11 +265,23 @@
           <button class="advanced-btn" id="advanced-btn" name="advancedButton" aria-label="Open advanced settings">(ADVANCED)</button>
         </div>
         </div>
-        
-        
-        </div>
+      </div>
 
-        
+        <div
+          class="progress-container draggable-element"
+          id="progress-container"
+        >
+          <div class="progress-bar" id="progress-bar"></div>
+          <!-- Resize handles -->
+          <div class="resize-handle top"></div>
+          <div class="resize-handle bottom"></div>
+          <div class="resize-handle left"></div>
+          <div class="resize-handle right"></div>
+          <div class="resize-handle top-left"></div>
+          <div class="resize-handle top-right"></div>
+          <div class="resize-handle bottom-left"></div>
+          <div class="resize-handle bottom-right"></div>
+        </div>
         
 
        <!-- Notes display (only shown if Timer 1 has notes) -->
@@ -308,22 +320,6 @@
           style="display: none"
         >
           <img id="timer-image-main" src="" alt="Custom timer image for your language learning project, knowledgde quiz and other projects" />
-          <div class="resize-handle top"></div>
-          <div class="resize-handle bottom"></div>
-          <div class="resize-handle left"></div>
-          <div class="resize-handle right"></div>
-          <div class="resize-handle top-left"></div>
-          <div class="resize-handle top-right"></div>
-          <div class="resize-handle bottom-left"></div>
-          <div class="resize-handle bottom-right"></div>
-        </div>
-
-        <div
-          class="progress-container draggable-element"
-          id="progress-container"
-        >
-          <div class="progress-bar" id="progress-bar"></div>
-          <!-- Resize handles -->
           <div class="resize-handle top"></div>
           <div class="resize-handle bottom"></div>
           <div class="resize-handle left"></div>
@@ -495,7 +491,7 @@
         </div>
     </footer>
 
-    <script src="js/serial-main.js"></script>
+    <script src="js/parallel-countdown.js"></script>
     <script src="js/shared-nav.js"></script>
   </body>
 </html>

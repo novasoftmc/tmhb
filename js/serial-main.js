@@ -3249,8 +3249,11 @@ const eventHandlers = (function () {
           resizeStartY = e.clientY;
 
           const rect = element.getBoundingClientRect();
+          const computedStyle = window.getComputedStyle(element);
+          const marginTop = parseFloat(computedStyle.marginTop) || 0;
+          
           dragStartLeft = rect.left + window.pageXOffset;
-          dragStartTop = rect.top + window.pageYOffset;
+          dragStartTop = (rect.top + window.pageYOffset) - marginTop;
 
           e.preventDefault();
           return;

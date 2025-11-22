@@ -488,20 +488,17 @@ body {
 }
 
 .progress-container {
-  height: 72px;
-  /* 20% taller */
+  height: 1.4em;
   background-color: rgba(236, 240, 241, 0.3);
-  /* Semi-transparent container */
-  /* border-radius: 10px; */
+  border: 1px solid #ddd;
   overflow: hidden;
   position: relative;
   width: 100%;
-  margin: 0 auto;
-  overflow: auto;
-  min-height: 54px;
+  margin: 0;
+  min-height: 1.4em;
   min-width: 180px;
   max-width: 100%;
-  cursor: move;
+  cursor: auto;
 }
 
 .progress-container::before {
@@ -534,8 +531,20 @@ body {
   transition: box-shadow 0.2s;
 }
 
+/* Override cursor for static elements */
+.progress-container,
+.timer-notes-display {
+  cursor: auto !important;
+}
+
 .draggable-element:hover {
   box-shadow: 0 0 0 2px #3498db;
+}
+
+/* Don't show hover for progress bar and notes */
+.progress-container:hover,
+.timer-notes-display:hover {
+  box-shadow: none;
 }
 
 .draggable-element.is-dragging {
@@ -544,6 +553,7 @@ body {
 
 /* Countdown + Label Box */
 .countdown-box {
+  display: none;  /* Hidden in parallel countdown */
   background-color: rgba(255, 255, 255, 0.8);
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -1256,23 +1266,27 @@ body {
 /* === Main Page Display Areas === */
 
 .timer-notes-display {
-  padding: 2px 15px;
-  margin: 10px 0;
+  padding: 2px 9px;
+  margin: 0;
   background-color: #fffef9;
   font-size: 0.9rem;
   color: #333;
   white-space: normal;
   line-height: 1.4;
-  position: relative;
-  /* Enable resize handles */
-  overflow: auto;
-  /* Allow scrolling if content overflows */
-  resize: both;
-  cursor: move;
+  position: relative; 
+  overflow:hidden;  
+  resize: none;
+  cursor: auto;
   min-width: 200px;
-  min-height: 50px;
+  min-height: 1.4em;
+  max-height: 3.2em;
   border: 1px solid #ddd;
-  border-radius: 8px;
+}
+
+/* Hide resize handles for progress bar and notes */
+.progress-container .resize-handle,
+.timer-notes-display .resize-handle {
+  display: none;
 }
 
 .timer-image-display {
@@ -1405,6 +1419,7 @@ body.dark-theme .preset-time-display {
 
 body.dark-theme .progress-container {
     background-color: rgba(40, 40, 40, 0.5);
+    border-color: #606060;
 }
 
 body.dark-theme .advanced-btn {

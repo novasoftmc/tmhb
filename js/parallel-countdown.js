@@ -2240,14 +2240,14 @@ function updateMainPageDisplay(timerIndex = null) {
       notesDisplay.style.display = "block";
 
       // Auto-resize height to fit content
-      notesDisplay.style.height = "auto";
+      // notesDisplay.style.height = "auto";
 
       // Get the actual content height
-      const contentHeight = notesDisplay.scrollHeight;
+      // const contentHeight = notesDisplay.scrollHeight;
 
       // Set height to fit content (with min/max constraints)
-      notesDisplay.style.height =
-        Math.max(50, Math.min(400, contentHeight + 20)) + "px";
+      // notesDisplay.style.height =
+      //  Math.max(50, Math.min(400, contentHeight + 20)) + "px";
 
       // Ensure resize handles exist
       if (!notesDisplay.querySelector(".resize-handle")) {
@@ -3249,8 +3249,11 @@ const eventHandlers = (function () {
           resizeStartY = e.clientY;
 
           const rect = element.getBoundingClientRect();
+          const computedStyle = window.getComputedStyle(element);
+          const marginTop = parseFloat(computedStyle.marginTop) || 0;
+          
           dragStartLeft = rect.left + window.pageXOffset;
-          dragStartTop = rect.top + window.pageYOffset;
+          dragStartTop = (rect.top + window.pageYOffset) - marginTop;
 
           e.preventDefault();
           return;
@@ -3592,6 +3595,10 @@ const eventHandlers = (function () {
 
     // Apply draggable to all elements with the class
     document.querySelectorAll(".draggable-element").forEach((el) => {
+      // Skip progress bar and notes display
+      if (el.id === 'progress-container' || el.id === 'timer-notes-display') {
+        return;
+      }
       makeDraggable(el);
 
       // Initial scale for countdown box
