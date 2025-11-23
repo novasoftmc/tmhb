@@ -474,7 +474,7 @@ const uiManager = (function () {
                     </div> 
                     
                     <!-- Preset time display -->
-                    <div class="preset-time-display" data-timer-index="${index}">${timerData.hours.toString().padStart(2, "0")}:${timerData.minutes.toString().padStart(2, "0")}:${timerData.seconds.toString().padStart(2, "0")}</div>
+                    <div class="preset-time-display" data-timer-index="${index}" title="Duration Set">${timerData.hours.toString().padStart(2, "0")}:${timerData.minutes.toString().padStart(2, "0")}:${timerData.seconds.toString().padStart(2, "0")}</div>
 
                     <!-- Direction and Color controls on LEFT -->
                     <div class="timer-controls-left">
@@ -1639,7 +1639,7 @@ const timerLogic = (function () {
               for (let i = 0; i < r.duration; i++) {
                 try {
                   const beepTimeout = setTimeout(() => {
-                    if (state.getIsRunning() && !state.getIsPaused()) {
+                    if (state.getIsRunning() && !state.getIsPaused() && src.beepAt > 0) {
                       state.playBeep(false);
                     }
                   }, i * 1000);
@@ -1685,7 +1685,7 @@ const timerLogic = (function () {
             // Schedule beeps for duration (check if paused before playing)
             for (let i = 0; i < r.duration; i++) {
               const beepTimeout = setTimeout(() => {
-                if (state.getIsRunning() && !state.getIsPaused()) {
+                if (state.getIsRunning() && !state.getIsPaused() && src.beepAt > 0) {
                   state.playBeep(false);
                 }
               }, i * 1000);

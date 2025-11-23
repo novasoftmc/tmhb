@@ -88,12 +88,17 @@ const state = (function () {
     showHeader: true,
     showTimeSetter: true,
     showAdvancedBtn: true,
-    showCountdown: true,
-    showTimerInfo: true,
+    showCountdown: false,
+    showTimerInfo: false,
     showStartBtn: true,
     showNotes: true,
     showImage: true,
     showProgressBar: true,
+  };
+  let scheduledStart = {
+    enabled: false,
+    time: null, // Will be set to 1 hour from now on init
+    checkInterval: null
   };
 
   return {
@@ -175,6 +180,11 @@ const state = (function () {
     setVisibilitySettings: (value) => {
       visibilitySettings = value;
     },
+
+    getScheduledStart: () => scheduledStart,
+    setScheduledStart: (value) => { scheduledStart = value; 
+    },
+
   };
 })();
 
@@ -474,7 +484,7 @@ const uiManager = (function () {
                     </div> 
                     
                     <!-- Preset time display -->
-                    <div class="preset-time-display" data-timer-index="${index}">${timerData.hours.toString().padStart(2, "0")}:${timerData.minutes.toString().padStart(2, "0")}:${timerData.seconds.toString().padStart(2, "0")}</div>
+                    <div class="preset-time-display" data-timer-index="${index}" title="Duration Set">${timerData.hours.toString().padStart(2, "0")}:${timerData.minutes.toString().padStart(2, "0")}:${timerData.seconds.toString().padStart(2, "0")}</div>
 
                     <!-- Direction and Color controls on LEFT -->
                     <div class="timer-controls-left">
@@ -576,8 +586,8 @@ const uiManager = (function () {
                         <select class="toolbar-select font-size-select">
                             <option value="8px">8px</option>
                             <option value="10px">10px</option>
-                            <option value="12px">12px</option>
-                            <option value="14px" selected>14px</option>
+                            <option value="12px" selected>12px</option>
+                            <option value="14px">14px</option>
                             <option value="16px">16px</option>
                             <option value="18px">18px</option>
                             <option value="20px">20px</option>
@@ -1639,7 +1649,7 @@ const timerLogic = (function () {
               for (let i = 0; i < r.duration; i++) {
                 try {
                   const beepTimeout = setTimeout(() => {
-                    if (state.getIsRunning() && !state.getIsPaused()) {
+                    if (state.getIsRunning() && !state.getIsPaused() && src.beepAt > 0) {
                       state.playBeep(false);
                     }
                   }, i * 1000);
@@ -1685,7 +1695,7 @@ const timerLogic = (function () {
             // Schedule beeps for duration (check if paused before playing)
             for (let i = 0; i < r.duration; i++) {
               const beepTimeout = setTimeout(() => {
-                if (state.getIsRunning() && !state.getIsPaused()) {
+                if (state.getIsRunning() && !state.getIsPaused() && src.beepAt > 0) {
                   state.playBeep(false);
                 }
               }, i * 1000);
@@ -2129,18 +2139,9 @@ const settingsManager = (function () {
   // Update visibility settings
   function updateVisibilitySettings() {
     const settings = state.getVisibilitySettings();
-    settings.showMainTitle = document.getElementById("show-main-title").checked;
-    settings.showTimeSetter =
-      document.getElementById("show-time-setter").checked;
-    settings.showAdvancedBtn =
-      document.getElementById("show-advanced-btn").checked;
-    settings.showCountdown = document.getElementById("show-countdown").checked;
-    settings.showTimerInfo = document.getElementById("show-timer-info").checked;
-    settings.showStartBtn = document.getElementById("show-start-btn").checked;
     settings.showNotes = document.getElementById("show-notes").checked;
     settings.showImage = document.getElementById("show-image").checked;
-    settings.showProgressBar =
-      document.getElementById("show-progress-bar").checked;
+    settings.showProgressBar = document.getElementById("show-progress-bar").checked;
 
     state.setVisibilitySettings(settings);
   }
@@ -2935,6 +2936,115 @@ const eventHandlers = (function () {
       setTimeout(initializeToolbarListeners, 100);
     });
 
+   // Scheduled start functionality
+    const scheduledCheckbox = document.getElementById('scheduled-start-checkbox');
+    const scheduledPeriod = document.getElementById('scheduled-period');
+    
+    // Click on time units to edit
+    document.querySelectorAll('.scheduled-time-unit').forEach(unit => {
+      unit.addEventListener('click', function() {
+        const currentValue = parseInt(this.textContent);
+        const unitType = this.dataset.unit;
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = '';
+        input.className = 'time-input';
+        input.style.width = '36px';
+        input.placeholder = currentValue.toString();
+        
+        input.addEventListener('blur', () => {
+          let value = parseInt(input.value);
+          if (isNaN(value) || input.value.trim() === '') {
+            this.textContent = currentValue.toString().padStart(2, '0');
+          } else {
+            if (unitType === 'hours') {
+              if (value < 1) value = 1;
+              if (value > 12) value = 12;
+            } else {
+              if (value < 0) value = 0;
+              if (value > 59) value = 59;
+            }
+            this.textContent = value.toString().padStart(2, '0');
+          }
+          updateScheduledTime();
+        });
+        
+        input.addEventListener('keyup', (e) => {
+          if (e.key === 'Enter') input.blur();
+        });
+        
+        this.textContent = '';
+        this.appendChild(input);
+        input.focus();
+        input.select();
+      });
+    });
+    
+    // Toggle AM/PM
+    scheduledPeriod.addEventListener('click', function() {
+      this.textContent = this.textContent === 'AM' ? 'PM' : 'AM';
+      updateScheduledTime();
+    });
+    
+    function updateScheduledTime() {
+      const hoursSpan = document.querySelector('.scheduled-time-unit[data-unit="hours"]');
+      const minutesSpan = document.querySelector('.scheduled-time-unit[data-unit="minutes"]');
+      const secondsSpan = document.querySelector('.scheduled-time-unit[data-unit="seconds"]');
+      
+      let hours = parseInt(hoursSpan.textContent) || 1;
+      const minutes = parseInt(minutesSpan.textContent) || 0;
+      const seconds = parseInt(secondsSpan.textContent) || 0;
+      const period = scheduledPeriod.textContent;
+      
+      // Convert to 24-hour format
+      if (period === 'PM' && hours !== 12) hours += 12;
+      if (period === 'AM' && hours === 12) hours = 0;
+      
+      state.getScheduledStart().time = { hours, minutes, seconds };
+    }
+    
+    scheduledCheckbox.addEventListener('change', function() {
+      state.getScheduledStart().enabled = this.checked;
+      if (this.checked) {
+        updateScheduledTime();
+        startScheduledCheck();
+      } else {
+        stopScheduledCheck();
+      }
+    });
+    
+    function startScheduledCheck() {
+      stopScheduledCheck();
+      
+      const checkTime = () => {
+        if (!state.getScheduledStart().enabled || state.getIsRunning()) {
+          stopScheduledCheck();
+          return;
+        }
+        
+        const now = new Date();
+        const scheduled = state.getScheduledStart().time;
+        
+        if (now.getHours() === scheduled.hours && 
+            now.getMinutes() === scheduled.minutes && 
+            now.getSeconds() === scheduled.seconds) {
+          timerLogic.startTimer();
+          scheduledCheckbox.checked = false;
+          state.getScheduledStart().enabled = false;
+          stopScheduledCheck();
+        }
+      };
+      
+      state.getScheduledStart().checkInterval = setInterval(checkTime, 1000);
+    }
+    
+    function stopScheduledCheck() {
+      if (state.getScheduledStart().checkInterval) {
+        clearInterval(state.getScheduledStart().checkInterval);
+        state.getScheduledStart().checkInterval = null;
+      }
+    }
+
     // Start/Pause button
     elements.startBtn.addEventListener("click", timerLogic.startTimer);
     elements.pauseBtn.addEventListener("click", timerLogic.startTimer); // Same function handles pause/resume
@@ -3034,25 +3144,13 @@ const eventHandlers = (function () {
       }
     });
 
+    
     // Visibility settings
-    document
-      .getElementById("show-main-title")
-      .addEventListener("change", handleVisibilityChange);
-    document
-      .getElementById("show-time-setter")
-      .addEventListener("change", handleVisibilityChange);
-    document
-      .getElementById("show-advanced-btn")
-      .addEventListener("change", handleVisibilityChange);
-    document
-      .getElementById("show-countdown")
-      .addEventListener("change", handleVisibilityChange);
-    document
-      .getElementById("show-timer-info")
-      .addEventListener("change", handleVisibilityChange);
-    document
-      .getElementById("show-start-btn")
-      .addEventListener("change", handleVisibilityChange);
+
+    // document.getElementById("show-main-title").addEventListener("change", handleVisibilityChange);
+    // document.getElementById("show-time-setter").addEventListener("change", handleVisibilityChange);
+    // document.getElementById("show-advanced-btn").addEventListener("change", handleVisibilityChange);
+    // document.getElementById("show-start-btn").addEventListener("change", handleVisibilityChange);
     document
       .getElementById("show-notes")
       .addEventListener("change", handleVisibilityChange);
@@ -4066,6 +4164,26 @@ function init() {
   // Set up event listeners
   eventHandlers.setupEventListeners();
 
+  // Initialize scheduled start time to 1 hour from now
+  const now = new Date();
+  now.setMinutes(now.getMinutes() + 5);
+  const hours = now.getHours();
+  const minutes = now.getMinutes();
+  const seconds = 0;
+  
+  const displayHours = hours % 12 || 12;
+  const period = hours >= 12 ? 'PM' : 'AM';
+  
+  document.querySelector('.scheduled-time-unit[data-unit="hours"]').textContent = 
+    displayHours.toString().padStart(2, '0');
+  document.querySelector('.scheduled-time-unit[data-unit="minutes"]').textContent = 
+    minutes.toString().padStart(2, '0');
+  document.querySelector('.scheduled-time-unit[data-unit="seconds"]').textContent = 
+    seconds.toString().padStart(2, '0');
+  document.getElementById('scheduled-period').textContent = period;
+  
+  state.getScheduledStart().time = { hours, minutes, seconds };
+
   // Set up color picker interactions
   colorPickerManager.setupColorPickerInteractions();
 
@@ -4081,25 +4199,19 @@ function init() {
   updateMainPageDisplay();
 
   // Initialize visibility settings
-  document.getElementById("show-main-title").checked =
-    state.getVisibilitySettings().showMainTitle;
-  document.getElementById("show-time-setter").checked =
-    state.getVisibilitySettings().showTimeSetter;
-  document.getElementById("show-advanced-btn").checked =
-    state.getVisibilitySettings().showAdvancedBtn;
-  document.getElementById("show-countdown").checked =
-    state.getVisibilitySettings().showCountdown;
-  document.getElementById("show-timer-info").checked =
-    state.getVisibilitySettings().showTimerInfo;
-  document.getElementById("show-start-btn").checked =
-    state.getVisibilitySettings().showStartBtn;
+  // document.getElementById("show-main-title").checked = state.getVisibilitySettings().showMainTitle;
+  //document.getElementById("show-time-setter").checked = state.getVisibilitySettings().showTimeSetter;
+  //document.getElementById("show-advanced-btn").checked = state.getVisibilitySettings().showAdvancedBtn;
+  //document.getElementById("show-countdown").checked = state.getVisibilitySettings().showCountdown;
+  //document.getElementById("show-timer-info").checked = state.getVisibilitySettings().showTimerInfo;
+  //document.getElementById("show-start-btn").checked = state.getVisibilitySettings().showStartBtn;
+  document.getElementById("show-progress-bar").checked =
+    state.getVisibilitySettings().showProgressBar;  
   document.getElementById("show-notes").checked =
     state.getVisibilitySettings().showNotes;
   document.getElementById("show-image").checked =
     state.getVisibilitySettings().showImage;
-  document.getElementById("show-progress-bar").checked =
-    state.getVisibilitySettings().showProgressBar;
-}
+  }
 
 // Initialize the app when DOM is loaded
 document.addEventListener("DOMContentLoaded", init);

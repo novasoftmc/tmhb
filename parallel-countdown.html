@@ -106,7 +106,7 @@
           </div>
 
           <!-- Static time display box -->
-          <div class="preset-time-display" id="preset-time-display">00:00:00</div>
+          <div class="preset-time-display" id="preset-time-display" title="Duration Set">00:00:00</div>
         
           <!-- Sound icon -->
           <div
@@ -257,12 +257,26 @@
           <!-- Bottom control container -->
         <!-- Bottom control container -->
         <div class="time-setter-bottom-controls" id="main-time-setter-bottom-controls">
+          <div class="scheduled-start-controls">
+            <div class="scheduled-label">Start at</div>
+            <div class="scheduled-inputs">
+              <input type="checkbox" id="scheduled-start-checkbox" class="scheduled-checkbox">
+              <div class="scheduled-time-display" id="scheduled-start-time">
+                <span class="scheduled-time-unit" data-unit="hours" tabindex="0">01</span>
+                <span>:</span>
+                <span class="scheduled-time-unit" data-unit="minutes" tabindex="0">00</span>
+                <span>:</span>
+                <span class="scheduled-time-unit" data-unit="seconds" tabindex="0">00</span>
+              </div>
+              <span class="scheduled-period" id="scheduled-period" tabindex="0">PM</span>
+            </div>
+          </div>
           <div class="main-timer-buttons" id="main-timer-buttons-container">
             <button class="start-btn" id="start-btn" name="startTimer" aria-label="Start timer">START ></button>
             <button class="pause-btn" id="pause-btn" name="pauseTimer" style="display: none" aria-label="Pause timer">PAUSE ||</button>
             <button class="stop-reset-btn" id="stop-reset-btn" name="stopResetTimer" style="display: none" aria-label="Stop and reset timer">STOP ■</button>
           </div>
-          <button class="advanced-btn" id="advanced-btn" name="advancedButton" aria-label="Open advanced settings">(ADVANCED)</button>
+          <button class="advanced-btn" id="advanced-btn" name="advancedButton" aria-label="Open advanced settings">Customize</button>
         </div>
         </div>
       </div>
@@ -353,7 +367,7 @@
 
         <div class="visibility-section">
           <h3 style="font-weight: bold; margin-bottom: 9px; text-align: center; font-size: 1rem;">Display Options While Timer is Running</h3>
-          <div class="visibility-option">
+          <!-- <div class="visibility-option">
             <input type="checkbox" id="show-main-title" checked />
             <label for="show-main-title">Show Main Title</label>
           </div>
@@ -376,19 +390,20 @@
           <div class="visibility-option">
             <input type="checkbox" id="show-timer-info" checked />
             <label for="show-timer-info">Show current timer label</label>
+          </div> -->
+          <div class="visibility-option">
+            <input type="checkbox" id="show-progress-bar" checked />
+            <label for="show-progress-bar">Show progress bar</label>
           </div>
           <div class="visibility-option">
             <input type="checkbox" id="show-notes" checked />
-            <label for="show-notes">Show input text</label>
+            <label for="show-notes">Show notes box</label>
           </div>
           <div class="visibility-option">
             <input type="checkbox" id="show-image" checked />
             <label for="show-image">Show image</label>
           </div>
-          <div class="visibility-option">
-            <input type="checkbox" id="show-progress-bar" checked />
-            <label for="show-progress-bar">Show progress bar</label>
-          </div>
+          
         </div>
 
         <button
