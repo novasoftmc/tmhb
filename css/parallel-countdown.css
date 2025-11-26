@@ -231,7 +231,7 @@ body {
 /* Mobile: Move preset time left on advanced page only */
 @media (max-width: 768px) {
   .timer-box-wrapper .preset-time-display {
-    right: 18px;
+    right: 21px;
   }
 }
 
