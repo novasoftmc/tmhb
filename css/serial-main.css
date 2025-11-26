@@ -151,10 +151,10 @@ body {
 
 .timer-remove-btn {
   position: absolute;
-  right: 6px;
-  top: 6px;
-  width: 20px;
-  height: 20px;
+  right: 2px;
+  top: 2px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   background-color: #e74c3c;
   color: white;
@@ -378,6 +378,112 @@ body {
   font-size: 1rem;
   cursor: pointer;
   padding: 1px 3px;
+}
+
+/* Scheduled Start Controls */
+.scheduled-start-controls {
+  position: absolute;
+  left: 5px;
+  bottom: 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0px;
+}
+
+.scheduled-label {
+  font-size: 0.63rem;
+  color: #555;
+  white-space: nowrap;
+}
+
+.scheduled-inputs {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.scheduled-checkbox {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+}
+
+.scheduled-time-display {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  border: 2px solid #ddd;
+  padding: 0px 4px;
+  background-color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.scheduled-time-unit {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #2c3e50;
+  cursor: pointer;
+  min-width: 14px;
+  text-align: center;
+}
+
+.scheduled-time-unit:hover {
+  background-color: #e8f4f8;
+}
+
+.scheduled-time-unit input.time-input {
+  font-size: 1.5rem;
+  border: none;
+  outline: none;
+  text-align: center;
+  padding: 0;
+}
+
+.scheduled-period {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #2c3e50;
+  cursor: pointer;
+  padding: 1px 3px;
+  border-radius: 3px;
+}
+
+.scheduled-period:hover {
+  background-color: #e8f4f8;
+}
+
+/* Dark Theme */
+body.dark-theme .scheduled-label {
+  color: #bbb;
+}
+
+body.dark-theme .scheduled-time-display {
+  background-color: #2a2a2a;
+  border-color: #606060;
+}
+
+body.dark-theme .scheduled-time-unit {
+  color: #e0e0e0;
+}
+
+body.dark-theme .scheduled-time-unit:hover {
+  background-color: #3a3a3a;
+}
+
+body.dark-theme .scheduled-time-unit input.time-input {
+  background-color: #2a2a2a;
+  color: #e0e0e0;
+  border: none;
+}
+
+body.dark-theme .scheduled-period {
+  color: #e0e0e0;
+}
+
+body.dark-theme .scheduled-period:hover {
+  background-color: #3a3a3a;
 }
 
 .advanced-btn,

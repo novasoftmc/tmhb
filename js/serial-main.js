@@ -21,6 +21,12 @@ const state = (function () {
     },
   ];
 
+  let scheduledStart = {
+    enabled: false,
+    time: null,
+    checkInterval: null
+  };
+
   let pauses = [];
   // Sound state and functions
   let soundEnabled = true;
@@ -175,6 +181,9 @@ const state = (function () {
     setVisibilitySettings: (value) => {
       visibilitySettings = value;
     },
+
+    getScheduledStart: () => scheduledStart,
+    setScheduledStart: (value) => { scheduledStart = value; },
   };
 })();
 
@@ -2928,6 +2937,115 @@ const eventHandlers = (function () {
       adjustTime("seconds", -1)
     );
 
+    // Scheduled start functionality
+    const scheduledCheckbox = document.getElementById('scheduled-start-checkbox');
+    const scheduledPeriod = document.getElementById('scheduled-period');
+    
+    // Click on time units to edit
+    document.querySelectorAll('.scheduled-time-unit').forEach(unit => {
+      unit.addEventListener('click', function() {
+        const currentValue = parseInt(this.textContent);
+        const unitType = this.dataset.unit;
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = '';
+        input.className = 'time-input';
+        input.style.width = '36px';
+        input.placeholder = currentValue.toString();
+        
+        input.addEventListener('blur', () => {
+          let value = parseInt(input.value);
+          if (isNaN(value) || input.value.trim() === '') {
+            this.textContent = currentValue.toString().padStart(2, '0');
+          } else {
+            if (unitType === 'hours') {
+              if (value < 1) value = 1;
+              if (value > 12) value = 12;
+            } else {
+              if (value < 0) value = 0;
+              if (value > 59) value = 59;
+            }
+            this.textContent = value.toString().padStart(2, '0');
+          }
+          updateScheduledTime();
+        });
+        
+        input.addEventListener('keyup', (e) => {
+          if (e.key === 'Enter') input.blur();
+        });
+        
+        this.textContent = '';
+        this.appendChild(input);
+        input.focus();
+        input.select();
+      });
+    });
+    
+    // Toggle AM/PM
+    scheduledPeriod.addEventListener('click', function() {
+      this.textContent = this.textContent === 'AM' ? 'PM' : 'AM';
+      updateScheduledTime();
+    });
+    
+    function updateScheduledTime() {
+      const hoursSpan = document.querySelector('.scheduled-time-unit[data-unit="hours"]');
+      const minutesSpan = document.querySelector('.scheduled-time-unit[data-unit="minutes"]');
+      const secondsSpan = document.querySelector('.scheduled-time-unit[data-unit="seconds"]');
+      
+      let hours = parseInt(hoursSpan.textContent) || 1;
+      const minutes = parseInt(minutesSpan.textContent) || 0;
+      const seconds = parseInt(secondsSpan.textContent) || 0;
+      const period = scheduledPeriod.textContent;
+      
+      // Convert to 24-hour format
+      if (period === 'PM' && hours !== 12) hours += 12;
+      if (period === 'AM' && hours === 12) hours = 0;
+      
+      state.getScheduledStart().time = { hours, minutes, seconds };
+    }
+    
+    scheduledCheckbox.addEventListener('change', function() {
+      state.getScheduledStart().enabled = this.checked;
+      if (this.checked) {
+        updateScheduledTime();
+        startScheduledCheck();
+      } else {
+        stopScheduledCheck();
+      }
+    });
+    
+    function startScheduledCheck() {
+      stopScheduledCheck();
+      
+      const checkTime = () => {
+        if (!state.getScheduledStart().enabled || state.getIsRunning()) {
+          stopScheduledCheck();
+          return;
+        }
+        
+        const now = new Date();
+        const scheduled = state.getScheduledStart().time;
+        
+        if (now.getHours() === scheduled.hours && 
+            now.getMinutes() === scheduled.minutes && 
+            now.getSeconds() === scheduled.seconds) {
+          timerLogic.startTimer();
+          scheduledCheckbox.checked = false;
+          state.getScheduledStart().enabled = false;
+          stopScheduledCheck();
+        }
+      };
+      
+      state.getScheduledStart().checkInterval = setInterval(checkTime, 1000);
+    }
+    
+    function stopScheduledCheck() {
+      if (state.getScheduledStart().checkInterval) {
+        clearInterval(state.getScheduledStart().checkInterval);
+        state.getScheduledStart().checkInterval = null;
+      }
+    }
+
     // Advanced panel toggle
     elements.advancedBtn.addEventListener("click", () => {
       uiManager.showSettingsPage();
@@ -4061,6 +4179,26 @@ const eventHandlers = (function () {
 function init() {
   // Set up event listeners
   eventHandlers.setupEventListeners();
+
+   // Initialize scheduled start time to 5 minutes from now
+  const now = new Date();
+  now.setMinutes(now.getMinutes() + 5);
+  const hours = now.getHours();
+  const minutes = now.getMinutes();
+  const seconds = 0;
+  
+  const displayHours = hours % 12 || 12;
+  const period = hours >= 12 ? 'PM' : 'AM';
+  
+  document.querySelector('.scheduled-time-unit[data-unit="hours"]').textContent = 
+    displayHours.toString().padStart(2, '0');
+  document.querySelector('.scheduled-time-unit[data-unit="minutes"]').textContent = 
+    minutes.toString().padStart(2, '0');
+  document.querySelector('.scheduled-time-unit[data-unit="seconds"]').textContent = 
+    seconds.toString().padStart(2, '0');
+  document.getElementById('scheduled-period').textContent = period;
+  
+  state.getScheduledStart().time = { hours, minutes, seconds };
 
   // Set up color picker interactions
   colorPickerManager.setupColorPickerInteractions();
