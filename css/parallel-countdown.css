@@ -224,7 +224,14 @@ body {
 /* === MOBILE RESPONSIVE === */
 @media (max-width: 768px) {
   .preset-time-display {
-    right: 8px;
+    right: 9px;
+  }
+}
+
+/* Mobile: Move preset time left on advanced page only */
+@media (max-width: 768px) {
+  .timer-box-wrapper .preset-time-display {
+    right: 18px;
   }
 }
 
