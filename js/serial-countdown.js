@@ -433,6 +433,47 @@ const uiManager = (function () {
 
   // Render timer settings in the advanced panel
   function renderTimerSettings() {
+
+    // Update sequence info display
+    function updateSequenceInfo() {
+      const sequenceInfo = document.getElementById("sequence-info");
+      if (!sequenceInfo) return;
+      
+      const timers = state.getTimers();
+      let totalSeconds = 0;
+      const timerParts = [];
+      
+      timers.forEach((timer, index) => {
+        const timerTotalSeconds = timer.hours * 3600 + timer.minutes * 60 + timer.seconds;
+        totalSeconds += timerTotalSeconds;
+        
+        // Format duration
+        const h = timer.hours;
+        const m = timer.minutes;
+        const s = timer.seconds;
+        let durationStr = "";
+        if (h > 0) durationStr += h + "h ";
+        if (m > 0 || h > 0) durationStr += m + "m ";
+        durationStr += s + "s";
+        durationStr = durationStr.trim();
+        
+        const name = timer.name || "Timer " + (index + 1);
+        timerParts.push(`${durationStr} (${name})`);
+      });
+      
+      // Format total time
+      const totalH = Math.floor(totalSeconds / 3600);
+      const totalM = Math.floor((totalSeconds % 3600) / 60);
+      const totalS = totalSeconds % 60;
+      let totalStr = "";
+      if (totalH > 0) totalStr += totalH + "h ";
+      if (totalM > 0 || totalH > 0) totalStr += totalM + "m ";
+      totalStr += totalS + "s";
+      
+      const sequenceText = timerParts.join(" → ");
+      sequenceInfo.innerHTML = `<strong>Sequence Set:</strong> ${sequenceText} <strong>| Total:</strong> ${totalStr.trim()}`;
+    }
+
     const container = document.getElementById("timer-boxes-container");
     if (!container) return;
 
@@ -449,6 +490,9 @@ const uiManager = (function () {
       container.appendChild(timerBox);
     });
 
+    // Update sequence info after rendering
+    updateSequenceInfo();
+
     // Restore scroll position and re-initialize toolbar listeners
     setTimeout(() => {
       window.scrollTo(0, scrollPos);
@@ -461,6 +505,24 @@ const uiManager = (function () {
   function createTimerBox(timerData, index) {
     const wrapper = document.createElement("div");
     wrapper.className = "timer-box-wrapper";
+
+    // Create preset timer quick buttons container
+    const presetButtonsContainer = document.createElement("div");
+    presetButtonsContainer.className = "preset-timer-buttons";
+    presetButtonsContainer.innerHTML = `
+      <span class="preset-timer-label">1-Click Presets:</span>
+      <button class="preset-timer-btn" data-timer-index="${index}" data-minutes="1">1min</button>
+      <button class="preset-timer-btn" data-timer-index="${index}" data-minutes="5">5m</button>
+      <button class="preset-timer-btn" data-timer-index="${index}" data-minutes="10">10m</button>
+      <button class="preset-timer-btn" data-timer-index="${index}" data-minutes="15">15m</button>
+      <button class="preset-timer-btn" data-timer-index="${index}" data-minutes="20">20m</button>
+      <button class="preset-timer-btn" data-timer-index="${index}" data-minutes="25">25m</button>
+      <button class="preset-timer-btn" data-timer-index="${index}" data-minutes="30">30m</button>
+      <button class="preset-timer-btn" data-timer-index="${index}" data-minutes="45">45m</button>
+      <button class="preset-timer-btn" data-timer-index="${index}" data-minutes="60">1h</button>
+      <button class="preset-timer-btn" data-timer-index="${index}" data-seconds="30">30sec</button>
+    `;
+    wrapper.appendChild(presetButtonsContainer);
 
     const box = document.createElement("div");
     box.className = "time-setter";
@@ -523,7 +585,7 @@ const uiManager = (function () {
                     </div>
                     
                     <!-- Sound icon and beep settings on RIGHT -->
-                    <div style="position: absolute; right: 10px; top: 55%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: center; gap: 6px;">
+                    <div style="position: absolute; right: 10px; top: 72%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: center; gap: 6px;">
                         <div style="font-size: 0.65rem; text-align: center; line-height: 1.1;">
                             <div style="font-weight: bold; margin-bottom: 2px;">Final beeps:</div>
                             <div style="display: flex; flex-direction: row; gap: 2px; align-items: center;">
@@ -3185,6 +3247,43 @@ const eventHandlers = (function () {
     document
       .getElementById("timer-boxes-container")
       ?.addEventListener("click", (e) => {
+        // Handle preset timer quick buttons
+        if (e.target.classList.contains("preset-timer-btn")) {
+          const index = parseInt(e.target.dataset.timerIndex);
+          const minutes = parseInt(e.target.dataset.minutes) || 0;
+          const seconds = parseInt(e.target.dataset.seconds) || 0;
+          
+          const timers = state.getTimers();
+          
+          // Convert to hours, minutes, seconds
+          const totalMinutes = minutes;
+          timers[index].hours = Math.floor(totalMinutes / 60);
+          timers[index].minutes = totalMinutes % 60;
+          timers[index].seconds = seconds;
+          
+          state.setTimers(timers);
+          uiManager.renderTimerSettings();
+          
+          // If this is Timer 1, also update main screen
+          if (index === 0) {
+            const hoursEl = document.getElementById("hours");
+            const minutesEl = document.getElementById("minutes");
+            const secondsEl = document.getElementById("seconds");
+            const presetDisplay = document.getElementById("preset-time-display");
+            
+            if (hoursEl) hoursEl.textContent = timers[0].hours + "h";
+            if (minutesEl) minutesEl.textContent = timers[0].minutes.toString().padStart(2, "0") + "m";
+            if (secondsEl) secondsEl.textContent = timers[0].seconds.toString().padStart(2, "0") + "s";
+            if (presetDisplay) {
+              presetDisplay.textContent = 
+                timers[0].hours.toString().padStart(2, "0") + ":" +
+                timers[0].minutes.toString().padStart(2, "0") + ":" +
+                timers[0].seconds.toString().padStart(2, "0");
+            }
+          }
+          return;
+        }
+
         // Handle remove button
         if (e.target.classList.contains("timer-remove-btn")) {
           const index = parseInt(e.target.dataset.timerIndex);

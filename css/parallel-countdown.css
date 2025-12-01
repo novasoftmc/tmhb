@@ -50,6 +50,117 @@ body {
   top: 0;
 }
 
+/* ===== TIMERS CONTROL PANEL ===== */
+.timers-control-panel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 600px;
+  margin: 0 auto 20px;
+  padding: 12px 20px;
+  background: var(--card-bg);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  gap: 15px;
+}
+
+.timers-count-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.control-label {
+  font-weight: 600;
+  color: var(--text-color);
+  font-size: 0.95rem;
+}
+
+#timers-count-input {
+  width: 60px;
+  padding: 6px 8px;
+  font-size: 1rem;
+  text-align: center;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  background: var(--bg-color);
+  color: var(--text-color);
+}
+
+.timers-action-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.control-btn {
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: white;
+}
+
+.plus-btn,
+.minus-btn {
+  width: 27px;
+  padding: 2px;
+  font-size: 1.2rem;
+  background: #3498db;
+}
+
+.plus-btn:hover,
+.minus-btn:hover {
+  background: #2980b9;
+  transform: scale(1.05);
+}
+
+.start-all-btn {
+  background: #27ae60;
+}
+
+.start-all-btn:hover {
+  background: #229954;
+}
+
+.pause-all-btn {
+  background: #f39c12;
+}
+
+.pause-all-btn:hover {
+  background: #e67e22;
+}
+
+.reset-all-btn {
+  background: #e74c3c;
+}
+
+.reset-all-btn:hover {
+  background: #c0392b;
+}
+
+/* Mobile responsive */
+@media (max-width: 600px) {
+  .timers-control-panel {
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px 15px;
+  }
+
+  .timers-action-controls {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .control-btn {
+    flex: 1;
+    font-size: 0.85rem;
+    padding: 8px 12px;
+  }
+}
+
 .time-setter {
   display: flex;
   justify-content: center;
@@ -61,6 +172,7 @@ body {
   /* Only round top corners */
   background-color: white;
   position: relative;
+  margin-bottom: 30px;
 }
 
 .time-setter-bottom-controls {
@@ -74,9 +186,9 @@ body {
   background-color: white;
   display: flex;
   align-items: center;
-  justify-content: center;  /* centers the start buttons */
+  justify-content: center; /* centers the start buttons */
   gap: 8px;
-  padding: 4px 5px;  /* add small padding */
+  padding: 4px 5px; /* add small padding */
 }
 
 .scheduled-start-controls {
@@ -146,16 +258,25 @@ body {
 
 .time-setter-bottom-controls .advanced-btn {
   position: absolute;
-  right: 2px;  /* positioned at right edge */
+  right: 2px; /* positioned at right edge */
   margin: 0;
-  opacity: 1;  /* remove low-visibility behavior when inside */
+  opacity: 1; /* remove low-visibility behavior when inside */
 }
 
 .time-setter-bottom-controls .main-timer-buttons {
   display: flex;
   gap: 4px;
   margin: 0;
-  opacity: 1;  /* remove low-visibility behavior when inside */
+  opacity: 1; /* remove low-visibility behavior when inside */
+}
+
+.time-setter .progress-container {
+  position: absolute;
+  bottom: -23px;
+  left: 0;
+  right: 0;
+  width: 100%;
+  margin: 0;
 }
 
 .timer-box-wrapper {
@@ -593,8 +714,7 @@ body {
   background-color: var(--primary-color);
   width: 0%;
   transition: width 1s linear;
-  transform-origin: right;
-  /* Set transform origin to right side */
+  /* transform-origin controlled by JavaScript */
 }
 
 /* === Draggable/Resizable Elements === */
@@ -626,7 +746,7 @@ body {
 
 /* Countdown + Label Box */
 .countdown-box {
-  display: none;  /* Hidden in parallel countdown */
+  display: none; /* Hidden in parallel countdown */
   background-color: rgba(255, 255, 255, 0.8);
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -704,6 +824,53 @@ body {
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
 }
 
+/* === SIMPLE COLOR PICKER === */
+.simple-color-picker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.simple-color-picker label {
+  font-weight: bold;
+  min-width: 60px;
+}
+
+#simple-color-input {
+  width: 60px;
+  height: 40px;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.alpha-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.alpha-control label {
+  font-weight: bold;
+  min-width: 120px;
+}
+
+#alpha-input {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: #ddd;
+  outline: none;
+}
+
+#alpha-value {
+  min-width: 40px;
+  text-align: center;
+  font-weight: bold;
+}
+
 .direction-selector {
   display: flex;
   margin-left: 10px;
@@ -743,114 +910,6 @@ body {
   margin: 1px auto;
   cursor: pointer;
   border: none;
-}
-
-/* Enhanced Color Picker Modal */
-.color-modal {
-  display: none;
-  position: fixed;
-  z-index: 100;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-}
-
-.color-modal-content {
-  background-color: white;
-  margin: 10% auto;
-  padding: 20px;
-  border-radius: 10px;
-  width: 90%;
-  max-width: 400px;
-  text-align: center;
-}
-
-.color-picker-container {
-  display: flex;
-  margin-bottom: 15px;
-}
-
-.main-color-picker {
-  width: 70%;
-  height: 200px;
-  position: relative;
-  border: 1px solid #ccc;
-  cursor: crosshair;
-  background: linear-gradient(to right, #fff, #00f);
-}
-
-.hue-slider {
-  width: 30px;
-  height: 200px;
-  margin-left: 10px;
-  position: relative;
-  border: 1px solid #ccc;
-  cursor: pointer;
-  background: linear-gradient(
-    to bottom,
-    #f00,
-    #ff0,
-    #0f0,
-    #0ff,
-    #00f,
-    #f0f,
-    #f00
-  );
-}
-
-.alpha-slider {
-  width: 100%;
-  height: 30px;
-  margin-top: 15px;
-  position: relative;
-  border: 1px solid #ccc;
-  cursor: pointer;
-  background: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1));
-}
-
-.slider-handle {
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  border: 2px solid white;
-  border-radius: 50%;
-  box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-}
-
-/* Override the circle for the hue slider handle */
-#hue-handle {
-  width: 30px;
-  height: 6px;
-  border-radius: 3px;
-  background: white;
-  border: 2px solid black;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-/* Override the circle for the alpha slider handle */
-#alpha-handle {
-  width: 6px;
-  height: 30px;
-  border-radius: 3px;
-  background: white;
-  border: 2px solid black;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.close-color-modal {
-  margin-top: 15px;
-  padding: 8px 15px;
-  background-color: #e74c3c;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
 }
 
 .countdown-display {
@@ -1346,8 +1405,8 @@ body {
   color: #333;
   white-space: normal;
   line-height: 1.4;
-  position: relative; 
-  overflow:auto;  
+  position: relative;
+  overflow: auto;
   resize: both;
   cursor: move;
   min-width: 200px;
@@ -1435,22 +1494,38 @@ body {
 
 /* === DARK THEME FOR TIMER PAGE === */
 body.dark-theme {
-    background-color: #1a1a2e;
-    color: #e0e0e0;
+  background-color: #1a1a2e;
+  color: #e0e0e0;
+}
+
+/* Dark mode for timers control panel */
+body.dark-theme .timers-control-panel {
+  background: #2a2a2a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-theme #timers-count-input {
+  background: #3a3a3a;
+  color: #ffffff;
+  border-color: #555;
+}
+
+body.dark-theme .control-label {
+  color: #e0e0e0;
 }
 
 body.dark-theme .time-setter,
 body.dark-theme .countdown-box,
 body.dark-theme .timer-notes-display {
-    background-color: #4e4e4e;
-    border-color: #404040;
-    color: #e0e0e0;
+  background-color: #4e4e4e;
+  border-color: #404040;
+  color: #e0e0e0;
 }
 
 body.dark-theme .time-setter-bottom-controls {
   background-color: #4e4e4e;
   border-top: 2px solid;
-  border-top-color: #404040;  
+  border-top-color: #404040;
 }
 
 body.dark-theme .scheduled-label {
@@ -1485,192 +1560,190 @@ body.dark-theme .scheduled-period:hover {
 }
 
 body.dark-theme .current-timer-info {
-    color: #ffffff;
+  color: #ffffff;
 }
 
 body.dark-theme .time-value {
-    background-color: #2a2a2a;
-    border-color: #404040;
-    color: #e0e0e0;
+  background-color: #2a2a2a;
+  border-color: #404040;
+  color: #e0e0e0;
 }
 
 body.dark-theme .time-input {
-    color: #ffffff;
+  color: #ffffff;
 }
 
 body.dark-theme .time-value input.time-input {
-    color: #ffffff;
+  color: #ffffff;
 }
 
 body.dark-theme .timer-label-left,
 body.dark-theme .timer-label-left input {
-    background-color: #2a2a2a;
-    border-color: #404040;
-    color: #e0e0e0;
+  background-color: #2a2a2a;
+  border-color: #404040;
+  color: #e0e0e0;
 }
 
 body.dark-theme .arrow-btn {
-    color: #e0e0e0;
+  color: #e0e0e0;
 }
 
 body.dark-theme .preset-time-display {
-    background-color: #2a2a2a;
-    border-color: #404040;
-    color: #e0e0e0;
+  background-color: #2a2a2a;
+  border-color: #404040;
+  color: #e0e0e0;
 }
 
 body.dark-theme .progress-container {
-    background-color: rgba(40, 40, 40, 0.5);
-    border-color: #606060;
+  background-color: rgba(40, 40, 40, 0.5);
+  border-color: #606060;
 }
 
 body.dark-theme .advanced-btn {
-    background-color: #2ecc71;
-    color: #1a1a2e;
+  background-color: #2ecc71;
+  color: #1a1a2e;
 }
 
 body.dark-theme .start-btn,
 body.dark-theme .pause-btn,
 body.dark-theme .stop-reset-btn,
 body.dark-theme .close-settings-btn {
-    opacity: 0.95;
+  opacity: 0.95;
 }
 
 body.dark-theme .sound-reminders {
-    background-color: #303b5e;
-    border-color: #404040;
+  background-color: #303b5e;
+  border-color: #404040;
 }
 
 body.dark-theme .sound-reminders input {
-    background-color: #909090;
-    border-color: #404040;
-    color: #e0e0e0;
+  background-color: #909090;
+  border-color: #404040;
+  color: #e0e0e0;
 }
 
 body.dark-theme .sound-reminders-title {
-    color: #f0f0f0;
+  color: #f0f0f0;
 }
 
 body.dark-theme .sound-reminders-row span {
-    color: #d0d0d0;
+  color: #d0d0d0;
 }
 
 body.dark-theme .timer-controls-label {
-    color: #d0d0d0;
+  color: #d0d0d0;
 }
 
 body.dark-theme .sound-reminders input::placeholder {
-    color: #888;
+  color: #888;
 }
 
 body.dark-theme .timer-notes-advanced {
-    background-color: #2a2a2a;
-    border-color: #404040;
-    color: #000000;
+  background-color: #2a2a2a;
+  border-color: #404040;
+  color: #000000;
 }
 
 /* Also set color for the display on main page */
 body.dark-theme .timer-notes-display {
-    background-color: #2a2a2a;
-    color: #000000;
+  background-color: #2a2a2a;
+  color: #000000;
 }
 
 /* Placeholder text color */
 body.dark-theme .timer-notes-advanced:empty:before {
-    color: #666666;
+  color: #666666;
 }
 
-
-
 body.dark-theme .timer-notes-advanced:empty:before {
-    color: #666666;
+  color: #666666;
 }
 
 /* Only force black color for text that doesn't have inline styles */
 body.dark-theme .timer-notes-advanced:not(:has([style*="color"])) {
-    color: #000000;
+  color: #000000;
 }
 
 body.dark-theme .timer-notes-advanced input,
 body.dark-theme .timer-name-input,
 body.dark-theme .time-input {
-    color: #000000;
+  color: #000000;
 }
 
 body.dark-theme h1 {
-    color: #c5c5c5 !important;
+  color: #c5c5c5 !important;
 }
 
 body.dark-theme h2,
 body.dark-theme h3 {
-    color: #d6d6d6 !important;
+  color: #d6d6d6 !important;
 }
 
 body.dark-theme footer h3,
 body.dark-theme .footer-section h3 {
-    color: #3498db !important;
+  color: #3498db !important;
 }
 
 body.dark-theme #settings-page h1 {
-    color: #f0f0f0;
+  color: #f0f0f0;
 }
 
 body.dark-theme #settings-page h3 {
-    color: #e0e0e0;
+  color: #e0e0e0;
 }
 
 body.dark-theme .visibility-section label {
-    color: #d0d0d0;
+  color: #d0d0d0;
 }
 
 body.dark-theme .reminder-time {
-    background-color: #2a2a2a;
-    color: #000000;
-    border-color: #404040;
+  background-color: #2a2a2a;
+  color: #000000;
+  border-color: #404040;
 }
 
 body.dark-theme .text-toolbar {
-    background-color: #2a2a2a;
-    border-color: #3498db;
+  background-color: #2a2a2a;
+  border-color: #3498db;
 }
 
 body.dark-theme .toolbar-btn {
-    background-color: #3a3a3a;
-    border-color: #505050;
-    color: #e0e0e0;
+  background-color: #3a3a3a;
+  border-color: #505050;
+  color: #e0e0e0;
 }
 
 body.dark-theme .toolbar-btn:hover {
-    background-color: #4a4a4a;
+  background-color: #4a4a4a;
 }
 
 body.dark-theme .upload-image-btn-advanced {
-    background-color: #2a2a2a;
-    border-color: #909090;
-    color: #e0e0e0;
+  background-color: #2a2a2a;
+  border-color: #909090;
+  color: #e0e0e0;
 }
 
 body.dark-theme .visibility-section {
-    background-color: #252a3a;
-    border-color: #404040;
+  background-color: #252a3a;
+  border-color: #404040;
 }
 
 body.dark-theme .color-modal-content {
-    background-color: #2a2a2a;
-    color: #e0e0e0;
+  background-color: #2a2a2a;
+  color: #e0e0e0;
 }
 
 body.dark-theme #main-title {
-    color: #e0e0e0;
+  color: #e0e0e0;
 }
 
 /* === PAGE-SPECIFIC FOOTER SPACING === */
 body footer {
-    margin-top: 72vh;
+  margin-top: 72vh;
 }
 
 @media (max-width: 768px) {
   body {
-    max-width: 500px;  /* Keep narrow on mobile */
+    max-width: 500px; /* Keep narrow on mobile */
   }
 }

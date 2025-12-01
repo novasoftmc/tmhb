@@ -89,9 +89,25 @@
     <!-- Main Page -->
     <main id="main-page" class="page">
       <h1 id="main-title" style="text-align: center; font-size: 1.5rem; margin: 10px 0 15px 0; color: #2c3e50; font-weight: 600;">Free Online Parallel Countdown Timer</h1>
+      
+      <!-- Timers Control Panel -->
+      <div class="timers-control-panel">
+        <div class="timers-count-controls">
+          <label for="timers-count-input" class="control-label">Timers:</label>
+          <input type="number" id="timers-count-input" min="1" max="20" value="2" />
+          <button class="control-btn minus-btn" id="minus-timers-btn" aria-label="Remove one timer">−</button>
+          <button class="control-btn plus-btn" id="plus-timers-btn" aria-label="Add one timer">+</button>
+        </div>
+        <div class="timers-action-controls">
+          <button class="control-btn start-all-btn" id="start-all-btn">START ALL</button>
+          <button class="control-btn pause-all-btn" id="pause-all-btn" style="display: none;">PAUSE ALL</button>
+          <button class="control-btn reset-all-btn" id="reset-all-btn" style="display: none;">RESET ALL</button>
+        </div>
+      </div>
+
       <h2 class="hidden">Main Timer Functions</h2> 
       <div class="container">
-        <div class="time-setter" id="main-timer" style="position: relative;">
+        <div class="time-setter" id="main-timer" data-timer-index="0" style="position: relative;">
           <div class="timer-label-left">
             <label for="timer-label-input" class="hidden">Timer name</label>
             <input
@@ -274,13 +290,12 @@
           <div class="main-timer-buttons" id="main-timer-buttons-container">
             <button class="start-btn" id="start-btn" name="startTimer" aria-label="Start timer">START ></button>
             <button class="pause-btn" id="pause-btn" name="pauseTimer" style="display: none" aria-label="Pause timer">PAUSE ||</button>
-            <button class="stop-reset-btn" id="stop-reset-btn" name="stopResetTimer" style="display: none" aria-label="Stop and reset timer">STOP ■</button>
+            <button class="stop-reset-btn" id="stop-reset-btn" name="stopResetTimer" style="display: none" aria-label="Stop and reset timer">RESET ■</button>
           </div>
           <button class="advanced-btn" id="advanced-btn" name="advancedButton" aria-label="Open advanced settings">Customize</button>
         </div>
-        </div>
-      </div>
-
+        
+        <!-- Progress bar inside timer box -->
         <div
           class="progress-container draggable-element"
           id="progress-container"
@@ -296,6 +311,12 @@
           <div class="resize-handle bottom-left"></div>
           <div class="resize-handle bottom-right"></div>
         </div>
+        
+        </div> <!-- closes time-setter -->
+      </div> <!-- closes container -->
+      </div>
+
+        
         
 
        <!-- Notes display (only shown if Timer 1 has notes) -->
@@ -366,31 +387,7 @@
         </button>
 
         <div class="visibility-section">
-          <h3 style="font-weight: bold; margin-bottom: 9px; text-align: center; font-size: 1rem;">Display Options While Timer is Running</h3>
-          <!-- <div class="visibility-option">
-            <input type="checkbox" id="show-main-title" checked />
-            <label for="show-main-title">Show Main Title</label>
-          </div>
-          <div class="visibility-option">
-            <input type="checkbox" id="show-time-setter" checked />
-            <label for="show-time-setter">Show time setter box</label>
-          </div>
-          <div class="visibility-option">
-            <input type="checkbox" id="show-start-btn" checked />
-            <label for="show-start-btn">Show start/stop button</label>
-          </div>
-          <div class="visibility-option">
-            <input type="checkbox" id="show-advanced-btn" checked />
-            <label for="show-advanced-btn">Show advanced button</label>
-          </div>
-          <div class="visibility-option">
-            <input type="checkbox" id="show-countdown" checked />
-            <label for="show-countdown">Show digital countdown display</label>
-          </div>
-          <div class="visibility-option">
-            <input type="checkbox" id="show-timer-info" checked />
-            <label for="show-timer-info">Show current timer label</label>
-          </div> -->
+          <h3 style="font-weight: bold; margin-bottom: 9px; text-align: center; font-size: 1rem;">Display Options While Timer is Running</h3>          
           <div class="visibility-option">
             <input type="checkbox" id="show-progress-bar" checked />
             <label for="show-progress-bar">Show progress bar</label>
@@ -417,52 +414,29 @@
       </div>
     </section>
 
-    <!-- Enhanced Color Picker Modal -->
-    <div id="color-modal" class="color-modal">
-      <div class="color-modal-content">
-        <h3>Select a Color</h3>
-        <div class="color-picker-container">
-          <div class="main-color-picker" id="main-color-picker">
-            <div class="slider-handle" id="color-handle"></div>
-          </div>
-          <div class="hue-slider" id="hue-slider">
-            <div class="slider-handle" id="hue-handle"></div>
-          </div>
-        </div>
-
-        <div
-          id="color-preview"
-          style="
-            margin-top: 10px;
-            height: 30px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            background-color: rgba(52, 152, 219, 1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #333;
-            font-size: 0.9rem;
-            font-weight: bold;
-          "
-        >
-          Transparency
-        </div>
-
-        <div class="alpha-slider" id="alpha-slider">
-          <div class="slider-handle" id="alpha-handle"></div>
-        </div>
-
-        <button
-          class="close-color-modal"
-          id="close-color-modal"
-          name="closeColorPicker"
-          aria-label="Apply selected color"
-        >
-          Apply Color
-        </button>
-      </div>
+    <!-- Simple Color Picker Modal -->
+<div id="color-modal" class="color-modal" style="display: none">
+  <div class="color-modal-content">
+    <h3>Select a Color</h3>
+    <div class="simple-color-picker">
+      <label for="simple-color-input">Color:</label>
+      <input type="color" id="simple-color-input" value="#3498db">
     </div>
+    <div class="alpha-control">
+      <label for="alpha-input">Transparency:</label>
+      <input type="range" id="alpha-input" min="0" max="100" value="50">
+      <span id="alpha-value">50%</span>
+    </div>
+    <button
+      class="close-color-modal"
+      id="close-color-modal"
+      name="closeColorPicker"
+      aria-label="Apply selected color"
+    >
+      Apply Color
+    </button>
+  </div>
+</div>
 
     <!-- Footer -->
     <footer>

@@ -18,6 +18,34 @@ const state = (function () {
         every: { minutes: 0, seconds: 0 },
         duration: 5,
       },
+      isRunning: false,
+      isPaused: false,
+      remainingSeconds: 0,
+      totalSeconds: 0,
+      interval: null,
+    },
+    {
+      hours: 0,
+      minutes: 0,
+      seconds: 0,
+      color: "#e74c3c",
+      direction: "right",
+      alpha: 0.5,
+      beepAt: 5,
+      name: "Timer 2",
+      notes: "",
+      imageData: null,
+      imageName: null,
+      reminders: {
+        custom: [],
+        every: { minutes: 0, seconds: 0 },
+        duration: 5,
+      },
+      isRunning: false,
+      isPaused: false,
+      remainingSeconds: 0,
+      totalSeconds: 0,
+      interval: null,
     },
   ];
 
@@ -88,8 +116,6 @@ const state = (function () {
     showHeader: true,
     showTimeSetter: true,
     showAdvancedBtn: true,
-    showCountdown: false,
-    showTimerInfo: false,
     showStartBtn: true,
     showNotes: true,
     showImage: true,
@@ -98,7 +124,7 @@ const state = (function () {
   let scheduledStart = {
     enabled: false,
     time: null, // Will be set to 1 hour from now on init
-    checkInterval: null
+    checkInterval: null,
   };
 
   return {
@@ -182,9 +208,9 @@ const state = (function () {
     },
 
     getScheduledStart: () => scheduledStart,
-    setScheduledStart: (value) => { scheduledStart = value; 
+    setScheduledStart: (value) => {
+      scheduledStart = value;
     },
-
   };
 })();
 
@@ -344,7 +370,6 @@ const uiManager = (function () {
 
     if (currentTimerInfo) {
       if (type === "timer") {
-        // FIX: Use the actual timer name from state, not just Timer 1's input
         const timers = state.getTimers();
         if (index < timers.length) {
           currentTimerInfo.textContent =
@@ -479,36 +504,78 @@ const uiManager = (function () {
                     ${removeBtn}
 
                     <div class="timer-label-left">
-                        <label for="timer${index}_name" class="hidden">Timer ${index + 1} name</label>
-                        <input type="text" class="timer-name-input" data-timer-index="${index}" value="${timerData.name || "Timer " + (index + 1)}" placeholder="Enter timer name..." maxlength="30" name="timer${index}_name" id="timer${index}_name" aria-label="Timer ${index + 1} name">
+                        <label for="timer${index}_name" class="hidden">Timer ${
+      index + 1
+    } name</label>
+                        <input type="text" class="timer-name-input" data-timer-index="${index}" value="${
+      timerData.name || "Timer " + (index + 1)
+    }" placeholder="Enter timer name..." maxlength="30" name="timer${index}_name" id="timer${index}_name" aria-label="Timer ${
+      index + 1
+    } name">
                     </div> 
                     
                     <!-- Preset time display -->
-                    <div class="preset-time-display" data-timer-index="${index}" title="Duration Set">${timerData.hours.toString().padStart(2, "0")}:${timerData.minutes.toString().padStart(2, "0")}:${timerData.seconds.toString().padStart(2, "0")}</div>
+                    <div class="preset-time-display" data-timer-index="${index}" title="Duration Set">${timerData.hours
+      .toString()
+      .padStart(2, "0")}:${timerData.minutes
+      .toString()
+      .padStart(2, "0")}:${timerData.seconds.toString().padStart(2, "0")}</div>
 
                     <!-- Direction and Color controls on LEFT -->
                     <div class="timer-controls-left">
                         <span class="timer-controls-label">Progress Bar</span>
                         <div class="timer-controls-icons">
                             <div class="direction-indicator" data-timer-index="${index}">
-                                <button class="dir-btn-mini ${timerData.direction === "left" ? "selected" : ""}" data-dir="left" data-timer-index="${index}" style="${timerData.direction === "left" ? `background-color: ${timerData.color}; opacity: ${timerData.alpha || 0.5};` : ""}" aria-label="Timer ${index + 1} progress left to right">←</button>
-                                <button class="dir-btn-mini ${timerData.direction === "right" ? "selected" : ""}" data-dir="right" data-timer-index="${index}" style="${timerData.direction === "right" ? `background-color: ${timerData.color}; opacity: ${timerData.alpha || 0.5};` : ""}" aria-label="Timer ${index + 1} progress right to left">→</button>
+                                <button class="dir-btn-mini ${
+                                  timerData.direction === "left"
+                                    ? "selected"
+                                    : ""
+                                }" data-dir="left" data-timer-index="${index}" style="${
+      timerData.direction === "left"
+        ? `background-color: ${timerData.color}; opacity: ${
+            timerData.alpha || 0.5
+          };`
+        : ""
+    }" aria-label="Timer ${index + 1} progress left to right">←</button>
+                                <button class="dir-btn-mini ${
+                                  timerData.direction === "right"
+                                    ? "selected"
+                                    : ""
+                                }" data-dir="right" data-timer-index="${index}" style="${
+      timerData.direction === "right"
+        ? `background-color: ${timerData.color}; opacity: ${
+            timerData.alpha || 0.5
+          };`
+        : ""
+    }" aria-label="Timer ${index + 1} progress right to left">→</button>
                             </div>
-                            <div class="color-indicator" data-timer-index="${index}" title="Timer color" style="background-color: ${timerData.color}; opacity: ${timerData.alpha || 0.5};" role="button" aria-label="Change timer ${index + 1} color"></div>
+                            <div class="color-indicator" data-timer-index="${index}" title="Timer color" style="background-color: ${
+      timerData.color
+    }; opacity: ${
+      timerData.alpha || 0.5
+    };" role="button" aria-label="Change timer ${index + 1} color"></div>
                         </div>
                     </div>
                     
                     <!-- Time controls -->
                     <div class="time-unit">
-                        <div class="time-value" data-timer-index="${index}" data-unit="hours" role="textbox" aria-label="Timer ${index + 1} hours">${timerData.hours}h</div>
+                        <div class="time-value" data-timer-index="${index}" data-unit="hours" role="textbox" aria-label="Timer ${
+      index + 1
+    } hours">${timerData.hours}h</div>
                     </div>
                     <div class="arrow-buttons">
-                        <button class="arrow-btn" data-timer-index="${index}" data-unit="hours" data-direction="up" aria-label="Increase timer ${index + 1} hours">↑</button>
-                        <button class="arrow-btn" data-timer-index="${index}" data-unit="hours" data-direction="down" aria-label="Decrease timer ${index + 1} hours">↓</button>
+                        <button class="arrow-btn" data-timer-index="${index}" data-unit="hours" data-direction="up" aria-label="Increase timer ${
+      index + 1
+    } hours">↑</button>
+                        <button class="arrow-btn" data-timer-index="${index}" data-unit="hours" data-direction="down" aria-label="Decrease timer ${
+      index + 1
+    } hours">↓</button>
                     </div>
                     
                     <div class="time-unit">
-                        <div class="time-value" data-timer-index="${index}" data-unit="minutes" role="textbox" aria-label="Timer ${index + 1} minutes">${timerData.minutes.toString().padStart(2, "0")}m</div>
+                        <div class="time-value" data-timer-index="${index}" data-unit="minutes" role="textbox" aria-label="Timer ${
+      index + 1
+    } minutes">${timerData.minutes.toString().padStart(2, "0")}m</div>
                     </div>
                     <div class="arrow-buttons">
                         <button class="arrow-btn" data-timer-index="${index}" data-unit="minutes" data-direction="up">↑</button>
@@ -516,7 +583,9 @@ const uiManager = (function () {
                     </div>
                     
                     <div class="time-unit">
-                        <div class="time-value" data-timer-index="${index}" data-unit="seconds" role="textbox" aria-label="Timer ${index + 1} seconds">${timerData.seconds.toString().padStart(2, "0")}s</div>
+                        <div class="time-value" data-timer-index="${index}" data-unit="seconds" role="textbox" aria-label="Timer ${
+      index + 1
+    } seconds">${timerData.seconds.toString().padStart(2, "0")}s</div>
                     </div>
                     <div class="arrow-buttons seconds-arrows">
                         <button class="arrow-btn" data-timer-index="${index}" data-unit="seconds" data-direction="up">↑</button>
@@ -529,17 +598,33 @@ const uiManager = (function () {
                             <div style="font-weight: bold; margin-bottom: 2px;">Final beeps:</div>
                             <div style="display: flex; flex-direction: row; gap: 2px; align-items: center;">
                                 <label style="display: flex; align-items: center; gap: 3px; cursor: pointer;">
-                                    <input type="checkbox" class="beep-checkbox" data-type="timer" data-index="${index + 1}" data-seconds="5" ${timerData.beepAt === 5 ? "checked" : ""} style="width: 12px; height: 12px;">
+                                    <input type="checkbox" class="beep-checkbox" data-type="timer" data-index="${
+                                      index + 1
+                                    }" data-seconds="5" ${
+      timerData.beepAt === 5 ? "checked" : ""
+    } style="width: 12px; height: 12px;">
                                     <span>5s</span>
                                 </label>
                                 <label style="display: flex; align-items: center; gap: 3px; cursor: pointer;">
-                                    <input type="checkbox" class="beep-checkbox" data-type="timer" data-index="${index + 1}" data-seconds="10" ${timerData.beepAt === 10 ? "checked" : ""} style="width: 12px; height: 12px;">
+                                    <input type="checkbox" class="beep-checkbox" data-type="timer" data-index="${
+                                      index + 1
+                                    }" data-seconds="10" ${
+      timerData.beepAt === 10 ? "checked" : ""
+    } style="width: 12px; height: 12px;">
                                     <span>10s</span>
                                 </label>
                             </div>
                         </div>
-                        <div class="sound-icon advanced-sound-icon ${timerData.beepAt > 0 ? "active" : ""}" data-timer-index="${index}" title="Sound ${timerData.beepAt > 0 ? "enabled" : "muted"}" style="cursor: pointer; flex-shrink: 0; margin-top: 4px;">
-                            ${timerData.beepAt > 0 ? `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>` : `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>`}
+                        <div class="sound-icon advanced-sound-icon ${
+                          timerData.beepAt > 0 ? "active" : ""
+                        }" data-timer-index="${index}" title="Sound ${
+      timerData.beepAt > 0 ? "enabled" : "muted"
+    }" style="cursor: pointer; flex-shrink: 0; margin-top: 4px;">
+                            ${
+                              timerData.beepAt > 0
+                                ? `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>`
+                                : `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>`
+                            }
                         </div>
                     </div>
                     
@@ -797,21 +882,6 @@ const uiManager = (function () {
       advancedBtn.classList.add("force-visible");
     }
 
-    // Countdown box visibility
-    const countdownBox = document.getElementById("countdown-box");
-    if (countdownBox) {
-      countdownBox.style.display =
-        settings.showCountdown || settings.showTimerInfo ? "block" : "none";
-    }
-
-    // Individual elements within the box
-    elements.countdownDisplay.style.display = settings.showCountdown
-      ? "flex"
-      : "none";
-    elements.currentTimerInfo.style.display = settings.showTimerInfo
-      ? "block"
-      : "none";
-
     // Notes and image visibility
     const notesDisplay = document.getElementById("notes-content-editable");
     const imageDisplay = document.getElementById("timer-image-display");
@@ -889,146 +959,12 @@ const uiManager = (function () {
   };
 })();
 
-// ===== COLOR PICKER MODULE =====
+// ===== SIMPLE COLOR PICKER MODULE =====
 const colorPickerManager = (function () {
-  const elements = uiManager.getElements();
+  let currentColor = "#3498db";
+  let currentAlpha = 0.5;
 
-  // Helper function to convert hex to RGB
-  function hexToRgb(hex) {
-    // Remove the # if present
-    hex = hex.replace(/^#/, "");
-
-    // Parse the hex values
-    let r, g, b;
-    if (hex.length === 3) {
-      r = parseInt(hex[0] + hex[0], 16);
-      g = parseInt(hex[1] + hex[1], 16);
-      b = parseInt(hex[2] + hex[2], 16);
-    } else if (hex.length === 6) {
-      r = parseInt(hex.substring(0, 2), 16);
-      g = parseInt(hex.substring(2, 4), 16);
-      b = parseInt(hex.substring(4, 6), 16);
-    } else {
-      return { r: 0, g: 0, b: 0 };
-    }
-
-    return { r, g, b };
-  }
-
-  // Helper function to convert RGB to hex
-  function rgbToHex(r, g, b) {
-    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-  }
-
-  // HSL to RGB conversion
-  function hslToRgb(h, s, l) {
-    let r, g, b;
-
-    if (s === 0) {
-      r = g = b = l;
-    } else {
-      const hue2rgb = (p, q, t) => {
-        if (t < 0) t += 1;
-        if (t > 1) t -= 1;
-        if (t < 1 / 6) return p + (q - p) * 6 * t;
-        if (t < 1 / 2) return q;
-        if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
-        return p;
-      };
-
-      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-      const p = 2 * l - q;
-      r = hue2rgb(p, q, h + 1 / 3);
-      g = hue2rgb(p, q, h);
-      b = hue2rgb(p, q, h - 1 / 3);
-    }
-
-    return {
-      r: Math.round(r * 255),
-      g: Math.round(g * 255),
-      b: Math.round(b * 255),
-    };
-  }
-
-  // RGB to HSL conversion
-  function rgbToHsl(r, g, b) {
-    r /= 255;
-    g /= 255;
-    b /= 255;
-
-    const max = Math.max(r, g, b);
-    const min = Math.min(r, g, b);
-    let h,
-      s,
-      l = (max + min) / 2;
-
-    if (max === min) {
-      h = s = 0; // achromatic
-    } else {
-      const d = max - min;
-      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-
-      switch (max) {
-        case r:
-          h = (g - b) / d + (g < b ? 6 : 0);
-          break;
-        case g:
-          h = (b - r) / d + 2;
-          break;
-        case b:
-          h = (r - g) / d + 4;
-          break;
-      }
-      h /= 6;
-    }
-
-    return {
-      h: h * 360,
-      s: s,
-      l: l,
-    };
-  }
-
-  // Update selected color display
-  function updateSelectedColor() {
-    const mainRect = elements.mainColorPicker.getBoundingClientRect();
-    const hueRect = elements.hueSlider.getBoundingClientRect();
-    const alphaRect = elements.alphaSlider.getBoundingClientRect();
-
-    // Get positions relative to their containers
-    const colorX =
-      parseInt(elements.colorHandle.style.left) || mainRect.width / 2;
-    const colorY =
-      parseInt(elements.colorHandle.style.top) || mainRect.height / 2;
-    const hueY = parseInt(elements.hueHandle.style.top) || hueRect.height / 2;
-    const alphaX =
-      parseInt(elements.alphaHandle.style.left) || alphaRect.width * 0.5;
-
-    // Calculate normalized values (0-1)
-    const saturation = Math.max(0, Math.min(1, colorX / mainRect.width));
-    const lightness = Math.max(0, Math.min(1, 1 - colorY / mainRect.height));
-    const hue = Math.max(0, Math.min(360, (hueY / hueRect.height) * 360));
-    const alpha = Math.max(0, Math.min(1, alphaX / alphaRect.width));
-
-    // Convert to RGB
-    const rgb = hslToRgb(hue / 360, saturation, lightness);
-    const colorPreview = document.getElementById("color-preview");
-    if (colorPreview) {
-      colorPreview.style.backgroundColor = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`;
-      colorPreview.style.color = `rgba(0,0,0, ${1 - alpha})`; // Text fades in when transparency increases
-    }
-
-    // Update the main color picker background based on selected hue
-    const currentHueColor = hslToRgb(hue / 360, 1, 0.5);
-    const hueColorHex = rgbToHex(
-      currentHueColor.r,
-      currentHueColor.g,
-      currentHueColor.b
-    );
-    elements.mainColorPicker.style.background = `linear-gradient(to right, #fff, ${hueColorHex}), linear-gradient(to top, #000, transparent)`;
-  }
-
-  // Initialize color picker with current values - FIXED VERSION
+  // Initialize simple color picker
   function initColorPicker(element) {
     const type = element.dataset.type;
     const index = parseInt(element.dataset.index);
@@ -1036,237 +972,60 @@ const colorPickerManager = (function () {
     let color, alpha;
     if (type === "timer") {
       const timers = state.getTimers();
-      color = timers[index - 1].color;
-      alpha = timers[index - 1].alpha || 1;
+      color = timers[index].color;
+      alpha = timers[index].alpha || 0.5;
     } else {
       const pauses = state.getPauses();
-      color = pauses[index - 1].color;
-      alpha = pauses[index - 1].alpha || 1;
+      color = pauses[index].color;
+      alpha = pauses[index].alpha || 0.5;
     }
 
-    // Convert hex to HSL to position handles correctly
-    const rgb = hexToRgb(color);
-    const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+    currentColor = color;
+    currentAlpha = alpha * 100; // Convert to percentage
 
-    // Set initial handle positions based on current color
-    const mainRect = elements.mainColorPicker.getBoundingClientRect();
-    const hueRect = elements.hueSlider.getBoundingClientRect();
-    const alphaRect = elements.alphaSlider.getBoundingClientRect();
+    // Set initial values
+    const colorInput = document.getElementById("simple-color-input");
+    const alphaInput = document.getElementById("alpha-input");
+    const alphaValue = document.getElementById("alpha-value");
 
-    // Position color handle (saturation and lightness)
-    elements.colorHandle.style.left = `${Math.max(
-      0,
-      Math.min(mainRect.width, hsl.s * mainRect.width)
-    )}px`;
-    elements.colorHandle.style.top = `${Math.max(
-      0,
-      Math.min(mainRect.height, (1 - hsl.l) * mainRect.height)
-    )}px`;
-
-    // Position hue handle
-    elements.hueHandle.style.top = `${Math.max(
-      0,
-      Math.min(hueRect.height, (hsl.h / 360) * hueRect.height)
-    )}px`;
-
-    // Position alpha handle correctly
-    setTimeout(() => {
-      const alphaRect = elements.alphaSlider.getBoundingClientRect();
-      elements.alphaHandle.style.left = `${Math.max(
-        0,
-        Math.min(alphaRect.width, alpha * alphaRect.width)
-      )}px`;
-      elements.alphaHandle.style.top = "50%"; // Center vertically
-    }, 50);
-
-    // Update the main color picker background based on selected hue
-    const currentHueColor = hslToRgb(hsl.h / 360, 1, 0.5);
-    const hueColorHex = rgbToHex(
-      currentHueColor.r,
-      currentHueColor.g,
-      currentHueColor.b
-    );
-    elements.mainColorPicker.style.background = `linear-gradient(to right, #fff, ${hueColorHex}), linear-gradient(to top, #000, transparent)`;
-
-    // Set initial color values
-    const colorPreview = document.getElementById("color-preview");
-    if (colorPreview) {
-      colorPreview.style.backgroundColor = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`;
-    }
+    if (colorInput) colorInput.value = color;
+    if (alphaInput) alphaInput.value = currentAlpha;
+    if (alphaValue) alphaValue.textContent = `${currentAlpha}%`;
   }
 
-  // Set up color picker interactions
+  // Set up simple color picker interactions
   function setupColorPickerInteractions() {
-    // Main color picker interaction (click + drag)
-    let isDraggingMainColor = false;
+    const colorInput = document.getElementById("simple-color-input");
+    const alphaInput = document.getElementById("alpha-input");
+    const alphaValue = document.getElementById("alpha-value");
+    const closeBtn = document.getElementById("close-color-modal");
 
-    elements.mainColorPicker.addEventListener("mousedown", (e) => {
-      isDraggingMainColor = true;
-      moveMainColorHandle(e);
-    });
-
-    document.addEventListener("mousemove", (e) => {
-      if (isDraggingMainColor) {
-        moveMainColorHandle(e);
-      }
-    });
-
-    document.addEventListener("mouseup", () => {
-      isDraggingMainColor = false;
-    });
-
-    // Helper function to move the main color handle
-    function moveMainColorHandle(e) {
-      const rect = elements.mainColorPicker.getBoundingClientRect();
-      let x = e.clientX - rect.left;
-      let y = e.clientY - rect.top;
-
-      // Clamp within bounds
-      x = Math.max(0, Math.min(rect.width, x));
-      y = Math.max(0, Math.min(rect.height, y));
-
-      elements.colorHandle.style.left = `${x}px`;
-      elements.colorHandle.style.top = `${y}px`;
-      updateSelectedColor();
+    if (colorInput) {
+      colorInput.addEventListener("input", (e) => {
+        currentColor = e.target.value;
+      });
     }
 
-    // Hue slider interaction (click + drag)
-    let isDraggingHue = false;
-
-    elements.hueSlider.addEventListener("mousedown", (e) => {
-      isDraggingHue = true;
-      moveHueHandle(e);
-    });
-
-    document.addEventListener("mousemove", (e) => {
-      if (isDraggingHue) {
-        moveHueHandle(e);
-      }
-    });
-
-    document.addEventListener("mouseup", () => {
-      isDraggingHue = false;
-    });
-
-    // Helper function to move the hue handle
-    function moveHueHandle(e) {
-      const rect = elements.hueSlider.getBoundingClientRect();
-      let y = e.clientY - rect.top;
-
-      // Clamp within bounds
-      y = Math.max(0, Math.min(rect.height, y));
-
-      elements.hueHandle.style.top = `${y}px`;
-      updateSelectedColor();
+    if (alphaInput && alphaValue) {
+      alphaInput.addEventListener("input", (e) => {
+        currentAlpha = e.target.value;
+        alphaValue.textContent = `${currentAlpha}%`;
+      });
     }
 
-    // Alpha slider interaction (click + drag)
-    let isDraggingAlpha = false;
-
-    elements.alphaSlider.addEventListener("mousedown", (e) => {
-      isDraggingAlpha = true;
-      moveAlphaHandle(e);
-    });
-
-    document.addEventListener("mousemove", (e) => {
-      if (isDraggingAlpha) {
-        moveAlphaHandle(e);
-      }
-    });
-
-    document.addEventListener("mouseup", () => {
-      isDraggingAlpha = false;
-    });
-
-    // Helper for alpha handle
-    function moveAlphaHandle(e) {
-      const rect = elements.alphaSlider.getBoundingClientRect();
-      let x = e.clientX - rect.left;
-
-      // Clamp within bounds
-      x = Math.max(0, Math.min(rect.width, x));
-
-      elements.alphaHandle.style.left = `${x}px`;
-
-      // Normalize alpha 0–1
-      const alpha = x / rect.width;
-
-      // Update preview immediately
-      const preview = document.getElementById("color-preview");
-      const bg = window.getComputedStyle(preview).backgroundColor;
-      const rgbaMatch = bg.match(
-        /rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/
-      );
-
-      if (rgbaMatch) {
-        const r = parseInt(rgbaMatch[1]);
-        const g = parseInt(rgbaMatch[2]);
-        const b = parseInt(rgbaMatch[3]);
-        preview.style.backgroundColor = `rgba(${r}, ${g}, ${b}, ${alpha})`;
-        preview.style.color = `rgba(0,0,0, ${1 - alpha})`;
-      }
-    }
-
-    // Close color modal with selected color
-    elements.closeColorModal.addEventListener("click", () => {
-      const preview = document.getElementById("color-preview");
-      const colorValue = window.getComputedStyle(preview).backgroundColor;
-
-      const rgbaMatch = colorValue.match(
-        /rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/
-      );
-
-      if (rgbaMatch && state.getCurrentColorPicker()) {
-        const r = parseInt(rgbaMatch[1]);
-        const g = parseInt(rgbaMatch[2]);
-        const b = parseInt(rgbaMatch[3]);
-        const alpha = rgbaMatch[4] ? parseFloat(rgbaMatch[4]) : 1;
-
-        const hex =
-          "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-
+    if (closeBtn) {
+      closeBtn.addEventListener("click", () => {
         const currentPicker = state.getCurrentColorPicker();
-        const type = currentPicker.dataset.type;
-        const index = parseInt(currentPicker.dataset.index);
+        if (currentPicker) {
+          const type = currentPicker.dataset.type;
+          const index = parseInt(currentPicker.dataset.index);
+          const alpha = currentAlpha / 100; // Convert back to 0-1
 
-        // Update visual appearance
-        currentPicker.style.backgroundColor = hex;
-        currentPicker.style.opacity = alpha.toString();
-
-        // Update direction buttons
-        const parentRow = currentPicker.closest(".timer-row, .pause-row");
-        if (parentRow) {
-          const dirButtons = parentRow.querySelectorAll(".dir-btn.selected");
-          dirButtons.forEach((btn) => {
-            btn.style.backgroundColor = hex;
-            btn.style.opacity = alpha.toString();
-          });
+          settingsManager.changeColor(type, index, currentColor, alpha);
         }
-
-        // Save to state (now with alpha)
-        settingsManager.changeColor(type, index, hex, alpha);
-
-        // Update main direction buttons if editing Timer 1
-        if (type === "timer" && index === 1) {
-          document
-            .querySelectorAll("#main-dir-left, #main-dir-right")
-            .forEach((btn) => {
-              if (btn.classList.contains("selected")) {
-                btn.style.backgroundColor = hex;
-                btn.style.opacity = alpha.toString();
-              }
-            });
-          document.getElementById(
-            "main-color-indicator"
-          ).style.backgroundColor = hex;
-          document.getElementById("main-color-indicator").style.opacity =
-            alpha.toString();
-        }
-
-        // Close modal
         uiManager.hideColorPicker();
-      }
-    });
+      });
+    }
   }
 
   return {
@@ -1388,7 +1147,6 @@ const timerLogic = (function () {
 
     // Update UI
     uiManager.updateButtonVisibility(true, false);
-    uiManager.updateCountdownDisplay(firstItem.totalSeconds);
     uiManager.updateCurrentTimerInfo(firstItem.type, firstItem.index);
 
     // Update notes and image for first timer
@@ -1649,7 +1407,11 @@ const timerLogic = (function () {
               for (let i = 0; i < r.duration; i++) {
                 try {
                   const beepTimeout = setTimeout(() => {
-                    if (state.getIsRunning() && !state.getIsPaused() && src.beepAt > 0) {
+                    if (
+                      state.getIsRunning() &&
+                      !state.getIsPaused() &&
+                      src.beepAt > 0
+                    ) {
                       state.playBeep(false);
                     }
                   }, i * 1000);
@@ -1695,7 +1457,11 @@ const timerLogic = (function () {
             // Schedule beeps for duration (check if paused before playing)
             for (let i = 0; i < r.duration; i++) {
               const beepTimeout = setTimeout(() => {
-                if (state.getIsRunning() && !state.getIsPaused() && src.beepAt > 0) {
+                if (
+                  state.getIsRunning() &&
+                  !state.getIsPaused() &&
+                  src.beepAt > 0
+                ) {
                   state.playBeep(false);
                 }
               }, i * 1000);
@@ -2012,14 +1778,14 @@ const settingsManager = (function () {
     if (type === "timer") {
       const timers = state.getTimers();
       // FIX: index is already 1-based, no need to subtract 1
-      timers[index - 1].color = color;
-      timers[index - 1].alpha = alpha;
+      timers[index].color = color;
+      timers[index].alpha = alpha;
       state.setTimers(timers);
     } else {
       const pauses = state.getPauses();
       // FIX: index is already 1-based, no need to subtract 1
-      pauses[index - 1].color = color;
-      pauses[index - 1].alpha = alpha;
+      pauses[index].color = color;
+      pauses[index].alpha = alpha;
       state.setPauses(pauses);
     }
 
@@ -2115,8 +1881,6 @@ const settingsManager = (function () {
           mainPresetDisplay.textContent = `${h}:${m}:${s}`;
         }
       }
-
-      
     } else {
       const pauses = state.getPauses();
       const pause = pauses[index - 1];
@@ -2141,7 +1905,8 @@ const settingsManager = (function () {
     const settings = state.getVisibilitySettings();
     settings.showNotes = document.getElementById("show-notes").checked;
     settings.showImage = document.getElementById("show-image").checked;
-    settings.showProgressBar = document.getElementById("show-progress-bar").checked;
+    settings.showProgressBar =
+      document.getElementById("show-progress-bar").checked;
 
     state.setVisibilitySettings(settings);
   }
@@ -2692,8 +2457,14 @@ const eventHandlers = (function () {
   const elements = uiManager.getElements();
 
   // Edit time unit by converting to input field
-  function editTimeUnit(unit) {
-    const element = elements[unit];
+  function editTimeUnit(unit, timerIndex = 0) {
+    const timerBox = document.querySelector(
+      `[data-timer-index="${timerIndex}"]`
+    );
+    if (!timerBox) return;
+
+    const element = timerBox.querySelector(`#${unit}-${timerIndex}`);
+    if (!element) return;
 
     // Prevent multiple inputs from being created
     if (element.querySelector("input")) {
@@ -2727,7 +2498,7 @@ const eventHandlers = (function () {
         if (unit !== "hours" && value > 59) value = 59;
 
         element.textContent = uiManager.formatTimeValue(value, unit);
-        updateStateFromUI();
+        updateStateFromUI(timerIndex);
       }, 100);
     });
 
@@ -2777,37 +2548,57 @@ const eventHandlers = (function () {
   }
 
   // Adjust time value using arrows
-  function adjustTime(unit, change) {
-    const element = elements[unit];
-    let value = parseInt(element.textContent) || 0;
+  function adjustTime(unit, change, timerIndex = 0) {
+    const timerBox = document.querySelector(
+      `[data-timer-index="${timerIndex}"]`
+    );
+    if (!timerBox) return;
 
+    const element = timerBox.querySelector(`#${unit}-${timerIndex}`);
+    if (!element) return;
+
+    let value = parseInt(element.textContent) || 0;
     value += change;
 
     if (value < 0) value = 0;
     if (unit !== "hours" && value > 59) value = 59;
 
     element.textContent = uiManager.formatTimeValue(value, unit);
-    updateStateFromUI();
+    updateStateFromUI(timerIndex);
   }
 
   // Update state from UI values
-  function updateStateFromUI() {
+  function updateStateFromUI(timerIndex = 0) {
     const timers = state.getTimers();
-    timers[0].hours = parseInt(elements.hours.textContent) || 0;
-    timers[0].minutes = parseInt(elements.minutes.textContent) || 0;
-    timers[0].seconds = parseInt(elements.seconds.textContent) || 0;
+    const timerBox = document.querySelector(
+      `[data-timer-index="${timerIndex}"]`
+    );
+    if (!timerBox) return;
+
+    const hours = timerBox.querySelector(`#hours-${timerIndex}`);
+    const minutes = timerBox.querySelector(`#minutes-${timerIndex}`);
+    const seconds = timerBox.querySelector(`#seconds-${timerIndex}`);
+
+    if (hours) timers[timerIndex].hours = parseInt(hours.textContent) || 0;
+    if (minutes)
+      timers[timerIndex].minutes = parseInt(minutes.textContent) || 0;
+    if (seconds)
+      timers[timerIndex].seconds = parseInt(seconds.textContent) || 0;
+
     state.setTimers(timers);
 
     // Update countdown display
-    const totalSeconds = timerLogic.calculateTotalSeconds(timers[0]);
+    const totalSeconds = timerLogic.calculateTotalSeconds(timers[timerIndex]);
     uiManager.updateCountdownDisplay(totalSeconds);
 
     // Update preset time display with user set time
-    const staticDisplay = document.getElementById("preset-time-display");
+    const staticDisplay = timerBox.querySelector(
+      `#preset-time-display-${timerIndex}`
+    );
     if (staticDisplay) {
-      const h = timers[0].hours.toString().padStart(2, "0");
-      const m = timers[0].minutes.toString().padStart(2, "0");
-      const s = timers[0].seconds.toString().padStart(2, "0");
+      const h = timers[timerIndex].hours.toString().padStart(2, "0");
+      const m = timers[timerIndex].minutes.toString().padStart(2, "0");
+      const s = timers[timerIndex].seconds.toString().padStart(2, "0");
       staticDisplay.textContent = `${h}:${m}:${s}`;
     }
   }
@@ -2886,10 +2677,23 @@ const eventHandlers = (function () {
 
   // Set up all event listeners
   function setupEventListeners() {
-    // Time unit click to edit
-    elements.hours.addEventListener("click", () => editTimeUnit("hours"));
-    elements.minutes.addEventListener("click", () => editTimeUnit("minutes"));
-    elements.seconds.addEventListener("click", () => editTimeUnit("seconds"));
+    // Time unit click to edit - use event delegation for all timers
+    document.addEventListener("click", (e) => {
+      if (e.target.classList.contains("time-value")) {
+        const timerBox = e.target.closest("[data-timer-index]");
+        if (!timerBox) return;
+        const timerIndex = parseInt(timerBox.dataset.timerIndex);
+
+        const elementId = e.target.id;
+        if (elementId.includes("hours")) {
+          editTimeUnit("hours", timerIndex);
+        } else if (elementId.includes("minutes")) {
+          editTimeUnit("minutes", timerIndex);
+        } else if (elementId.includes("seconds")) {
+          editTimeUnit("seconds", timerIndex);
+        }
+      }
+    });
 
     // Time unit keyboard support (Space to edit)
     elements.hours.addEventListener("keydown", (e) => {
@@ -2911,23 +2715,113 @@ const eventHandlers = (function () {
       }
     });
 
-    // Arrow buttons
-    elements.hourUpBtn.addEventListener("click", () => adjustTime("hours", 1));
-    elements.hourDownBtn.addEventListener("click", () =>
-      adjustTime("hours", -1)
-    );
-    elements.minuteUpBtn.addEventListener("click", () =>
-      adjustTime("minutes", 1)
-    );
-    elements.minuteDownBtn.addEventListener("click", () =>
-      adjustTime("minutes", -1)
-    );
-    elements.secondUpBtn.addEventListener("click", () =>
-      adjustTime("seconds", 1)
-    );
-    elements.secondDownBtn.addEventListener("click", () =>
-      adjustTime("seconds", -1)
-    );
+    // Arrow buttons - use event delegation for all timers
+    document.addEventListener("click", (e) => {
+      if (e.target.classList.contains("arrow-btn")) {
+        const timerBox = e.target.closest("[data-timer-index]");
+        if (!timerBox) return;
+
+        const timerIndex = parseInt(timerBox.dataset.timerIndex);
+        const btnId = e.target.id || e.target.getAttribute("id");
+
+        if (
+          btnId.includes("hour-up") ||
+          e.target.getAttribute("name") === "hourUp"
+        ) {
+          adjustTime("hours", 1, timerIndex);
+        } else if (
+          btnId.includes("hour-down") ||
+          e.target.getAttribute("name") === "hourDown"
+        ) {
+          adjustTime("hours", -1, timerIndex);
+        } else if (
+          btnId.includes("minute-up") ||
+          e.target.getAttribute("name") === "minuteUp"
+        ) {
+          adjustTime("minutes", 1, timerIndex);
+        } else if (
+          btnId.includes("minute-down") ||
+          e.target.getAttribute("name") === "minuteDown"
+        ) {
+          adjustTime("minutes", -1, timerIndex);
+        } else if (
+          btnId.includes("second-up") ||
+          e.target.getAttribute("name") === "secondUp"
+        ) {
+          adjustTime("seconds", 1, timerIndex);
+        } else if (
+          btnId.includes("second-down") ||
+          e.target.getAttribute("name") === "secondDown"
+        ) {
+          adjustTime("seconds", -1, timerIndex);
+        }
+      }
+    });
+
+    // Individual timer start/pause/reset buttons - event delegation
+    document.addEventListener("click", (e) => {
+      if (
+        e.target.classList.contains("start-btn") ||
+        e.target.getAttribute("name") === "startTimer"
+      ) {
+        const timerBox = e.target.closest("[data-timer-index]");
+        if (!timerBox) return;
+        const timerIndex = parseInt(timerBox.dataset.timerIndex);
+
+        const timers = state.getTimers();
+        if (!timers[timerIndex].isRunning && !timers[timerIndex].isPaused) {
+          startSingleTimer(timerIndex);
+          e.target.style.display = "none";
+          const pauseBtn = timerBox.querySelector(".pause-btn");
+          if (pauseBtn) pauseBtn.style.display = "inline-block";
+          // Don't show stop button until paused
+        }
+      }
+
+      if (
+        e.target.classList.contains("pause-btn") ||
+        e.target.getAttribute("name") === "pauseTimer"
+      ) {
+        const timerBox = e.target.closest("[data-timer-index]");
+        if (!timerBox) return;
+        const timerIndex = parseInt(timerBox.dataset.timerIndex);
+
+        const timers = state.getTimers();
+        const resetBtn = timerBox.querySelector(".stop-reset-btn");
+
+        if (timers[timerIndex].isRunning && !timers[timerIndex].isPaused) {
+          pauseSingleTimer(timerIndex);
+          e.target.textContent = "RESUME >";
+          // Show reset button when paused
+          if (resetBtn) resetBtn.style.display = "inline-block";
+        } else if (timers[timerIndex].isPaused) {
+          resumeSingleTimer(timerIndex);
+          e.target.textContent = "PAUSE ||";
+          // Hide reset button when resumed
+          if (resetBtn) resetBtn.style.display = "none";
+        }
+      }
+
+      if (
+        e.target.classList.contains("stop-reset-btn") ||
+        e.target.getAttribute("name") === "stopResetTimer"
+      ) {
+        const timerBox = e.target.closest("[data-timer-index]");
+        if (!timerBox) return;
+        const timerIndex = parseInt(timerBox.dataset.timerIndex);
+
+        resetSingleTimer(timerIndex);
+        const startBtn = timerBox.querySelector(".start-btn");
+        const pauseBtn = timerBox.querySelector(".pause-btn");
+        const resetBtn = timerBox.querySelector(".stop-reset-btn");
+        if (startBtn) startBtn.style.display = "inline-block";
+        if (pauseBtn) {
+          pauseBtn.style.display = "none";
+          pauseBtn.textContent = "PAUSE ||"; // Reset text
+        }
+        if (resetBtn) resetBtn.style.display = "none";
+      }
+    });
 
     // Advanced panel toggle
     elements.advancedBtn.addEventListener("click", () => {
@@ -2936,74 +2830,82 @@ const eventHandlers = (function () {
       setTimeout(initializeToolbarListeners, 100);
     });
 
-   // Scheduled start functionality
-    const scheduledCheckbox = document.getElementById('scheduled-start-checkbox');
-    const scheduledPeriod = document.getElementById('scheduled-period');
-    
+    // Scheduled start functionality
+    const scheduledCheckbox = document.getElementById(
+      "scheduled-start-checkbox"
+    );
+    const scheduledPeriod = document.getElementById("scheduled-period");
+
     // Click on time units to edit
-    document.querySelectorAll('.scheduled-time-unit').forEach(unit => {
-      unit.addEventListener('click', function() {
+    document.querySelectorAll(".scheduled-time-unit").forEach((unit) => {
+      unit.addEventListener("click", function () {
         const currentValue = parseInt(this.textContent);
         const unitType = this.dataset.unit;
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.value = '';
-        input.className = 'time-input';
-        input.style.width = '36px';
+        const input = document.createElement("input");
+        input.type = "text";
+        input.value = "";
+        input.className = "time-input";
+        input.style.width = "36px";
         input.placeholder = currentValue.toString();
-        
-        input.addEventListener('blur', () => {
+
+        input.addEventListener("blur", () => {
           let value = parseInt(input.value);
-          if (isNaN(value) || input.value.trim() === '') {
-            this.textContent = currentValue.toString().padStart(2, '0');
+          if (isNaN(value) || input.value.trim() === "") {
+            this.textContent = currentValue.toString().padStart(2, "0");
           } else {
-            if (unitType === 'hours') {
+            if (unitType === "hours") {
               if (value < 1) value = 1;
               if (value > 12) value = 12;
             } else {
               if (value < 0) value = 0;
               if (value > 59) value = 59;
             }
-            this.textContent = value.toString().padStart(2, '0');
+            this.textContent = value.toString().padStart(2, "0");
           }
           updateScheduledTime();
         });
-        
-        input.addEventListener('keyup', (e) => {
-          if (e.key === 'Enter') input.blur();
+
+        input.addEventListener("keyup", (e) => {
+          if (e.key === "Enter") input.blur();
         });
-        
-        this.textContent = '';
+
+        this.textContent = "";
         this.appendChild(input);
         input.focus();
         input.select();
       });
     });
-    
+
     // Toggle AM/PM
-    scheduledPeriod.addEventListener('click', function() {
-      this.textContent = this.textContent === 'AM' ? 'PM' : 'AM';
+    scheduledPeriod.addEventListener("click", function () {
+      this.textContent = this.textContent === "AM" ? "PM" : "AM";
       updateScheduledTime();
     });
-    
+
     function updateScheduledTime() {
-      const hoursSpan = document.querySelector('.scheduled-time-unit[data-unit="hours"]');
-      const minutesSpan = document.querySelector('.scheduled-time-unit[data-unit="minutes"]');
-      const secondsSpan = document.querySelector('.scheduled-time-unit[data-unit="seconds"]');
-      
+      const hoursSpan = document.querySelector(
+        '.scheduled-time-unit[data-unit="hours"]'
+      );
+      const minutesSpan = document.querySelector(
+        '.scheduled-time-unit[data-unit="minutes"]'
+      );
+      const secondsSpan = document.querySelector(
+        '.scheduled-time-unit[data-unit="seconds"]'
+      );
+
       let hours = parseInt(hoursSpan.textContent) || 1;
       const minutes = parseInt(minutesSpan.textContent) || 0;
       const seconds = parseInt(secondsSpan.textContent) || 0;
       const period = scheduledPeriod.textContent;
-      
+
       // Convert to 24-hour format
-      if (period === 'PM' && hours !== 12) hours += 12;
-      if (period === 'AM' && hours === 12) hours = 0;
-      
+      if (period === "PM" && hours !== 12) hours += 12;
+      if (period === "AM" && hours === 12) hours = 0;
+
       state.getScheduledStart().time = { hours, minutes, seconds };
     }
-    
-    scheduledCheckbox.addEventListener('change', function() {
+
+    scheduledCheckbox.addEventListener("change", function () {
       state.getScheduledStart().enabled = this.checked;
       if (this.checked) {
         updateScheduledTime();
@@ -3012,32 +2914,34 @@ const eventHandlers = (function () {
         stopScheduledCheck();
       }
     });
-    
+
     function startScheduledCheck() {
       stopScheduledCheck();
-      
+
       const checkTime = () => {
         if (!state.getScheduledStart().enabled || state.getIsRunning()) {
           stopScheduledCheck();
           return;
         }
-        
+
         const now = new Date();
         const scheduled = state.getScheduledStart().time;
-        
-        if (now.getHours() === scheduled.hours && 
-            now.getMinutes() === scheduled.minutes && 
-            now.getSeconds() === scheduled.seconds) {
+
+        if (
+          now.getHours() === scheduled.hours &&
+          now.getMinutes() === scheduled.minutes &&
+          now.getSeconds() === scheduled.seconds
+        ) {
           timerLogic.startTimer();
           scheduledCheckbox.checked = false;
           state.getScheduledStart().enabled = false;
           stopScheduledCheck();
         }
       };
-      
+
       state.getScheduledStart().checkInterval = setInterval(checkTime, 1000);
     }
-    
+
     function stopScheduledCheck() {
       if (state.getScheduledStart().checkInterval) {
         clearInterval(state.getScheduledStart().checkInterval);
@@ -3144,7 +3048,6 @@ const eventHandlers = (function () {
       }
     });
 
-    
     // Visibility settings
 
     // document.getElementById("show-main-title").addEventListener("change", handleVisibilityChange);
@@ -3349,9 +3252,9 @@ const eventHandlers = (function () {
           const rect = element.getBoundingClientRect();
           const computedStyle = window.getComputedStyle(element);
           const marginTop = parseFloat(computedStyle.marginTop) || 0;
-          
+
           dragStartLeft = rect.left + window.pageXOffset;
-          dragStartTop = (rect.top + window.pageYOffset) - marginTop;
+          dragStartTop = rect.top + window.pageYOffset - marginTop;
 
           e.preventDefault();
           return;
@@ -3671,38 +3574,13 @@ const eventHandlers = (function () {
       }
     }
 
-    // Scale text based on container size for countdown box
-    function scaleCountdownBoxText(element) {
-      const timerInfo = element.querySelector(".current-timer-info");
-      const countdown = element.querySelector(".countdown-display");
-
-      if (!timerInfo || !countdown) return;
-
-      // Get container dimensions
-      const width = element.offsetWidth;
-      const height = element.offsetHeight;
-
-      // Scale font sizes based on container size
-      // Base sizes: timerInfo = 1.2rem (19.2px), countdown = 2.5rem (40px)
-      const baseWidth = 270; // Match the default CSS width
-      const scale = Math.max(0.5, Math.min(2, width / baseWidth));
-
-      timerInfo.style.fontSize = 1.0 * scale + "rem";
-      countdown.style.fontSize = 2.0 * scale + "rem";
-    }
-
     // Apply draggable to all elements with the class
     document.querySelectorAll(".draggable-element").forEach((el) => {
       // Skip progress bar and notes display
-      if (el.id === 'progress-container' || el.id === 'timer-notes-display') {
+      if (el.id === "progress-container" || el.id === "timer-notes-display") {
         return;
       }
       makeDraggable(el);
-
-      // Initial scale for countdown box
-      if (el.id === "countdown-box") {
-        scaleCountdownBoxText(el);
-      }
     });
 
     // === SOUND REMINDER INPUT HANDLING ===
@@ -3937,61 +3815,83 @@ const eventHandlers = (function () {
     );
   }
 
-  // Main screen color indicator click
-  elements.colorIndicator = document.getElementById("main-color-indicator");
-  if (elements.colorIndicator) {
-    elements.colorIndicator.addEventListener("click", () => {
+  // Color indicator - use event delegation for all timers
+  document.addEventListener("click", (e) => {
+    if (e.target.classList.contains("color-indicator")) {
+      const timerBox = e.target.closest("[data-timer-index]");
+      if (!timerBox) return;
+      const timerIndex = parseInt(timerBox.dataset.timerIndex);
+
       // Create a temporary element with timer data
       const tempElement = document.createElement("div");
       tempElement.dataset.type = "timer";
-      tempElement.dataset.index = "1";
+      tempElement.dataset.index = timerIndex;
       uiManager.showColorPicker(tempElement);
 
-      // Override the color picker to update main display
+      // Override the color picker to update this timer's color indicator
       const originalHide = uiManager.hideColorPicker;
       uiManager.hideColorPicker = function () {
         originalHide.call(uiManager);
-        // Update main color indicator
-        const timer1 = state.getTimers()[0];
-        elements.colorIndicator.style.backgroundColor = timer1.color;
-        elements.colorIndicator.style.opacity = timer1.alpha || 0.5;
+        // Update color indicator for this timer
+        const timer = state.getTimers()[timerIndex];
+        const colorIndicator = timerBox.querySelector(".color-indicator");
+        if (colorIndicator) {
+          colorIndicator.style.backgroundColor = timer.color;
+          colorIndicator.style.opacity = timer.alpha || 0.5;
+        }
+
+        // Also update direction buttons
+        const leftBtn = timerBox.querySelector('[data-dir="left"]');
+        const rightBtn = timerBox.querySelector('[data-dir="right"]');
+        if (timer.direction === "left" && leftBtn) {
+          leftBtn.style.backgroundColor = timer.color;
+          leftBtn.style.opacity = timer.alpha || 0.5;
+        } else if (timer.direction === "right" && rightBtn) {
+          rightBtn.style.backgroundColor = timer.color;
+          rightBtn.style.opacity = timer.alpha || 0.5;
+        }
       };
-    });
-  }
-
-  // Main screen direction buttons
-  document.getElementById("main-dir-left")?.addEventListener("click", () => {
-    const timers = state.getTimers();
-    timers[0].direction = "left";
-    state.setTimers(timers);
-
-    const leftBtn = document.getElementById("main-dir-left");
-    const rightBtn = document.getElementById("main-dir-right");
-    leftBtn.classList.add("selected");
-    rightBtn.classList.remove("selected");
-
-    // Update colors
-    leftBtn.style.backgroundColor = timers[0].color;
-    leftBtn.style.opacity = timers[0].alpha || 0.5;
-    rightBtn.style.backgroundColor = "#eee";
-    rightBtn.style.opacity = "1";
+    }
   });
 
-  document.getElementById("main-dir-right")?.addEventListener("click", () => {
-    const timers = state.getTimers();
-    timers[0].direction = "right";
-    state.setTimers(timers);
+  // Direction buttons - use event delegation for all timers
+  document.addEventListener("click", (e) => {
+    if (e.target.classList.contains("dir-btn-mini")) {
+      const timerBox = e.target.closest("[data-timer-index]");
+      if (!timerBox) return;
+      const timerIndex = parseInt(timerBox.dataset.timerIndex);
 
-    const leftBtn = document.getElementById("main-dir-left");
-    const rightBtn = document.getElementById("main-dir-right");
-    rightBtn.classList.add("selected");
-    leftBtn.classList.remove("selected");
+      const direction = e.target.dataset.dir;
+      const timers = state.getTimers();
+      timers[timerIndex].direction = direction;
+      state.setTimers(timers);
 
-    // Update colors
-    rightBtn.style.backgroundColor = timers[0].color;
-    rightBtn.style.opacity = timers[0].alpha || 0.5;
-    leftBtn.style.backgroundColor = "#eee";
-    leftBtn.style.opacity = "1";
+      const leftBtn = timerBox.querySelector('[data-dir="left"]');
+      const rightBtn = timerBox.querySelector('[data-dir="right"]');
+
+      if (direction === "left") {
+        leftBtn.classList.add("selected");
+        rightBtn.classList.remove("selected");
+        leftBtn.style.backgroundColor = timers[timerIndex].color;
+        leftBtn.style.opacity = timers[timerIndex].alpha || 0.5;
+        rightBtn.style.backgroundColor = "#eee";
+        rightBtn.style.opacity = "1";
+      } else {
+        rightBtn.classList.add("selected");
+        leftBtn.classList.remove("selected");
+        rightBtn.style.backgroundColor = timers[timerIndex].color;
+        rightBtn.style.opacity = timers[timerIndex].alpha || 0.5;
+        leftBtn.style.backgroundColor = "#eee";
+        leftBtn.style.opacity = "1";
+      }
+
+      // Update progress bar direction immediately
+      const progressBar = timerBox.querySelector(".progress-bar");
+      if (progressBar) {
+        progressBar.style.transformOrigin =
+          direction === "left" ? "left" : "right";
+      }
+    }
   });
 
   // Sound icon toggle - PROPERLY FIXED VERSION
@@ -4159,10 +4059,389 @@ const eventHandlers = (function () {
   };
 })();
 
+// ===== TIMERS CONTROL PANEL HANDLERS =====
+const timersControlPanel = (function () {
+  const timersCountInput = document.getElementById("timers-count-input");
+  const plusTimersBtn = document.getElementById("plus-timers-btn");
+  const minusTimersBtn = document.getElementById("minus-timers-btn");
+  const startAllBtn = document.getElementById("start-all-btn");
+  const pauseAllBtn = document.getElementById("pause-all-btn");
+  const resetAllBtn = document.getElementById("reset-all-btn");
+
+  // Blur on Enter key
+  function setupTimersCountInput() {
+    timersCountInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        timersCountInput.blur();
+      }
+    });
+
+    // Validate input - only positive integers 1-20
+    timersCountInput.addEventListener("input", (e) => {
+      let value = parseInt(e.target.value);
+      if (isNaN(value) || value < 1) {
+        e.target.value = 1;
+        value = 1;
+      } else if (value > 20) {
+        e.target.value = 20;
+        value = 20;
+      }
+      updateTimersCount(value);
+    });
+
+    // Plus button
+    plusTimersBtn.addEventListener("click", () => {
+      let current = parseInt(timersCountInput.value);
+      if (current < 20) {
+        timersCountInput.value = current + 1;
+        updateTimersCount(current + 1);
+      }
+    });
+
+    // Minus button
+    minusTimersBtn.addEventListener("click", () => {
+      let current = parseInt(timersCountInput.value);
+      if (current > 1) {
+        timersCountInput.value = current - 1;
+        updateTimersCount(current - 1);
+      }
+    });
+
+    // Start all timers
+    startAllBtn.addEventListener("click", () => {
+      const timers = state.getTimers();
+      timers.forEach((timer, index) => {
+        if (!timer.isRunning && !timer.isPaused) {
+          startSingleTimer(index);
+        }
+      });
+      startAllBtn.style.display = "none";
+      pauseAllBtn.style.display = "inline-block";
+      resetAllBtn.style.display = "inline-block";
+    });
+
+    // Pause/Resume all timers
+    pauseAllBtn.addEventListener("click", () => {
+      const timers = state.getTimers();
+      if (pauseAllBtn.textContent === "PAUSE ALL") {
+        timers.forEach((timer, index) => {
+          if (timer.isRunning && !timer.isPaused) {
+            pauseSingleTimer(index);
+          }
+        });
+        pauseAllBtn.textContent = "RESUME ALL";
+      } else {
+        timers.forEach((timer, index) => {
+          if (timer.isPaused) {
+            resumeSingleTimer(index);
+          }
+        });
+        pauseAllBtn.textContent = "PAUSE ALL";
+      }
+    });
+
+    // Reset all timers
+    resetAllBtn.addEventListener("click", () => {
+      const timers = state.getTimers();
+      timers.forEach((timer, index) => {
+        resetSingleTimer(index);
+      });
+      startAllBtn.style.display = "inline-block";
+      pauseAllBtn.style.display = "none";
+      resetAllBtn.style.display = "none";
+      pauseAllBtn.textContent = "PAUSE ALL";
+    });
+  }
+
+  // Update timers count
+  function updateTimersCount(count) {
+    const timers = state.getTimers();
+    const currentCount = timers.length;
+
+    if (count > currentCount) {
+      // Add timers
+      for (let i = currentCount; i < count; i++) {
+        timers.push({
+          hours: 0,
+          minutes: 0,
+          seconds: 0,
+          color: `#${Math.floor(Math.random() * 16777215)
+            .toString(16)
+            .padStart(6, "0")}`,
+          direction: "right",
+          alpha: 0.5,
+          beepAt: 5,
+          name: `Timer ${i + 1}`,
+          notes: "",
+          imageData: null,
+          imageName: null,
+          reminders: {
+            custom: [],
+            every: { minutes: 0, seconds: 0 },
+            duration: 5,
+          },
+          isRunning: false,
+          isPaused: false,
+          remainingSeconds: 0,
+          totalSeconds: 0,
+          interval: null,
+        });
+      }
+    } else if (count < currentCount) {
+      // Remove timers from the end
+      timers.splice(count);
+    }
+
+    state.setTimers(timers);
+
+    renderAllTimers();
+  }
+
+  return {
+    setupTimersCountInput,
+    startSingleTimer,
+    pauseSingleTimer,
+    resumeSingleTimer,
+    resetSingleTimer,
+  };
+})();
+
+// ===== TIMER CONTROL HELPER FUNCTIONS =====
+function startSingleTimer(index) {
+  const timers = state.getTimers();
+  const timer = timers[index];
+
+  timer.totalSeconds = timer.hours * 3600 + timer.minutes * 60 + timer.seconds;
+  if (timer.totalSeconds === 0) return;
+
+  timer.remainingSeconds = timer.totalSeconds;
+  timer.isRunning = true;
+  timer.isPaused = false;
+
+  timer.interval = setInterval(() => {
+    if (timer.remainingSeconds > 0) {
+      timer.remainingSeconds--;
+      updateTimerDisplay(index);
+    } else {
+      clearInterval(timer.interval);
+      timer.isRunning = false;
+      state.playBeep(true);
+    }
+  }, 1000);
+}
+
+function pauseSingleTimer(index) {
+  const timers = state.getTimers();
+  const timer = timers[index];
+
+  if (timer.interval) {
+    clearInterval(timer.interval);
+    timer.interval = null;
+  }
+  timer.isPaused = true;
+}
+
+function resumeSingleTimer(index) {
+  const timers = state.getTimers();
+  const timer = timers[index];
+
+  timer.isPaused = false;
+  timer.interval = setInterval(() => {
+    if (timer.remainingSeconds > 0) {
+      timer.remainingSeconds--;
+      updateTimerDisplay(index);
+    } else {
+      clearInterval(timer.interval);
+      timer.isRunning = false;
+      state.playBeep(true);
+    }
+  }, 1000);
+}
+
+function resetSingleTimer(index) {
+  const timers = state.getTimers();
+  const timer = timers[index];
+
+  if (timer.interval) {
+    clearInterval(timer.interval);
+    timer.interval = null;
+  }
+  timer.isRunning = false;
+  timer.isPaused = false;
+  timer.remainingSeconds = timer.totalSeconds;
+  updateTimerDisplay(index);
+}
+
+function updateTimerDisplay(index) {
+  const timers = state.getTimers();
+  const timer = timers[index];
+  if (!timer) return;
+
+  const timerBox = document.querySelector(`[data-timer-index="${index}"]`);
+  if (!timerBox) return;
+
+  /// Update progress bar
+  const progressBar = timerBox.querySelector(".progress-bar");
+
+  if (progressBar && timer.totalSeconds > 0) {
+    const percentage =
+      ((timer.totalSeconds - timer.remainingSeconds) / timer.totalSeconds) *
+      100;
+
+    progressBar.style.width = `${percentage}%`;
+    progressBar.style.backgroundColor = timer.color;
+    progressBar.style.opacity = timer.alpha;
+    progressBar.style.transformOrigin =
+      timer.direction === "left" ? "left" : "right";
+  }
+}
+
+// ===== RENDER TIMERS =====
+function renderAllTimers() {
+  const container = document.querySelector(".container");
+  const timers = state.getTimers();
+  const timerCount = timers.length;
+
+  // Get the first timer as template
+  const firstTimer = document.getElementById("main-timer");
+  if (!firstTimer) return;
+
+  // Remove all timers except the first one
+  const existingTimers = container.querySelectorAll(".time-setter");
+  existingTimers.forEach((timer, index) => {
+    if (index > 0) timer.remove();
+  });
+
+  // Update first timer data
+  updateTimerData(firstTimer, 0);
+
+  // Clone for additional timers
+  for (let i = 1; i < timerCount; i++) {
+    const clonedTimer = firstTimer.cloneNode(true);
+    clonedTimer.id = `main-timer-${i}`;
+    clonedTimer.setAttribute("data-timer-index", i);
+
+    // Add remove button for timer index > 1
+    if (i > 0) {
+      addRemoveButton(clonedTimer, i);
+    }
+
+    updateTimerData(clonedTimer, i);
+    container.appendChild(clonedTimer);
+  }
+}
+
+function updateTimerData(timerElement, index) {
+  const timer = state.getTimers()[index];
+  if (!timer) return;
+
+  // Update timer name input
+  const nameInput = timerElement.querySelector('input[type="text"]');
+  if (nameInput) {
+    nameInput.value = timer.name;
+    nameInput.id = `timer-label-input-${index}`;
+  }
+
+  // Update time displays
+  const hours =
+    timerElement.querySelector("#hours") ||
+    timerElement.querySelector('[id^="hours"]');
+  const minutes =
+    timerElement.querySelector("#minutes") ||
+    timerElement.querySelector('[id^="minutes"]');
+  const seconds =
+    timerElement.querySelector("#seconds") ||
+    timerElement.querySelector('[id^="seconds"]');
+
+  if (hours) {
+    hours.id = `hours-${index}`;
+    hours.textContent = `${timer.hours}h`;
+  }
+  if (minutes) {
+    minutes.id = `minutes-${index}`;
+    minutes.textContent = `${timer.minutes.toString().padStart(2, "0")}m`;
+  }
+  if (seconds) {
+    seconds.id = `seconds-${index}`;
+    seconds.textContent = `${timer.seconds.toString().padStart(2, "0")}s`;
+  }
+
+  // Update preset time display
+  const presetDisplay = timerElement.querySelector(".preset-time-display");
+  if (presetDisplay) {
+    presetDisplay.id = `preset-time-display-${index}`;
+    const h = timer.hours.toString().padStart(2, "0");
+    const m = timer.minutes.toString().padStart(2, "0");
+    const s = timer.seconds.toString().padStart(2, "0");
+    presetDisplay.textContent = `${h}:${m}:${s}`;
+  }
+  // Reset progress bar and container for this timer
+  const progressBar = timerElement.querySelector(".progress-bar");
+  const progressContainer = timerElement.querySelector(".progress-container");
+
+  // Give unique IDs to avoid conflicts
+  if (progressBar) {
+    progressBar.id = `progress-bar-${index}`;
+    progressBar.style.width = "0%";
+    progressBar.style.marginLeft = "0";
+    progressBar.style.transformOrigin =
+      timer.direction === "left" ? "left" : "right";
+    progressBar.style.backgroundColor = timer.color;
+    progressBar.style.opacity = timer.alpha;
+  }
+
+  if (progressContainer) {
+    progressContainer.id = `progress-container-${index}`;
+  }
+}
+
+function addRemoveButton(timerElement, index) {
+  // Check if remove button already exists
+  if (timerElement.querySelector(".timer-remove-btn")) return;
+
+  const removeBtn = document.createElement("button");
+  removeBtn.className = "timer-remove-btn";
+  removeBtn.innerHTML = "×";
+  removeBtn.setAttribute("data-timer-index", index);
+  removeBtn.setAttribute("aria-label", `Remove timer ${index + 1}`);
+  removeBtn.title = "Remove timer";
+
+  removeBtn.addEventListener("click", () => {
+    removeTimer(index);
+  });
+
+  timerElement.style.position = "relative";
+  timerElement.appendChild(removeBtn);
+}
+
+function removeTimer(index) {
+  const timers = state.getTimers();
+  if (timers.length <= 1) return; // Don't remove last timer
+
+  // Clear interval if running
+  if (timers[index].interval) {
+    clearInterval(timers[index].interval);
+  }
+
+  timers.splice(index, 1);
+  state.setTimers(timers);
+
+  // Update input counter
+  const timersCountInput = document.getElementById("timers-count-input");
+  if (timersCountInput) {
+    timersCountInput.value = timers.length;
+  }
+
+  renderAllTimers();
+}
+
 // ===== INITIALIZATION =====
 function init() {
   // Set up event listeners
   eventHandlers.setupEventListeners();
+
+  // Set up timers control panel
+  timersControlPanel.setupTimersCountInput();
 
   // Initialize scheduled start time to 1 hour from now
   const now = new Date();
@@ -4170,27 +4449,25 @@ function init() {
   const hours = now.getHours();
   const minutes = now.getMinutes();
   const seconds = 0;
-  
+
   const displayHours = hours % 12 || 12;
-  const period = hours >= 12 ? 'PM' : 'AM';
-  
-  document.querySelector('.scheduled-time-unit[data-unit="hours"]').textContent = 
-    displayHours.toString().padStart(2, '0');
-  document.querySelector('.scheduled-time-unit[data-unit="minutes"]').textContent = 
-    minutes.toString().padStart(2, '0');
-  document.querySelector('.scheduled-time-unit[data-unit="seconds"]').textContent = 
-    seconds.toString().padStart(2, '0');
-  document.getElementById('scheduled-period').textContent = period;
-  
+  const period = hours >= 12 ? "PM" : "AM";
+
+  document.querySelector(
+    '.scheduled-time-unit[data-unit="hours"]'
+  ).textContent = displayHours.toString().padStart(2, "0");
+  document.querySelector(
+    '.scheduled-time-unit[data-unit="minutes"]'
+  ).textContent = minutes.toString().padStart(2, "0");
+  document.querySelector(
+    '.scheduled-time-unit[data-unit="seconds"]'
+  ).textContent = seconds.toString().padStart(2, "0");
+  document.getElementById("scheduled-period").textContent = period;
+
   state.getScheduledStart().time = { hours, minutes, seconds };
 
   // Set up color picker interactions
   colorPickerManager.setupColorPickerInteractions();
-
-  // Initialize the countdown display
-  const initialTimer = state.getTimers()[0];
-  const totalSeconds = timerLogic.calculateTotalSeconds(initialTimer);
-  uiManager.updateCountdownDisplay(totalSeconds);
 
   // Initialize button visibility
   uiManager.updateButtonVisibility(false, false);
@@ -4198,20 +4475,18 @@ function init() {
   // Initialize main page display
   updateMainPageDisplay();
 
+  // Render all timers
+  renderAllTimers();
+
   // Initialize visibility settings
-  // document.getElementById("show-main-title").checked = state.getVisibilitySettings().showMainTitle;
-  //document.getElementById("show-time-setter").checked = state.getVisibilitySettings().showTimeSetter;
-  //document.getElementById("show-advanced-btn").checked = state.getVisibilitySettings().showAdvancedBtn;
-  //document.getElementById("show-countdown").checked = state.getVisibilitySettings().showCountdown;
-  //document.getElementById("show-timer-info").checked = state.getVisibilitySettings().showTimerInfo;
-  //document.getElementById("show-start-btn").checked = state.getVisibilitySettings().showStartBtn;
+  
   document.getElementById("show-progress-bar").checked =
-    state.getVisibilitySettings().showProgressBar;  
+    state.getVisibilitySettings().showProgressBar;
   document.getElementById("show-notes").checked =
     state.getVisibilitySettings().showNotes;
   document.getElementById("show-image").checked =
     state.getVisibilitySettings().showImage;
-  }
+}
 
 // Initialize the app when DOM is loaded
 document.addEventListener("DOMContentLoaded", init);

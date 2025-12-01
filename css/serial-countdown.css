@@ -55,7 +55,7 @@ body {
   justify-content: center;
   align-items: center;
   gap: 4px;
-  padding: 40px 20px 42px 20px;
+  padding: 40px 20px 52px 20px;
   border: 1px solid #ddd;
   border-radius: 8px 8px 0 0;
   /* Only round top corners */
@@ -69,7 +69,7 @@ body {
   left: 0;
   right: 0;
   width: 100%;
-  min-height: 35px;
+  min-height: 40px;
   border-top: 2px solid #ddd;
   background-color: white;
   display: flex;
@@ -81,10 +81,6 @@ body {
 
 .timer-box-wrapper {
   margin-bottom: 15px;
-}
-
-.timer-box-wrapper .time-setter {
-  margin-bottom: 0;
 }
 
 .timer-box-wrapper .sound-reminders {
@@ -125,6 +121,118 @@ body {
 
 .timer-label-left input::placeholder {
   color: #bdc3c7;
+}
+
+/* === Preset Timer Quick Buttons === */
+.preset-timer-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  justify-content: center;
+  padding: 8px 10px;
+  background-color: #f5f7fa;
+  border: 1px solid #ddd;
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+}
+
+.preset-timer-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #555;
+  margin-right: 5px;
+  align-self: center;
+}
+
+body.dark-theme .preset-timer-label {
+  color: #bbb;
+}
+
+.preset-timer-btn {
+  padding: 5px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #2c3e50;
+  transition: all 0.15s ease;
+  min-width: 40px;
+  text-align: center;
+}
+
+.preset-timer-btn:hover {
+  background-color: #e8f4fc;
+  border-color: #3498db;
+  color: #3498db;
+}
+
+.preset-timer-btn:active {
+  background-color: #3498db;
+  color: white;
+  border-color: #3498db;
+  transform: scale(0.97);
+}
+
+/* Dark theme for preset timer buttons */
+body.dark-theme .preset-timer-buttons {
+  background-color: #3a3a4a;
+  border-color: #404040;
+}
+
+body.dark-theme .preset-timer-btn {
+  background-color: #2a2a2a;
+  border-color: #505050;
+  color: #e0e0e0;
+}
+
+body.dark-theme .preset-timer-btn:hover {
+  background-color: #3a4a5a;
+  border-color: #3498db;
+  color: #5dade2;
+}
+
+body.dark-theme .preset-timer-btn:active {
+  background-color: #3498db;
+  color: white;
+  border-color: #3498db;
+}
+
+/* === Sequence Info Box === */
+.sequence-info-box {
+  padding: 10px 12px;
+  margin: 10px 0;
+  background-color: #e8f6e8;
+  border: 1px solid #b8dab8;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: #2c3e50;
+  line-height: 1.5;
+  text-align: center;
+  word-wrap: break-word;
+}
+
+body.dark-theme .sequence-info-box {
+  background-color: #2a3a2a;
+  border-color: #3a5a3a;
+  color: #d0e0d0;
+}
+
+/* Hide empty bottom controls on advanced page timer boxes */
+.timer-box-wrapper .time-setter-bottom-controls {
+  display: none;
+}
+
+/* Adjust time-setter border radius when preset buttons are above */
+.timer-box-wrapper .time-setter {
+  border-radius: 0;
+  border-top: none;
+  margin-bottom: 0;
+}
+
+.timer-box-wrapper .time-setter {
+  padding-bottom: 9px;
 }
 
 .preset-time-display {

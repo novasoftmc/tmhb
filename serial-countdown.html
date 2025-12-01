@@ -14,7 +14,7 @@
     <title>Countdown Timers with Progress Bar and Sound Alerts - Audio Visual Timer Tool</title>
     
     <link rel="stylesheet" href="css/shared-nav.css" />
-    <link rel="stylesheet" href="css/serial-main.css" />
+    <link rel="stylesheet" href="css/serial-countdown.css" />
     <link rel="stylesheet" href="css/shared-footer.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
     <link rel="apple-touch-icon" href="apple-touch-icon.png" />
@@ -440,12 +440,11 @@
           </div>
         </div>
 
-        <button
-          class="close-settings-btn"
-          id="close-settings-btn"
-          name="closeSettings"
-          aria-label="Close settings and return to main screen"
-        >
+        <div class="sequence-info-box" id="sequence-info">
+          <strong>Sequence Set:</strong> 0s (Timer 1) <strong>| Total:</strong> 0s
+        </div>
+
+        <button class="close-settings-btn" id="close-settings-btn" name="closeSettings" aria-label="Close settings and return to main screen">
           CLOSE SETTINGS
         </button>
       </div>
@@ -540,7 +539,7 @@
         </div>
     </footer>
 
-    <script src="js/serial-main.js"></script>
+    <script src="js/serial-countdown.js"></script>
     <script src="js/shared-nav.js"></script>
   </body>
 </html>
