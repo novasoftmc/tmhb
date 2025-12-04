@@ -756,24 +756,46 @@ body.dark-theme .scheduled-period:hover {
   background-color: rgba(255, 255, 255, 0.8);
   border: 1px solid #ddd;
   border-radius: 8px;
-  padding: 9px 3px;
+  padding: 15px 5px;
   margin: 9px 0;
   position: relative;
-  min-width: 177px;
-  min-height: 80px;
-  width: 270px;
+  min-width: 220px;
+  min-height: 110px;
+  width: 350px;
   margin-left: auto;
   margin-right: auto;
 }
 
 /* Scale text inside countdown box based on container size */
 .countdown-box .current-timer-info {
-  font-size: 1rem;
+  font-size: 1.5rem;
   margin-bottom: 5px;
 }
 
 .countdown-box .countdown-display {
-  font-size: 2rem;
+  font-size: 2.8rem;
+}
+
+/* === Reminder Message Display (Main Page) === */
+.reminder-message-display {
+  font-size: 1.2rem;
+  color: #2c3e50;
+  text-align: center;
+  padding: 5px 10px;
+  margin-top: 5px;
+  line-height: 1.3;
+  min-height: 0;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  display: none;
+}
+
+.reminder-message-display.active {
+  display: block;
+}
+
+body.dark-theme .reminder-message-display {
+  color: #e0e0e0;
 }
 
 /* Advanced Panel Styles */
@@ -1181,13 +1203,16 @@ body.dark-theme .scheduled-period:hover {
 }
 
 .sound-reminders-title {
-  font-weight: 800;
-  text-align: center;
-  font-size: 0.8rem;
-  color: #706d6d;
-  margin-bottom: 2px;
-  padding-bottom: 2px;
-  border-bottom: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  margin: -6px -10px 6px -10px;
+  border-radius: 8px 8px 0 0;
+  user-select: none;
+  font-weight: bold;
 }
 
 .sound-reminders-row {
@@ -1260,6 +1285,109 @@ body.dark-theme .scheduled-period:hover {
   cursor: pointer;
   color: #333;
   font-weight: 500;
+}
+
+/* === Collapsible Reminders Section === */
+.sound-reminders-title {
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 8px;
+  margin: -6px -10px 0 -10px;
+  border-radius: 8px 8px 0 0;
+  user-select: none;
+}
+
+.sound-reminders-title:hover {
+  background-color: rgba(52, 152, 219, 0.1);
+}
+
+.sound-reminders-toggle {
+  font-size: 0.7rem;
+  transition: transform 0.3s ease;
+}
+
+.sound-reminders-toggle.collapsed {
+  transform: rotate(-90deg);
+}
+
+.sound-reminders-content {
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+  max-height: 500px;
+  opacity: 1;
+}
+
+.sound-reminders-content.collapsed {
+  max-height: 0;
+  opacity: 0;
+}
+
+.reminders-collapse-btn {
+  margin-left: auto;
+  padding: 2px 3px;
+  background-color: #eee;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.6rem;
+  color: #555;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.reminders-collapse-btn:hover {
+  background-color: #ddd;
+  border-color: #3498db;
+}
+
+body.dark-theme .sound-reminders-title:hover {
+  background-color: rgba(52, 152, 219, 0.2);
+}
+
+body.dark-theme .reminders-collapse-btn {
+  background-color: #3a3a3a;
+  border-color: #505050;
+  color: #bbb;
+}
+
+body.dark-theme .reminders-collapse-btn:hover {
+  background-color: #4a4a4a;
+  border-color: #3498db;
+}
+
+/* === Reminder Message Input === */
+.reminder-message-row {
+  padding: 5px 10px 5px 25px;
+  margin-top: 2px;
+}
+
+.reminder-message-input {
+  width: 350px;
+  max-width: 100%;
+  height: 50px;
+  padding: 6px 8px;
+  font-size: 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: none;
+  font-family: inherit;
+  line-height: 1.4;
+}
+
+.reminder-message-input:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+body.dark-theme .reminder-message-input {
+  background-color: #2a2a2a;
+  border-color: #505050;
+  color: #e0e0e0;
+}
+
+body.dark-theme .reminder-message-input:focus {
+  border-color: #3498db;
 }
 
 /* === Advanced Page Notes/Image Controls === */
