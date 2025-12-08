@@ -14,7 +14,7 @@
     <title>Countdown Timers with Progress Bar and Sound Alerts - Audio Visual Timer Tool</title>
     
     <link rel="stylesheet" href="css/shared-nav.css" />
-    <link rel="stylesheet" href="css/serial-countdown.css" />
+    <link rel="stylesheet" href="css/pomodoro-countdown.css" />
     <link rel="stylesheet" href="css/shared-footer.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
     <link rel="apple-touch-icon" href="apple-touch-icon.png" />
@@ -36,7 +36,7 @@
     </script>
   </head>
 
-  <body>
+  <body class="pomodoro-page">
     <a href="#main-page" class="skip-link">Skip to main content</a>
     
     <!-- Shared Header Navigation -->
@@ -75,9 +75,9 @@
         
         <!-- Row 2: Sub-tabs (Countdown options) -->
         <div class="header-row-2" id="headerRow2">
-            <a href="serial-countdown.html" class="header-sub-tab active">Serial Countdown</a>
+            <a href="serial-countdown.html" class="header-sub-tab">Serial Countdown</a>
             <a href="parallel-countdown.html" class="header-sub-tab">Parallel Countdown</a>
-            <a href="pomodoro-countdown.html" class="header-sub-tab">Pomodoro Timer</a>
+            <a href="pomodoro-countdown.html" class="header-sub-tab active">Pomodoro Timer</a>
         </div>
     </nav>
 
@@ -88,9 +88,24 @@
     </noscript>
     <!-- Main Page -->
     <main id="main-page" class="page">
-      <h1 id="main-title" style="text-align: center; font-size: 1.5rem; margin: 10px 0 15px 0; color: #2c3e50; font-weight: 600;">Free Online Serial Countdown Bar Timer</h1>
+      <h1 id="main-title" style="text-align: center; font-size: 1.5rem; margin: 10px 0 15px 0; color: #2c3e50; font-weight: 600;">Free Online Pomodoro Bar Timer</h1>
       <h2 class="hidden">Main Timer Functions</h2> 
       <div class="container">
+        <!-- Classic Pomodoro Presets -->
+        <div class="pomodoro-presets-box">
+          <div class="pomodoro-section-title">Classic Pomodoro</div>
+          <div class="pomodoro-buttons-row">
+            <button class="pomodoro-preset-btn" data-preset="25+5">25+5</button>
+            <button class="pomodoro-preset-btn" data-preset="(25+5)*2">(25+5)×2</button>
+            <button class="pomodoro-preset-btn" data-preset="(25+5)*3">(25+5)×3</button>
+            <button class="pomodoro-preset-btn" data-preset="(25+5)*4+20">(25+5)×4+20</button>
+          </div>
+          <hr class="pomodoro-divider">
+          <div class="pomodoro-section-title">Modifications</div>
+          <div class="pomodoro-buttons-row">
+            <!-- Future modification buttons will go here -->
+          </div>
+        </div>
         <div class="time-setter" id="main-timer" style="position: relative;">
           <div class="timer-label-left">
             <label for="timer-label-input" class="hidden">Timer name</label>
@@ -98,7 +113,7 @@
               type="text"
               id="timer-label-input"
               tabindex="0"
-              value="Timer 1"
+              value="Focus 1"
               placeholder="Enter timer name..."
               maxlength="30"
               aria-label="Timer name"
@@ -388,6 +403,21 @@
         <h1 style="text-align: center; font-size: 1.3rem; margin: 10px 0 15px 0; color: #2c3e50; font-weight: 600;">Advanced Timer Settings</h1>
         <h2 class="hidden">Advanced Timer Functions</h2>
         <h3 class="hidden">Timer Configuration</h3>
+        <!-- Classic Pomodoro Presets -->
+        <div class="pomodoro-presets-box">
+          <div class="pomodoro-section-title">Classic Pomodoro</div>
+          <div class="pomodoro-buttons-row">
+            <button class="pomodoro-preset-btn" data-preset="25+5">25+5</button>
+            <button class="pomodoro-preset-btn" data-preset="(25+5)*2">(25+5)×2</button>
+            <button class="pomodoro-preset-btn" data-preset="(25+5)*3">(25+5)×3</button>
+            <button class="pomodoro-preset-btn" data-preset="(25+5)*4+20">(25+5)×4+20</button>
+          </div>
+          <hr class="pomodoro-divider">
+          <div class="pomodoro-section-title">Modifications</div>
+          <div class="pomodoro-buttons-row">
+            <!-- Future modification buttons will go here -->
+          </div>
+        </div>
         <div id="timer-boxes-container">
           <!-- Timer boxes will be added here dynamically -->
         </div>
@@ -540,7 +570,7 @@
         </div>
     </footer>
 
-    <script src="js/serial-countdown.js"></script>
+    <script src="js/pomodoro-countdown.js"></script>
     <script src="js/shared-nav.js"></script>
   </body>
 </html>

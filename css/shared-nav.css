@@ -268,3 +268,33 @@ body.dark-theme .feature-card:nth-child(3) {
 body.dark-theme .feature-card:nth-child(4) {
     border-left-color: #e67e22;
 }
+
+/* === Pomodoro Page Header Theme === */
+body.pomodoro-page .header-row-1 {
+  background: linear-gradient(135deg, #e85a4f 0%, #d64545 100%);
+}
+
+body.pomodoro-page .header-main-tab.active {
+  color: #e85a4f;
+}
+
+body.pomodoro-page .header-sub-tab.active {
+  color: #e85a4f;
+  border-bottom-color: #e85a4f;
+}
+
+body.pomodoro-page .header-sub-tab:hover {
+  background: #ffe8e6;
+  color: #e85a4f;
+}
+
+/* Dark theme + Pomodoro page */
+body.dark-theme.pomodoro-page .header-sub-tab.active {
+  color: #f0a8a3;
+  border-bottom-color: #e85a4f;
+}
+
+body.dark-theme.pomodoro-page .header-sub-tab:hover {
+  background: #3a2a28;
+  color: #f0a8a3;
+}

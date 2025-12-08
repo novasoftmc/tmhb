@@ -21,6 +21,8 @@ const state = (function () {
     },
   ];
 
+  let activePreset = null;
+
   let scheduledStart = {
     enabled: false,
     time: null,
@@ -103,7 +105,7 @@ const state = (function () {
   };
 
   // === localStorage persistence ===
-  const STORAGE_KEY = 'serialCountdownState';
+  const STORAGE_KEY = 'pomodoroCountdownState';
   
   function saveToStorage() {
     const data = {
@@ -118,6 +120,7 @@ const state = (function () {
       visibilitySettings,
       soundEnabled,
       pauses,
+      activePreset,
       scheduledStart: {
         enabled: scheduledStart.enabled,
         time: scheduledStart.time
@@ -147,6 +150,7 @@ const state = (function () {
       visibilitySettings = data.visibilitySettings || visibilitySettings;
       soundEnabled = data.soundEnabled !== undefined ? data.soundEnabled : true;
       pauses = data.pauses || [];
+      activePreset = data.activePreset || null;
       
       if (data.scheduledStart) {
         scheduledStart.enabled = data.scheduledStart.enabled;
@@ -177,6 +181,11 @@ const state = (function () {
   }
 
   return {
+    getActivePreset: () => activePreset,
+    setActivePreset: (value) => {
+      activePreset = value;
+      saveToStorage();
+    },
     getIsPaused: () => isPaused,
     setIsPaused: (value) => {
       isPaused = value;
@@ -622,23 +631,6 @@ const uiManager = (function () {
   function createTimerBox(timerData, index, isCollapsed = true) {
     const wrapper = document.createElement("div");
     wrapper.className = "timer-box-wrapper";
-
-    // Create preset timer quick buttons container
-    const presetButtonsContainer = document.createElement("div");
-    presetButtonsContainer.className = "preset-timer-buttons";
-    presetButtonsContainer.innerHTML = `
-      <span class="preset-timer-label">Pre-set</span>
-      <button class="preset-timer-btn" data-timer-index="${index}" data-minutes="1">1min</button>
-      <button class="preset-timer-btn" data-timer-index="${index}" data-minutes="5">5m</button>
-      <button class="preset-timer-btn" data-timer-index="${index}" data-minutes="10">10m</button>
-      <button class="preset-timer-btn" data-timer-index="${index}" data-minutes="15">15m</button>
-      <button class="preset-timer-btn" data-timer-index="${index}" data-minutes="20">20m</button>
-      <button class="preset-timer-btn" data-timer-index="${index}" data-minutes="25">25m</button>
-      <button class="preset-timer-btn" data-timer-index="${index}" data-minutes="30">30m</button>
-      <button class="preset-timer-btn" data-timer-index="${index}" data-minutes="45">45m</button>            
-    `;
-    wrapper.appendChild(presetButtonsContainer);
-
     const box = document.createElement("div");
     box.className = "time-setter";
     box.style.position = "relative";
@@ -1666,7 +1658,7 @@ const timerLogic = (function () {
     }
 
     // Restore browser tab title
-    document.title = 'Serial Countdown';
+    document.title = 'Pomodoro Countdown';
 
     // Clear completion message if exists
     const completionMsg = document.getElementById("completion-message");
@@ -1675,7 +1667,7 @@ const timerLogic = (function () {
     }
 
     // Restore browser tab title
-    document.title = 'Serial Countdown';
+    document.title = 'Pomodoro Countdown';
 
       // Reset progress bar instantly (MODIFIED)
       const elements = uiManager.getElements();
@@ -2196,32 +2188,15 @@ const settingsManager = (function () {
     const timers = state.getTimers();
     const newTimerIndex = timers.length;
 
-    // Define colors based on timer index
-    let timerColor;
-    switch (newTimerIndex) {
-      case 0:
-        timerColor = "#3498db";
-        break; // Dark Blue
-      case 1:
-        timerColor = "#e67e22";
-        break; // Orange
-      case 2:
-        timerColor = "#2ecc71";
-        break; // Green
-      case 3:
-        timerColor = "#9b59b6";
-        break; // Violet
-      default:
-        timerColor = "#3498db";
-        break; // Dark Blue for 5+
-    }
+    // Generate random color for manually added timers
+    const randomColor = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
 
-    // Add new timer
+    // Add new timer with random color
     timers.push({
       hours: 0,
       minutes: 0,
       seconds: 0,
-      color: timerColor,
+      color: randomColor,
       direction: "right",
       orientation: "horizontal",
       alpha: 0.8,
@@ -2243,6 +2218,122 @@ const settingsManager = (function () {
     uiManager.renderTimerSettings();
 
     // Re-initialize toolbar listeners for the new timer
+    setTimeout(() => {
+      if (typeof initializeToolbarListeners === "function") {
+        initializeToolbarListeners();
+      }
+    }, 100);
+  }
+
+  // Create Pomodoro preset timers
+  function createPomodoroPreset(presetType) {
+    // Pair colors: each focus+break pair shares a color
+    const pairColors = ["#3498db", "#e67e22", "#2ecc71", "#9b59b6"];
+    const longBreakColor = "#e74c3c";
+    
+    let newTimers = [];
+    
+    switch(presetType) {
+      case "25+5":
+        newTimers = [
+          { name: "Focus", minutes: 25, color: pairColors[0] },
+          { name: "Break", minutes: 5, color: pairColors[0] }
+        ];
+        break;
+        
+      case "(25+5)*2":
+        newTimers = [
+          { name: "Focus 1", minutes: 25, color: pairColors[0] },
+          { name: "Break 1", minutes: 5, color: pairColors[0] },
+          { name: "Focus 2", minutes: 25, color: pairColors[1] },
+          { name: "Break 2", minutes: 5, color: pairColors[1] }
+        ];
+        break;
+        
+      case "(25+5)*3":
+        newTimers = [
+          { name: "Focus 1", minutes: 25, color: pairColors[0] },
+          { name: "Break 1", minutes: 5, color: pairColors[0] },
+          { name: "Focus 2", minutes: 25, color: pairColors[1] },
+          { name: "Break 2", minutes: 5, color: pairColors[1] },
+          { name: "Focus 3", minutes: 25, color: pairColors[2] },
+          { name: "Break 3", minutes: 5, color: pairColors[2] }
+        ];
+        break;
+        
+      case "(25+5)*4+20":
+        newTimers = [
+          { name: "Focus 1", minutes: 25, color: pairColors[0] },
+          { name: "Break 1", minutes: 5, color: pairColors[0] },
+          { name: "Focus 2", minutes: 25, color: pairColors[1] },
+          { name: "Break 2", minutes: 5, color: pairColors[1] },
+          { name: "Focus 3", minutes: 25, color: pairColors[2] },
+          { name: "Break 3", minutes: 5, color: pairColors[2] },
+          { name: "Focus 4", minutes: 25, color: pairColors[3] },
+          { name: "Break 4", minutes: 5, color: pairColors[3] },
+          { name: "Long Break", minutes: 20, color: longBreakColor }
+        ];
+        break;
+    }
+    
+    // Convert to full timer objects
+    const fullTimers = newTimers.map((t, idx) => ({
+      hours: 0,
+      minutes: t.minutes,
+      seconds: 0,
+      color: t.color,
+      direction: "right",
+      orientation: "horizontal",
+      alpha: 0.8,
+      beepAt: 5,
+      name: t.name,
+      notes: "",
+      imageData: null,
+      imageName: null,
+      reminders: {
+        custom: [],
+        every: { minutes: 0, seconds: 0 },
+        duration: 5,
+      },
+    }));
+    
+    state.setTimers(fullTimers);
+    
+    // Update main page Timer 1 display
+    const timer1 = fullTimers[0];
+    uiManager.updateMainTimeDisplay(timer1.hours, timer1.minutes, timer1.seconds);
+    
+    // Update main page timer label
+    const timerLabelInput = document.getElementById("timer-label-input");
+    if (timerLabelInput) {
+      timerLabelInput.value = timer1.name;
+    }
+    
+    // Update preset time display
+    const presetDisplay = document.getElementById("preset-time-display");
+    if (presetDisplay) {
+      const h = timer1.hours.toString().padStart(2, "0");
+      const m = timer1.minutes.toString().padStart(2, "0");
+      const s = timer1.seconds.toString().padStart(2, "0");
+      presetDisplay.textContent = `${h}:${m}:${s}`;
+    }
+    
+    // Update countdown display
+    const totalSeconds = timerLogic.calculateTotalSeconds(timer1);
+    uiManager.updateCountdownDisplay(totalSeconds);
+    
+    // Re-render settings
+    uiManager.renderTimerSettings();
+    
+    // Save active preset
+    state.setActivePreset(presetType);
+    
+    // Update button highlights on both pages
+    document.querySelectorAll('.pomodoro-preset-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.preset === presetType);
+    });
+
+    // Re-initialize toolbar listeners
     setTimeout(() => {
       if (typeof initializeToolbarListeners === "function") {
         initializeToolbarListeners();
@@ -2468,6 +2559,7 @@ const settingsManager = (function () {
 
   return {
     addNewTimer,
+    createPomodoroPreset,
     removeTimer,
     changeColor,
     changeDirection,
@@ -3400,6 +3492,14 @@ const eventHandlers = (function () {
 
     // Add timer button
     elements.addTimerBtn.addEventListener("click", settingsManager.addNewTimer);
+
+    // Pomodoro preset buttons
+    document.querySelectorAll('.pomodoro-preset-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const preset = e.target.dataset.preset;
+        settingsManager.createPomodoroPreset(preset);
+      });
+    });
 
     // Close settings button
     elements.closeSettingsBtn.addEventListener("click", uiManager.showMainPage);
@@ -4604,6 +4704,14 @@ const eventHandlers = (function () {
 function init() {
   // Restore state from localStorage
   const wasRestored = state.loadFromStorage();
+
+  // Highlight active pomodoro preset button
+  const activePreset = state.getActivePreset();
+  if (activePreset) {
+    document.querySelectorAll('.pomodoro-preset-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.preset === activePreset);
+    });
+  }
   
   // Set up event listeners
   eventHandlers.setupEventListeners();
@@ -4614,15 +4722,6 @@ function init() {
   if (wasRestored) {
     const timer1 = state.getTimers()[0];
     uiManager.updateMainTimeDisplay(timer1.hours, timer1.minutes, timer1.seconds);
-    
-    // Update preset time display
-    const presetDisplay = document.getElementById("preset-time-display");
-    if (presetDisplay) {
-      const h = timer1.hours.toString().padStart(2, "0");
-      const m = timer1.minutes.toString().padStart(2, "0");
-      const s = timer1.seconds.toString().padStart(2, "0");
-      presetDisplay.textContent = `${h}:${m}:${s}`;
-    }
   }
 
   // If timer was running or paused, resume UI state
