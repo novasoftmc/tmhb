@@ -705,7 +705,7 @@ body.dark-theme .scheduled-period:hover {
 .advanced-btn {
   background-color: #92f9a6;
   width: auto;
-  min-width: 19%;
+  min-width: 12%;
   padding: 6px 6px;
   margin: 5px auto;
   display: block;
@@ -1985,6 +1985,7 @@ body footer {
   }
 }
 
+/* Countdown box full width on small screens */
 @media (max-width: 768px) {
   .countdown-box {
     width: 100%;
@@ -2167,4 +2168,35 @@ body.dark-theme h1 {
 
 body.dark-theme .sequence-timer-name {
   color: #f0a8a3;
+}
+
+/* ========================================
+   DESKTOP CONTAINER WIDTH EXPANSION
+   ======================================== */
+@media (min-width: 1024px) {
+    body {
+        max-width: 900px;
+    }
+    
+    .time-setter,
+    .visibility-section,
+    .sequence-info-box,
+    .timer-box-wrapper {
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+ 
+    .visibility-section {
+        max-width: 500px;
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+@media (min-width: 1440px) {
+    body {
+        max-width: 1200px;
+    }
 }
