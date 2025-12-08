@@ -291,45 +291,39 @@
         
         </div>
 
-        <!-- Timer control buttons - outside time-setter so they can be shown independently -->
-        <div class="buttons-hover-wrapper">
-        <div class="main-timer-buttons" id="main-timer-buttons-container" style="position: relative; margin: 0 auto; width: fit-content;">
-          <button class="start-btn" id="start-btn" name="startTimer" aria-label="Start timer">
-            START >
-          </button>
-          <button
-            class="pause-btn"
-            id="pause-btn"
-            name="pauseTimer"
-            style="display: none"
-            aria-label="Pause timer"
-          >
-            PAUSE ||
-          </button>
-          <button
-            class="stop-reset-btn"
-            id="stop-reset-btn"
-            name="stopResetTimer"
-            style="display: none"
-            aria-label="Stop and reset timer"
-          >
-            STOP ■
-          </button>
-        </div>
-        </div>
-
-
-        <div style="text-align: center;">
-          <div class="button-hover-wrapper">
+        <!-- Timer control buttons -->
+        <div class="timer-buttons-row">
+          <div class="main-timer-buttons" id="main-timer-buttons-container">
+            <button class="start-btn" id="start-btn" name="startTimer" aria-label="Start timer">
+              START >
+            </button>
             <button
-              class="advanced-btn"
-              id="advanced-btn"
-              name="advancedButton"
-              aria-label="Open advanced settings"
+              class="pause-btn"
+              id="pause-btn"
+              name="pauseTimer"
+              style="display: none"
+              aria-label="Pause timer"
             >
-              CUSTOMIZE
+              PAUSE ||
+            </button>
+            <button
+              class="stop-reset-btn"
+              id="stop-reset-btn"
+              name="stopResetTimer"
+              style="display: none"
+              aria-label="Stop and reset timer"
+            >
+              STOP ■
             </button>
           </div>
+          <button
+            class="advanced-btn"
+            id="advanced-btn"
+            name="advancedButton"
+            aria-label="Open advanced settings"
+          >
+            CUSTOMIZE
+          </button>
         </div>
 
        <!-- Notes display (only shown if Timer 1 has notes) -->

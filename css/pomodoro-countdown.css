@@ -694,9 +694,9 @@ body.dark-theme .scheduled-period:hover {
 .advanced-btn,
 .start-btn,
 .close-settings-btn {
-  padding: 8px;
+  padding: 6px;
   text-align: center;
-  border-radius: 8px;
+  border-radius: 6px;
   font-weight: bold;
   cursor: pointer;
   border: none;
@@ -705,8 +705,8 @@ body.dark-theme .scheduled-period:hover {
 .advanced-btn {
   background-color: #92f9a6;
   width: auto;
-  min-width: 30%;
-  padding: 8px 9px;
+  min-width: 19%;
+  padding: 6px 6px;
   margin: 5px auto;
   display: block;
   opacity: 1;
@@ -849,9 +849,9 @@ body.dark-theme .scheduled-period:hover {
   padding: 15px 5px;
   margin: 9px 0;
   position: relative;
-  min-width: 250px;
-  min-height: 120px;
-  width: 350px;
+  min-width: 180px;
+  min-height: 90px;
+  width: 500px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -863,7 +863,7 @@ body.dark-theme .scheduled-period:hover {
 }
 
 .countdown-box .countdown-display {
-  font-size: 3rem;
+  font-size: 3.6rem;
 }
 
 /* === Reminder Message Display (Main Page) === */
@@ -2134,4 +2134,30 @@ body.dark-theme .time-value {
 body.dark-theme #main-title,
 body.dark-theme h1 {
   color: var(--pomo-dark-text) !important;
+}
+
+/* Timer buttons row layout */
+.timer-buttons-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  padding: 0 10px;
+}
+
+.timer-buttons-row .advanced-btn {
+  position: absolute;
+  right: 3px;
+  padding: 4px 2px;
+  font-size: 0.85rem;
+}
+
+.sequence-timer-name {
+  color: #e85a4f;
+  font-style: italic;
+  font-weight: 400;
+}
+
+body.dark-theme .sequence-timer-name {
+  color: #f0a8a3;
 }

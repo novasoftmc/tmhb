@@ -573,7 +573,7 @@ const uiManager = (function () {
         durationStr = durationStr.trim();
         
         const name = timer.name || "Timer " + (index + 1);
-        timerParts.push(`${durationStr} (${name})`);
+        timerParts.push(`${durationStr} <span class="sequence-timer-name">(${name})</span>`);
       });
       
       // Format total time

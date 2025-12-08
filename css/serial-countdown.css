@@ -219,6 +219,16 @@ body.dark-theme .sequence-info-box {
   color: #d0e0d0;
 }
 
+.sequence-timer-name {
+  color: #3498db;
+  font-style: italic;
+  font-weight: 400;
+}
+
+body.dark-theme .sequence-timer-name {
+  color: #5dade2;
+}
+
 /* Hide empty bottom controls on advanced page timer boxes */
 .timer-box-wrapper .time-setter-bottom-controls {
   display: none;
@@ -696,18 +706,17 @@ body.dark-theme .scheduled-period:hover {
   margin: 9px auto 10px;
 }
 
-.progress-container {
+.progress-container {  
   height: 72px;
-  /* 20% taller */
+  min-height: 18px;
   background-color: rgba(236, 240, 241, 0.3);
-  /* Semi-transparent container */
-  /* border-radius: 10px; */
+  /* Semi-transparent container */  
   overflow: hidden;
   position: relative;
   width: 100%;
   margin: 0 auto;
   overflow: auto;
-  min-height: 54px;
+  
   min-width: 180px;
   max-width: 100%;
   cursor: move;
@@ -759,21 +768,21 @@ body.dark-theme .scheduled-period:hover {
   padding: 15px 5px;
   margin: 9px 0;
   position: relative;
-  min-width: 220px;
-  min-height: 110px;
-  width: 350px;
+  min-width: 180px;
+  min-height: 90px;
+  width: 500px;
   margin-left: auto;
   margin-right: auto;
 }
 
 /* Scale text inside countdown box based on container size */
 .countdown-box .current-timer-info {
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   margin-bottom: 5px;
 }
 
 .countdown-box .countdown-display {
-  font-size: 2.8rem;
+  font-size: 3.6rem;
 }
 
 /* === Reminder Message Display (Main Page) === */
