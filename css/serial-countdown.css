@@ -1904,3 +1904,10 @@ body footer {
   }
 }
 
+@media (max-width: 768px) {
+  .countdown-box {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
