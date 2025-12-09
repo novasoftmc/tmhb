@@ -21,14 +21,15 @@ body {
   background-color: var(--background-color);
   color: var(--text-color);
   padding: 0;
-  max-width: 500px;
-  margin: 0 auto;
 }
 
 .container {
   display: flex;
   flex-direction: column;
   gap: 15px;
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 0 10px;
 }
 
 .header {
@@ -211,6 +212,7 @@ body.dark-theme .preset-timer-btn:active {
   line-height: 1.5;
   text-align: center;
   word-wrap: break-word;
+  width: 100%;
 }
 
 body.dark-theme .sequence-info-box {
@@ -1911,5 +1913,53 @@ body footer {
   }
 }
 
+/* ========================================
+   DESKTOP CONTAINER WIDTH EXPANSION
+   ======================================== */
+@media (min-width: 1024px) {
+    .container {
+        max-width: 800px;
+    }
+    .time-setter {
+    width: 100% !important;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+    
+    .sequence-info-box,
+    .timer-box-wrapper,
+    .timer-buttons-row,
+    .timer-notes-display,
+    .timer-image-display,
+    .progress-container {
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    time-setter {
+        width: 100%;
+    }
+
+    .timer-buttons-row {
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+    
+    .visibility-section {
+        max-width: 500px;
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+@media (min-width: 1440px) {
+    .container {
+        max-width: 1000px;
+    }
+}
 
 

@@ -302,6 +302,7 @@ body.dark-theme .preset-timer-btn:active {
   line-height: 1.5;
   text-align: center;
   word-wrap: break-word;
+  width: 100%;
 }
 
 body.dark-theme .sequence-info-box {
@@ -2181,7 +2182,11 @@ body.dark-theme .sequence-timer-name {
     
     .time-setter,
     .sequence-info-box,
-    .timer-box-wrapper {
+    .timer-box-wrapper,
+    .timer-buttons-row,
+    .timer-notes-display,
+    .timer-image-display,
+    .progress-container {
         max-width: 500px;
         margin-left: auto;
         margin-right: auto;
