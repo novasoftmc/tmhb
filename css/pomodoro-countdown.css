@@ -89,7 +89,7 @@ body {
   cursor: pointer;
   color: #3498db;
   transition: all 0.15s ease;
-  min-width: 70px;
+  min-width: 60px;
   text-align: center;
 }
 
@@ -109,6 +109,104 @@ body {
   border: none;
   border-top: 1px solid #ccc;
   margin: 12px 0;
+}
+
+/* Modified Pomodoro Buttons */
+.pomodoro-preset-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.preset-title {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.1;
+  text-align: center;
+}
+
+.preset-time {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.multiplier-btn {
+  font-size: 1.5rem;
+  font-weight: bold;
+  padding: 8px 12px;
+  min-width: 45px;
+}
+
+.multiplier-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.multiplier-input {
+  width: 50px;
+  height: 40px;
+  text-align: center;
+  font-size: 1rem;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  padding: 5px;
+  transition: border-color 0.2s;
+}
+
+.multiplier-input:focus {
+  outline: none;
+  border-color: #3498db;
+  background-color: #fff;
+}
+
+.multiplier-arrows {
+  position: absolute;
+  right: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.multiplier-arrow-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 0.6rem;
+  padding: 2px 4px;
+  color: #666;
+  line-height: 1;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.multiplier-input-wrapper:hover .multiplier-arrow-btn {
+  opacity: 1;
+}
+
+.multiplier-arrow-btn:hover {
+  color: #3498db;
+}
+
+/* Dark theme for multiplier */
+body.dark-theme .multiplier-input {
+  background-color: #2a2a2a;
+  border-color: #505050;
+  color: #e0e0e0;
+}
+
+body.dark-theme .multiplier-input:focus {
+  border-color: #3498db;
+}
+
+body.dark-theme .multiplier-arrow-btn {
+  color: #bbb;
+}
+
+body.dark-theme .multiplier-arrow-btn:hover {
+  color: #5dade2;
 }
 
 /* Dark theme for Pomodoro presets */

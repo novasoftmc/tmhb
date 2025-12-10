@@ -2226,120 +2226,190 @@ const settingsManager = (function () {
   }
 
   // Create Pomodoro preset timers
-  function createPomodoroPreset(presetType) {
-    // Pair colors: each focus+break pair shares a color
-    const pairColors = ["#3498db", "#e67e22", "#2ecc71", "#9b59b6"];
-    const longBreakColor = "#e74c3c";
+function createPomodoroPreset(presetType) {
+  // Get multiplier value
+  const multiplierInput = document.getElementById('preset-multiplier');
+  const multiplier = multiplierInput ? Math.max(1, Math.min(9, parseInt(multiplierInput.value) || 1)) : 1;
+  
+  // Pair colors for classic presets
+  const classicColors = ["#3498db", "#e67e22", "#2ecc71", "#9b59b6"];
+  const longBreakColor = "#e74c3c";
+  
+  // Additional colors for modified presets (avoiding first 4 classic colors)
+  const modifiedColors = ["#e91e63", "#673ab7", "#00bcd4", "#009688", "#ff9800", "#795548", "#607d8b", "#f44336", "#cddc39"];
+  
+  let newTimers = [];
+  
+  // Classic Pomodoro presets
+  switch(presetType) {
+    case "25+5":
+      newTimers = [
+        { name: "Focus", minutes: 25, color: classicColors[0] },
+        { name: "Break", minutes: 5, color: classicColors[0] }
+      ];
+      break;
+      
+    case "(25+5)*2":
+      newTimers = [
+        { name: "Focus 1", minutes: 25, color: classicColors[0] },
+        { name: "Break 1", minutes: 5, color: classicColors[0] },
+        { name: "Focus 2", minutes: 25, color: classicColors[1] },
+        { name: "Break 2", minutes: 5, color: classicColors[1] }
+      ];
+      break;
+      
+    case "(25+5)*3":
+      newTimers = [
+        { name: "Focus 1", minutes: 25, color: classicColors[0] },
+        { name: "Break 1", minutes: 5, color: classicColors[0] },
+        { name: "Focus 2", minutes: 25, color: classicColors[1] },
+        { name: "Break 2", minutes: 5, color: classicColors[1] },
+        { name: "Focus 3", minutes: 25, color: classicColors[2] },
+        { name: "Break 3", minutes: 5, color: classicColors[2] }
+      ];
+      break;
+      
+    case "(25+5)*4+20":
+      newTimers = [
+        { name: "Focus 1", minutes: 25, color: classicColors[0] },
+        { name: "Break 1", minutes: 5, color: classicColors[0] },
+        { name: "Focus 2", minutes: 25, color: classicColors[1] },
+        { name: "Break 2", minutes: 5, color: classicColors[1] },
+        { name: "Focus 3", minutes: 25, color: classicColors[2] },
+        { name: "Break 3", minutes: 5, color: classicColors[2] },
+        { name: "Focus 4", minutes: 25, color: classicColors[3] },
+        { name: "Break 4", minutes: 5, color: classicColors[3] },
+        { name: "Long Break", minutes: 20, color: longBreakColor }
+      ];
+      break;
     
-    let newTimers = [];
-    
-    switch(presetType) {
-      case "25+5":
-        newTimers = [
-          { name: "Focus", minutes: 25, color: pairColors[0] },
-          { name: "Break", minutes: 5, color: pairColors[0] }
-        ];
-        break;
-        
-      case "(25+5)*2":
-        newTimers = [
-          { name: "Focus 1", minutes: 25, color: pairColors[0] },
-          { name: "Break 1", minutes: 5, color: pairColors[0] },
-          { name: "Focus 2", minutes: 25, color: pairColors[1] },
-          { name: "Break 2", minutes: 5, color: pairColors[1] }
-        ];
-        break;
-        
-      case "(25+5)*3":
-        newTimers = [
-          { name: "Focus 1", minutes: 25, color: pairColors[0] },
-          { name: "Break 1", minutes: 5, color: pairColors[0] },
-          { name: "Focus 2", minutes: 25, color: pairColors[1] },
-          { name: "Break 2", minutes: 5, color: pairColors[1] },
-          { name: "Focus 3", minutes: 25, color: pairColors[2] },
-          { name: "Break 3", minutes: 5, color: pairColors[2] }
-        ];
-        break;
-        
-      case "(25+5)*4+20":
-        newTimers = [
-          { name: "Focus 1", minutes: 25, color: pairColors[0] },
-          { name: "Break 1", minutes: 5, color: pairColors[0] },
-          { name: "Focus 2", minutes: 25, color: pairColors[1] },
-          { name: "Break 2", minutes: 5, color: pairColors[1] },
-          { name: "Focus 3", minutes: 25, color: pairColors[2] },
-          { name: "Break 3", minutes: 5, color: pairColors[2] },
-          { name: "Focus 4", minutes: 25, color: pairColors[3] },
-          { name: "Break 4", minutes: 5, color: pairColors[3] },
-          { name: "Long Break", minutes: 20, color: longBreakColor }
-        ];
-        break;
-    }
-    
-    // Convert to full timer objects
-    const fullTimers = newTimers.map((t, idx) => ({
-      hours: 0,
-      minutes: t.minutes,
-      seconds: 0,
-      color: t.color,
-      direction: "right",
-      orientation: "horizontal",
-      alpha: 0.8,
-      beepAt: 5,
-      name: t.name,
-      notes: "",
-      imageData: null,
-      imageName: null,
-      reminders: {
-        custom: [],
-        every: { minutes: 0, seconds: 0 },
-        duration: 5,
-      },
-    }));
-    
-    state.setTimers(fullTimers);
-    
-    // Update main page Timer 1 display
-    const timer1 = fullTimers[0];
-    uiManager.updateMainTimeDisplay(timer1.hours, timer1.minutes, timer1.seconds);
-    
-    // Update main page timer label
-    const timerLabelInput = document.getElementById("timer-label-input");
-    if (timerLabelInput) {
-      timerLabelInput.value = timer1.name;
-    }
-    
-    // Update preset time display
-    const presetDisplay = document.getElementById("preset-time-display");
-    if (presetDisplay) {
-      const h = timer1.hours.toString().padStart(2, "0");
-      const m = timer1.minutes.toString().padStart(2, "0");
-      const s = timer1.seconds.toString().padStart(2, "0");
-      presetDisplay.textContent = `${h}:${m}:${s}`;
-    }
-    
-    // Update countdown display
-    const totalSeconds = timerLogic.calculateTotalSeconds(timer1);
-    uiManager.updateCountdownDisplay(totalSeconds);
-    
-    // Re-render settings
-    uiManager.renderTimerSettings();
-    
-    // Save active preset
-    state.setActivePreset(presetType);
-    
-    // Update button highlights on both pages
-    document.querySelectorAll('.pomodoro-preset-btn').forEach(b => {
-      b.classList.toggle('active', b.dataset.preset === presetType);
-    });
-
-    // Re-initialize toolbar listeners
-    setTimeout(() => {
-      if (typeof initializeToolbarListeners === "function") {
-        initializeToolbarListeners();
+    // Modified Pomodoro presets
+    case "45+15":
+      for (let i = 0; i < multiplier; i++) {
+        const colorIndex = i % modifiedColors.length;
+        newTimers.push(
+          { name: multiplier > 1 ? `Focus ${i+1}` : "Focus", minutes: 45, color: modifiedColors[colorIndex] },
+          { name: multiplier > 1 ? `Break ${i+1}` : "Break", minutes: 15, color: modifiedColors[colorIndex] }
+        );
       }
-    }, 100);
+      break;
+      
+    case "60+10":
+      for (let i = 0; i < multiplier; i++) {
+        const colorIndex = i % modifiedColors.length;
+        newTimers.push(
+          { name: multiplier > 1 ? `Focus ${i+1}` : "Focus", minutes: 60, color: modifiedColors[colorIndex] },
+          { name: multiplier > 1 ? `Break ${i+1}` : "Break", minutes: 10, color: modifiedColors[colorIndex] }
+        );
+      }
+      break;
+      
+    case "90/20":
+      for (let i = 0; i < multiplier; i++) {
+        const colorIndex = i % modifiedColors.length;
+        newTimers.push(
+          { name: multiplier > 1 ? `Focus ${i+1}` : "Focus", minutes: 90, color: modifiedColors[colorIndex] },
+          { name: multiplier > 1 ? `Break ${i+1}` : "Break", minutes: 20, color: modifiedColors[colorIndex] }
+        );
+      }
+      break;
+      
+    case "52/17":
+      for (let i = 0; i < multiplier; i++) {
+        const colorIndex = i % modifiedColors.length;
+        newTimers.push(
+          { name: multiplier > 1 ? `Focus ${i+1}` : "Focus", minutes: 52, color: modifiedColors[colorIndex] },
+          { name: multiplier > 1 ? `Break ${i+1}` : "Break", minutes: 17, color: modifiedColors[colorIndex] }
+        );
+      }
+      break;
+      
+    case "(10+2)*5":
+      const baseMultiplier = multiplier === 1 ? 5 : multiplier * 5;
+      for (let i = 0; i < baseMultiplier; i++) {
+        const colorIndex = i % modifiedColors.length;
+        newTimers.push(
+          { name: `Focus ${i+1}`, minutes: 10, color: modifiedColors[colorIndex] },
+          { name: `Break ${i+1}`, minutes: 2, color: modifiedColors[colorIndex] }
+        );
+      }
+      break;
+      
+    case "30+10":
+      for (let i = 0; i < multiplier; i++) {
+        const colorIndex = i % modifiedColors.length;
+        newTimers.push(
+          { name: multiplier > 1 ? `Focus ${i+1}` : "Focus", minutes: 30, color: modifiedColors[colorIndex] },
+          { name: multiplier > 1 ? `Break ${i+1}` : "Break", minutes: 10, color: modifiedColors[colorIndex] }
+        );
+      }
+      break;
   }
+  
+  // Convert to full timer objects
+  const fullTimers = newTimers.map((t, idx) => ({
+    hours: 0,
+    minutes: t.minutes,
+    seconds: 0,
+    color: t.color,
+    direction: "right",
+    orientation: "horizontal",
+    alpha: 0.8,
+    beepAt: 5,
+    name: t.name,
+    notes: "",
+    imageData: null,
+    imageName: null,
+    reminders: {
+      custom: [],
+      every: { minutes: 0, seconds: 0 },
+      duration: 5,
+    },
+  }));
+  
+  state.setTimers(fullTimers);
+  
+  // Update main page Timer 1 display
+  const timer1 = fullTimers[0];
+  uiManager.updateMainTimeDisplay(timer1.hours, timer1.minutes, timer1.seconds);
+  
+  // Update main page timer label
+  const timerLabelInput = document.getElementById("timer-label-input");
+  if (timerLabelInput) {
+    timerLabelInput.value = timer1.name;
+  }
+  
+  // Update preset time display
+  const presetDisplay = document.getElementById("preset-time-display");
+  if (presetDisplay) {
+    const h = timer1.hours.toString().padStart(2, "0");
+    const m = timer1.minutes.toString().padStart(2, "0");
+    const s = timer1.seconds.toString().padStart(2, "0");
+    presetDisplay.textContent = `${h}:${m}:${s}`;
+  }
+  
+  // Update countdown display
+  const totalSeconds = timerLogic.calculateTotalSeconds(timer1);
+  uiManager.updateCountdownDisplay(totalSeconds);
+  
+  // Re-render settings
+  uiManager.renderTimerSettings();
+  
+  // Save active preset
+  state.setActivePreset(presetType);
+  
+  // Update button highlights on both pages
+  document.querySelectorAll('.pomodoro-preset-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.preset === presetType);
+  });
+
+  // Re-initialize toolbar listeners
+  setTimeout(() => {
+    if (typeof initializeToolbarListeners === "function") {
+      initializeToolbarListeners();
+    }
+  }, 100);
+}
 
   // Remove a timer
   function removeTimer(index) {
@@ -3494,10 +3564,78 @@ const eventHandlers = (function () {
     elements.addTimerBtn.addEventListener("click", settingsManager.addNewTimer);
 
     // Pomodoro preset buttons
-    document.querySelectorAll('.pomodoro-preset-btn').forEach(btn => {
+document.querySelectorAll('.pomodoro-preset-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    // Get the button element (in case user clicked on span inside)
+    const button = e.target.closest('.pomodoro-preset-btn');
+    const preset = button.dataset.preset;
+    
+    // Skip if this is the multiplier button (has no preset)
+    if (!preset) return;
+    
+    settingsManager.createPomodoroPreset(preset);
+  });
+});
+
+    // Multiplier input handling
+    const multiplierInputs = document.querySelectorAll('#preset-multiplier');
+    multiplierInputs.forEach(multiplierInput => {
+      multiplierInput.addEventListener('focus', function() {
+        this.select();
+      });
+      
+      multiplierInput.addEventListener('blur', function() {
+        let value = parseInt(this.value) || 1;
+        value = Math.max(1, Math.min(9, value));
+        
+        // Update ALL multiplier inputs on both pages
+        document.querySelectorAll('#preset-multiplier').forEach(input => {
+          input.value = value;
+        });
+        
+        // Re-apply the current preset with new multiplier
+        const activePreset = state.getActivePreset();
+        const activeBtn = document.querySelector('.pomodoro-preset-btn.active[data-preset-type="modified"]');
+        if (activeBtn && activePreset) {
+          settingsManager.createPomodoroPreset(activePreset);
+        }
+      });
+      
+      multiplierInput.addEventListener('keyup', function(e) {
+        if (e.key === 'Enter') this.blur();
+      });
+    });
+
+    // Multiplier arrow buttons
+    document.querySelectorAll('.multiplier-arrow-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
-        const preset = e.target.dataset.preset;
-        settingsManager.createPomodoroPreset(preset);
+        e.preventDefault();
+        
+        // Get all multiplier inputs (main page and advanced page)
+        const allMultiplierInputs = document.querySelectorAll('#preset-multiplier');
+        if (allMultiplierInputs.length === 0) return;
+        
+        // Get current value from the clicked button's input
+        const clickedInput = e.target.closest('.multiplier-input-wrapper').querySelector('#preset-multiplier');
+        let value = parseInt(clickedInput.value) || 1;
+        
+        if (e.target.dataset.direction === 'up') {
+          value = Math.min(9, value + 1);
+        } else {
+          value = Math.max(1, value - 1);
+        }
+        
+        // Update ALL multiplier inputs on both pages
+        allMultiplierInputs.forEach(input => {
+          input.value = value;
+        });
+        
+        // Re-apply the current preset with new multiplier
+        const activePreset = state.getActivePreset();
+        const activeBtn = document.querySelector('.pomodoro-preset-btn.active[data-preset-type="modified"]');
+        if (activeBtn && activePreset) {
+          settingsManager.createPomodoroPreset(activePreset);
+        }
       });
     });
 

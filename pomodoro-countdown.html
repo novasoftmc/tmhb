@@ -103,7 +103,37 @@
           <hr class="pomodoro-divider">
           <div class="pomodoro-section-title">Modifications</div>
           <div class="pomodoro-buttons-row">
-            <!-- Future modification buttons will go here -->
+            <button class="pomodoro-preset-btn" data-preset="45+15" data-preset-type="modified">
+              <span class="preset-title">Extended Pomodoro</span>
+              <span class="preset-time">45+15</span>
+            </button>
+            <button class="pomodoro-preset-btn" data-preset="60+10" data-preset-type="modified">
+              <span class="preset-title">Power Hour</span>
+              <span class="preset-time">60+10</span>
+            </button>
+            <button class="pomodoro-preset-btn" data-preset="90/20" data-preset-type="modified">
+              <span class="preset-title">90/20 Rule</span>
+            </button>
+            <button class="pomodoro-preset-btn" data-preset="52/17" data-preset-type="modified">
+              <span class="preset-title">52/17 Method</span>
+            </button>
+            <button class="pomodoro-preset-btn" data-preset="(10+2)*5" data-preset-type="modified">
+              <span class="preset-title">(10+2)×5 Method</span>
+            </button>
+            <button class="pomodoro-preset-btn" data-preset="30+10" data-preset-type="modified">
+              <span class="preset-title">Balanced Pomodoro</span>
+              <span class="preset-time">30+10</span>
+            </button>
+            <button class="pomodoro-preset-btn multiplier-btn">
+              <span class="preset-title">×</span>
+            </button>
+            <div class="multiplier-input-wrapper">
+              <input type="number" id="preset-multiplier" class="multiplier-input" min="1" max="9" value="1">
+              <div class="multiplier-arrows">
+                <button class="multiplier-arrow-btn" data-direction="up">▲</button>
+                <button class="multiplier-arrow-btn" data-direction="down">▼</button>
+              </div>
+            </div>
           </div>
         </div>
         <div class="time-setter" id="main-timer" style="position: relative;">
@@ -409,7 +439,37 @@
           <hr class="pomodoro-divider">
           <div class="pomodoro-section-title">Modifications</div>
           <div class="pomodoro-buttons-row">
-            <!-- Future modification buttons will go here -->
+                      <button class="pomodoro-preset-btn" data-preset="45+15" data-preset-type="modified">
+              <span class="preset-title">Extended Pomodoro</span>
+              <span class="preset-time">45+15</span>
+            </button>
+            <button class="pomodoro-preset-btn" data-preset="60+10" data-preset-type="modified">
+              <span class="preset-title">Power Hour</span>
+              <span class="preset-time">60+10</span>
+            </button>
+            <button class="pomodoro-preset-btn" data-preset="90/20" data-preset-type="modified">
+              <span class="preset-title">90/20 Rule</span>
+            </button>
+            <button class="pomodoro-preset-btn" data-preset="52/17" data-preset-type="modified">
+              <span class="preset-title">52/17 Method</span>
+            </button>
+            <button class="pomodoro-preset-btn" data-preset="(10+2)*5" data-preset-type="modified">
+              <span class="preset-title">(10+2)×5 Method</span>
+            </button>
+            <button class="pomodoro-preset-btn" data-preset="30+10" data-preset-type="modified">
+              <span class="preset-title">Balanced Pomodoro</span>
+              <span class="preset-time">30+10</span>
+            </button>
+            <button class="pomodoro-preset-btn multiplier-btn">
+              <span class="preset-title">×</span>
+            </button>
+            <div class="multiplier-input-wrapper">
+              <input type="number" id="preset-multiplier" class="multiplier-input" min="1" max="9" value="1">
+              <div class="multiplier-arrows">
+                <button class="multiplier-arrow-btn" data-direction="up">▲</button>
+                <button class="multiplier-arrow-btn" data-direction="down">▼</button>
+              </div>
+            </div>
           </div>
         </div>
         <div id="timer-boxes-container">
