@@ -36,6 +36,217 @@ body {
   display: none;
 }
 
+/* Stats Button */
+.stats-btn {
+    padding: 8px 16px;
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin-right: 15px;
+}
+
+.stats-btn:hover {
+    background: #2980b9;
+}
+
+body.dark-theme .stats-btn {
+    background: #5dade2;
+}
+
+body.dark-theme .stats-btn:hover {
+    background: #3498db;
+}
+
+/* Stats Modal */
+.stats-modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    animation: fadeIn 0.3s;
+}
+
+.stats-modal-content {
+    position: relative;
+    background: white;
+    margin: 3% auto;
+    padding: 30px;
+    width: 90%;
+    max-width: 700px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+.stats-modal-content h2 {
+    margin: 0 0 25px 0;
+    color: #2c3e50;
+    font-size: 1.8rem;
+    text-align: center;
+}
+
+.stats-modal-content h3 {
+    margin: 25px 0 15px 0;
+    color: #2c3e50;
+    font-size: 1.3rem;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 8px;
+}
+
+.close-stats-modal {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #999;
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s;
+}
+
+.close-stats-modal:hover {
+    background: #f0f0f0;
+    color: #333;
+}
+
+.stats-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.stats-detailed {
+    margin: 25px 0;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.stat-detail-label {
+    color: #555;
+    font-weight: 500;
+}
+
+.stat-detail-value {
+    color: #3498db;
+    font-weight: bold;
+}
+
+.stats-chart {
+    margin: 25px 0;
+}
+
+#stats-chart-canvas {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 250px;
+}
+
+.reset-stats-btn {
+    width: 100%;
+    padding: 12px;
+    background: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background 0.3s;
+}
+
+.reset-stats-btn:hover {
+    background: #c0392b;
+}
+
+/* Dark Mode Stats Modal */
+body.dark-theme .stats-modal-content {
+    background: #2c2c2c;
+    color: #e0e0e0;
+}
+
+body.dark-theme .stats-modal-content h2,
+body.dark-theme .stats-modal-content h3 {
+    color: #f0f0f0;
+}
+
+body.dark-theme .stat-row {
+    border-bottom: 1px solid #444;
+}
+
+body.dark-theme .stat-detail-label {
+    color: #b0b0b0;
+}
+
+body.dark-theme .close-stats-modal:hover {
+    background: #3a3a3a;
+    color: #fff;
+}
+
+@media (max-width: 768px) {
+    .stats-modal-content {
+        width: 95%;
+        padding: 20px;
+        margin: 5% auto;
+    }
+    
+    .stats-overview {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .stat-card {
+        padding: 15px;
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+    }
+}
+
 .skip-link {
   position: absolute;
   top: -40px;
@@ -2448,7 +2659,7 @@ body.dark-theme .pomodoro-closing-tips ul li strong {
 
 @media (max-width: 768px) {
     .pomodoro-education-section {
-        padding: 50vh 15px 30px;
+        padding: 40vh 15px 30px;
     }
     
     .pomodoro-method-detail {
