@@ -71,7 +71,6 @@
                     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                 </svg>
             </div>
-            <button class="stats-btn" id="stats-btn" aria-label="View statistics">Stats</button>
         </div>
         
         <!-- Row 2: Sub-tabs (Countdown options) -->
@@ -582,75 +581,6 @@
         </button>
       </div>
     </div>
-
-    <!-- Stats Modal -->
-    <div id="stats-modal" class="stats-modal">
-      <div class="stats-modal-content">
-        <button class="close-stats-modal" id="close-stats-modal" aria-label="Close statistics">×</button>
-        <h2>Your Pomodoro Statistics</h2>
-        
-        <div class="stats-overview">
-          <div class="stat-card">
-            <div class="stat-value" id="stat-today">0</div>
-            <div class="stat-label">Today</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value" id="stat-week">0</div>
-            <div class="stat-label">This Week</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value" id="stat-month">0</div>
-            <div class="stat-label">This Month</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value" id="stat-streak">0</div>
-            <div class="stat-label">Day Streak</div>
-          </div>
-        </div>
-
-        <div class="stats-detailed">
-          <h3>Detailed Metrics</h3>
-          
-          <div class="stat-row">
-            <span class="stat-detail-label">Total Focus Time Today:</span>
-            <span class="stat-detail-value" id="stat-time-today">0h 0m</span>
-          </div>
-          
-          <div class="stat-row">
-            <span class="stat-detail-label">Average Pomodoros/Day (30 days):</span>
-            <span class="stat-detail-value" id="stat-avg-day">0</span>
-          </div>
-          
-          <div class="stat-row">
-            <span class="stat-detail-label">Average Pomodoro Length:</span>
-            <span class="stat-detail-value" id="stat-avg-length">25m</span>
-          </div>
-          
-          <div class="stat-row">
-            <span class="stat-detail-label">Completion Rate (30 days):</span>
-            <span class="stat-detail-value" id="stat-completion">0%</span>
-          </div>
-          
-          <div class="stat-row">
-            <span class="stat-detail-label">Total Breaks Today:</span>
-            <span class="stat-detail-value" id="stat-breaks-today">0</span>
-          </div>
-          
-          <div class="stat-row">
-            <span class="stat-detail-label">Total Break Time Today:</span>
-            <span class="stat-detail-value" id="stat-break-time">0m</span>
-          </div>
-        </div>
-
-        <div class="stats-chart">
-          <h3>Focus Hours (Last 7 Days)</h3>
-          <canvas id="stats-chart-canvas" width="400" height="200"></canvas>
-        </div>
-
-        <button class="reset-stats-btn" id="reset-stats-btn">Reset All Statistics</button>
-      </div>
-    </div> <!-- Stats Modal -->
-
     <!-- Educational Content Section -->
     <section class="pomodoro-education-section">
         <div class="container">
