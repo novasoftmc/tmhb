@@ -3404,6 +3404,39 @@ const eventHandlers = (function () {
     // Close settings button
     elements.closeSettingsBtn.addEventListener("click", uiManager.showMainPage);
 
+    // Timer example preset buttons
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('timer-example-preset')) {
+        e.preventDefault();
+        const minutes = parseInt(e.target.dataset.minutes) || 0;
+        const seconds = parseInt(e.target.dataset.seconds) || 0;
+        
+        const timers = state.getTimers();
+        timers[0].hours = Math.floor(minutes / 60);
+        timers[0].minutes = minutes % 60;
+        timers[0].seconds = seconds;
+        state.setTimers(timers);
+        
+        // Update main display
+        uiManager.updateMainTimeDisplay(timers[0].hours, timers[0].minutes, timers[0].seconds);
+        
+        // Update countdown and preset displays
+        const totalSeconds = timerLogic.calculateTotalSeconds(timers[0]);
+        uiManager.updateCountdownDisplay(totalSeconds);
+        
+        const presetDisplay = document.getElementById('preset-time-display');
+        if (presetDisplay) {
+          const h = timers[0].hours.toString().padStart(2, '0');
+          const m = timers[0].minutes.toString().padStart(2, '0');
+          const s = timers[0].seconds.toString().padStart(2, '0');
+          presetDisplay.textContent = `${h}:${m}:${s}`;
+        }
+        
+        // Scroll to top smoothly
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+
     // Keyboard shortcuts
     document.addEventListener("keydown", (e) => {
       // Only work when on main page (not settings page)
