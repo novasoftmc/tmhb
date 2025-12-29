@@ -408,6 +408,8 @@ const uiManager = (function () {
     // UPDATE: Sync main display with Timer 1's current values
     const timer1 = state.getTimers()[0];
     updateMainTimeDisplay(timer1.hours, timer1.minutes, timer1.seconds);
+    // Re-render all timers to reflect any changes made in settings
+    renderAllTimers();
 
     // Also update the countdown display
     const totalSeconds = timerLogic.calculateTotalSeconds(timer1);
@@ -1363,7 +1365,7 @@ const timerLogic = (function () {
       const newRemaining = remainingSeconds - 1;
 
       // Update countdown display with the new remaining seconds
-      uiManager.updateCountdownDisplay(newRemaining);
+      uiManager.updateCountdownDisplay(newRemaining); 
 
       // Check for beep - beep every second during warning period
       try {
@@ -2823,11 +2825,14 @@ const eventHandlers = (function () {
       }
     });
 
-    // Advanced panel toggle
-    elements.advancedBtn.addEventListener("click", () => {
-      uiManager.showSettingsPage();
-      // Initialize toolbar event listeners after rendering
-      setTimeout(initializeToolbarListeners, 100);
+    // Advanced panel toggle - use event delegation for all timers
+    document.addEventListener("click", (e) => {
+      if (e.target.classList.contains("advanced-btn") || 
+          e.target.getAttribute("name") === "advancedButton") {
+        uiManager.showSettingsPage();
+        // Initialize toolbar event listeners after rendering
+        setTimeout(initializeToolbarListeners, 100);
+      }
     });
 
     // Scheduled start functionality
@@ -4113,6 +4118,15 @@ const timersControlPanel = (function () {
       timers.forEach((timer, index) => {
         if (!timer.isRunning && !timer.isPaused) {
           startSingleTimer(index);
+          
+          // Update individual timer buttons
+          const timerBox = document.querySelector(`[data-timer-index="${index}"]`);
+          if (timerBox) {
+            const startBtn = timerBox.querySelector('.start-btn');
+            const pauseBtn = timerBox.querySelector('.pause-btn');
+            if (startBtn) startBtn.style.display = 'none';
+            if (pauseBtn) pauseBtn.style.display = 'inline-block';
+          }
         }
       });
       startAllBtn.style.display = "none";
@@ -4127,6 +4141,15 @@ const timersControlPanel = (function () {
         timers.forEach((timer, index) => {
           if (timer.isRunning && !timer.isPaused) {
             pauseSingleTimer(index);
+            
+            // Update individual timer buttons
+            const timerBox = document.querySelector(`[data-timer-index="${index}"]`);
+            if (timerBox) {
+              const pauseBtn = timerBox.querySelector('.pause-btn');
+              const resetBtn = timerBox.querySelector('.stop-reset-btn');
+              if (pauseBtn) pauseBtn.textContent = 'RESUME >';
+              if (resetBtn) resetBtn.style.display = 'inline-block';
+            }
           }
         });
         pauseAllBtn.textContent = "RESUME ALL";
@@ -4134,17 +4157,40 @@ const timersControlPanel = (function () {
         timers.forEach((timer, index) => {
           if (timer.isPaused) {
             resumeSingleTimer(index);
+            
+            // Update individual timer buttons
+            const timerBox = document.querySelector(`[data-timer-index="${index}"]`);
+            if (timerBox) {
+              const pauseBtn = timerBox.querySelector('.pause-btn');
+              const resetBtn = timerBox.querySelector('.stop-reset-btn');
+              if (pauseBtn) pauseBtn.textContent = 'PAUSE ||';
+              if (resetBtn) resetBtn.style.display = 'none';
+            }
           }
         });
         pauseAllBtn.textContent = "PAUSE ALL";
       }
     });
-
+    
     // Reset all timers
     resetAllBtn.addEventListener("click", () => {
       const timers = state.getTimers();
       timers.forEach((timer, index) => {
         resetSingleTimer(index);
+        
+        // Update individual timer buttons
+        const timerBox = document.querySelector(`[data-timer-index="${index}"]`);
+        if (timerBox) {
+          const startBtn = timerBox.querySelector('.start-btn');
+          const pauseBtn = timerBox.querySelector('.pause-btn');
+          const resetBtn = timerBox.querySelector('.stop-reset-btn');
+          if (startBtn) startBtn.style.display = 'inline-block';
+          if (pauseBtn) {
+            pauseBtn.style.display = 'none';
+            pauseBtn.textContent = 'PAUSE ||';
+          }
+          if (resetBtn) resetBtn.style.display = 'none';
+        }
       });
       startAllBtn.style.display = "inline-block";
       pauseAllBtn.style.display = "none";
@@ -4222,6 +4268,23 @@ function startSingleTimer(index) {
     if (timer.remainingSeconds > 0) {
       timer.remainingSeconds--;
       updateTimerDisplay(index);
+      
+      // Update the time setter digits for this timer
+      const timerBox = document.querySelector(`[data-timer-index="${index}"]`);
+      if (timerBox) {
+        const hours = Math.floor(timer.remainingSeconds / 3600);
+        const minutes = Math.floor((timer.remainingSeconds % 3600) / 60);
+        const seconds = timer.remainingSeconds % 60;
+        
+        const hoursEl = timerBox.querySelector(`#hours-${index}`);
+        const minutesEl = timerBox.querySelector(`#minutes-${index}`);
+        const secondsEl = timerBox.querySelector(`#seconds-${index}`);
+        
+        if (hoursEl) hoursEl.textContent = `${hours}h`;
+        if (minutesEl) minutesEl.textContent = `${minutes.toString().padStart(2, "0")}m`;
+        if (secondsEl) secondsEl.textContent = `${seconds.toString().padStart(2, "0")}s`;
+      }
+
     } else {
       clearInterval(timer.interval);
       timer.isRunning = false;
@@ -4250,6 +4313,22 @@ function resumeSingleTimer(index) {
     if (timer.remainingSeconds > 0) {
       timer.remainingSeconds--;
       updateTimerDisplay(index);
+      
+      // Update the time setter digits for this timer
+      const timerBox = document.querySelector(`[data-timer-index="${index}"]`);
+      if (timerBox) {
+        const hours = Math.floor(timer.remainingSeconds / 3600);
+        const minutes = Math.floor((timer.remainingSeconds % 3600) / 60);
+        const seconds = timer.remainingSeconds % 60;
+        
+        const hoursEl = timerBox.querySelector(`#hours-${index}`);
+        const minutesEl = timerBox.querySelector(`#minutes-${index}`);
+        const secondsEl = timerBox.querySelector(`#seconds-${index}`);
+        
+        if (hoursEl) hoursEl.textContent = `${hours}h`;
+        if (minutesEl) minutesEl.textContent = `${minutes.toString().padStart(2, "0")}m`;
+        if (secondsEl) secondsEl.textContent = `${seconds.toString().padStart(2, "0")}s`;
+      }
     } else {
       clearInterval(timer.interval);
       timer.isRunning = false;
@@ -4270,6 +4349,18 @@ function resetSingleTimer(index) {
   timer.isPaused = false;
   timer.remainingSeconds = timer.totalSeconds;
   updateTimerDisplay(index);
+  
+  // Update the time setter digits to show initial values
+  const timerBox = document.querySelector(`[data-timer-index="${index}"]`);
+  if (timerBox) {
+    const hoursEl = timerBox.querySelector(`#hours-${index}`);
+    const minutesEl = timerBox.querySelector(`#minutes-${index}`);
+    const secondsEl = timerBox.querySelector(`#seconds-${index}`);
+    
+    if (hoursEl) hoursEl.textContent = `${timer.hours}h`;
+    if (minutesEl) minutesEl.textContent = `${timer.minutes.toString().padStart(2, "0")}m`;
+    if (secondsEl) secondsEl.textContent = `${timer.seconds.toString().padStart(2, "0")}s`;
+  }
 }
 
 function updateTimerDisplay(index) {
@@ -4289,13 +4380,8 @@ function updateTimerDisplay(index) {
       100;
 
     progressBar.style.width = `${percentage}%`;
-    progressBar.style.backgroundColor = timer.color;
-    progressBar.style.opacity = timer.alpha;
-    progressBar.style.transformOrigin =
-      timer.direction === "left" ? "left" : "right";
   }
 }
-
 // ===== RENDER TIMERS =====
 function renderAllTimers() {
   const container = document.querySelector(".container");
@@ -4392,6 +4478,34 @@ function updateTimerData(timerElement, index) {
 
   if (progressContainer) {
     progressContainer.id = `progress-container-${index}`;
+  }
+
+  // Update color indicator
+  const colorIndicator = timerElement.querySelector('.color-indicator');
+  if (colorIndicator) {
+    colorIndicator.style.backgroundColor = timer.color;
+    colorIndicator.style.opacity = timer.alpha || 0.5;
+  }
+
+  // Update direction buttons with correct colors
+  const leftBtn = timerElement.querySelector('[data-dir="left"]');
+  const rightBtn = timerElement.querySelector('[data-dir="right"]');
+  if (leftBtn && rightBtn) {
+    if (timer.direction === 'left') {
+      leftBtn.style.backgroundColor = timer.color;
+      leftBtn.style.opacity = timer.alpha || 0.5;
+      leftBtn.classList.add('selected');
+      rightBtn.style.backgroundColor = '#eee';
+      rightBtn.style.opacity = '1';
+      rightBtn.classList.remove('selected');
+    } else {
+      rightBtn.style.backgroundColor = timer.color;
+      rightBtn.style.opacity = timer.alpha || 0.5;
+      rightBtn.classList.add('selected');
+      leftBtn.style.backgroundColor = '#eee';
+      leftBtn.style.opacity = '1';
+      leftBtn.classList.remove('selected');
+    }
   }
 }
 
