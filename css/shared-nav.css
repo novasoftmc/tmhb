@@ -299,3 +299,32 @@ body.dark-theme.pomodoro-page .header-sub-tab:hover {
   color: #f0a8a3;
 }
 
+/* === Parallel Countdown Page Header Theme === */
+body.parallel-countdown .header-row-1 {
+  background: linear-gradient(135deg, #69b659 0%, #98ad44 100%);
+}
+
+body.parallel-countdown .header-main-tab.active {
+  color: #69b659;
+}
+
+body.parallel-countdown .header-sub-tab.active {
+  color: #69b659;
+  border-bottom-color: #69b659;
+}
+
+body.parallel-countdown .header-sub-tab:hover {
+  background: #f5eafa;
+  color: #69b659;
+}
+
+/* Dark theme + Parallel page */
+body.dark-theme.parallel-countdown .header-sub-tab.active {
+  color: #bb8fce;
+  border-bottom-color: #69b659;
+}
+
+body.dark-theme.parallel-countdown .header-sub-tab:hover {
+  background: #3a2a3d;
+  color: #bb8fce;
+}

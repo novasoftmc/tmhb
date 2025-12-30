@@ -7,7 +7,7 @@ const state = (function () {
       seconds: 0,
       color: "#3498db",
       direction: "right",
-      alpha: 0.5,
+      alpha: 0.9,
       beepAt: 5,
       name: "Timer 1",
       notes: "",
@@ -15,14 +15,20 @@ const state = (function () {
       imageName: null,
       reminders: {
         custom: [],
-        every: { minutes: 0, seconds: 0 },
+        every: { minutes: 0, seconds: 0, flash: true, sound: true, message: false, messageText: "" },
         duration: 5,
+        isCollapsed: true
       },
       isRunning: false,
       isPaused: false,
       remainingSeconds: 0,
       totalSeconds: 0,
       interval: null,
+      scheduledStart: {
+        enabled: false,
+        time: { hours: 13, minutes: 0, seconds: 0 },
+        checkInterval: null,
+      },
     },
     {
       hours: 0,
@@ -30,7 +36,7 @@ const state = (function () {
       seconds: 0,
       color: "#e74c3c",
       direction: "right",
-      alpha: 0.5,
+      alpha: 0.9,
       beepAt: 5,
       name: "Timer 2",
       notes: "",
@@ -38,14 +44,20 @@ const state = (function () {
       imageName: null,
       reminders: {
         custom: [],
-        every: { minutes: 0, seconds: 0 },
+        every: { minutes: 0, seconds: 0, flash: true, sound: true, message: false, messageText: "" },
         duration: 5,
+        isCollapsed: true
       },
       isRunning: false,
       isPaused: false,
       remainingSeconds: 0,
       totalSeconds: 0,
       interval: null,
+      scheduledStart: {
+        enabled: false,
+        time: { hours: 13, minutes: 0, seconds: 0 },
+        checkInterval: null,
+      },
     },
   ];
 
@@ -121,21 +133,102 @@ const state = (function () {
     showImage: true,
     showProgressBar: true,
   };
-  let scheduledStart = {
-    enabled: false,
-    time: null, // Will be set to 1 hour from now on init
-    checkInterval: null,
-  };
+  
+  // === localStorage persistence ===
+  const STORAGE_KEY = 'parallelCountdownState';
+  
+  function saveToStorage() {
+    const data = {
+      timers: timers.map(t => ({
+        hours: t.hours,
+        minutes: t.minutes,
+        seconds: t.seconds,
+        color: t.color,
+        direction: t.direction,
+        alpha: t.alpha,
+        beepAt: t.beepAt,
+        name: t.name,
+        notes: t.notes,
+        imageData: t.imageData,
+        imageName: t.imageName,
+        reminders: t.reminders,
+        isRunning: t.isRunning,
+        isPaused: t.isPaused,
+        remainingSeconds: t.remainingSeconds,
+        totalSeconds: t.totalSeconds,
+        savedAt: t.isRunning && !t.isPaused ? Date.now() : null
+      })),
+      visibilitySettings,
+      soundEnabled
+    };
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch (e) {
+      console.warn('Failed to save state:', e);
+    }
+  }
+
+  function loadFromStorage() {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) return false;
+      
+      const data = JSON.parse(saved);
+      
+      if (data.timers && data.timers.length > 0) {
+        timers = data.timers.map((t, i) => {
+          let remaining = t.remainingSeconds || 0;
+          // Adjust for elapsed time if timer was running
+          if (t.isRunning && !t.isPaused && t.savedAt) {
+            const elapsed = Math.floor((Date.now() - t.savedAt) / 1000);
+            remaining = Math.max(0, remaining - elapsed);
+          }
+          return {
+            hours: t.hours || 0,
+            minutes: t.minutes || 0,
+            seconds: t.seconds || 0,
+            color: t.color || '#3498db',
+            direction: t.direction || 'right',
+            alpha: t.alpha || 0.9,
+            beepAt: t.beepAt || 5,
+            name: t.name || `Timer ${i + 1}`,
+            notes: t.notes || '',
+            imageData: t.imageData || null,
+            imageName: t.imageName || null,
+            reminders: t.reminders || { custom: [], every: { minutes: 0, seconds: 0 }, duration: 5 },
+            isRunning: remaining > 0 && t.isRunning,
+            isPaused: t.isPaused && remaining > 0,
+            remainingSeconds: remaining,
+            totalSeconds: t.totalSeconds || 0,
+            interval: null,
+            scheduledStart: { enabled: false, time: { hours: 13, minutes: 0, seconds: 0 }, checkInterval: null }
+          };
+        });
+      }
+      
+      if (data.visibilitySettings) {
+        visibilitySettings = data.visibilitySettings;
+      }
+      soundEnabled = data.soundEnabled !== undefined ? data.soundEnabled : true;
+      
+      return true;
+    } catch (e) {
+      console.warn('Failed to load state:', e);
+      return false;
+    }
+  }
 
   return {
     getIsPaused: () => isPaused,
     setIsPaused: (value) => {
       isPaused = value;
+      saveToStorage();
     },
 
     getSoundEnabled: () => soundEnabled,
     setSoundEnabled: (value) => {
       soundEnabled = value;
+      saveToStorage();
     },
     initAudioContext: initAudioContext,
     playBeep: playBeep,
@@ -143,56 +236,67 @@ const state = (function () {
     getTimers: () => timers,
     setTimers: (value) => {
       timers = value;
+      saveToStorage();
     },
 
     getPauses: () => pauses,
     setPauses: (value) => {
       pauses = value;
+      saveToStorage();
     },
 
     getCurrentTimer: () => currentTimer,
     setCurrentTimer: (value) => {
       currentTimer = value;
+      saveToStorage();
     },
 
     getIsRunning: () => isRunning,
     setIsRunning: (value) => {
       isRunning = value;
+      saveToStorage();
     },
 
     getTotalSeconds: () => totalSeconds,
     setTotalSeconds: (value) => {
       totalSeconds = value;
+      saveToStorage();
     },
 
     getRemainingSeconds: () => remainingSeconds,
     setRemainingSeconds: (value) => {
       remainingSeconds = value;
+      saveToStorage();
     },
 
     getCountdownInterval: () => countdownInterval,
     setCountdownInterval: (value) => {
       countdownInterval = value;
+      // Don't save - runtime only
     },
 
     getCurrentColorPicker: () => currentColorPicker,
     setCurrentColorPicker: (value) => {
       currentColorPicker = value;
+      // Don't save - UI state only
     },
 
     getCurrentSequenceItem: () => currentSequenceItem,
     setCurrentSequenceItem: (value) => {
       currentSequenceItem = value;
+      saveToStorage();
     },
 
     getSequence: () => sequence,
     setSequence: (value) => {
       sequence = value;
+      saveToStorage();
     },
 
     getFlashingTimeouts: () => flashingTimeouts,
     setFlashingTimeouts: (value) => {
       flashingTimeouts = value;
+      // Don't save - runtime only
     },
     addFlashingTimeout: (timeout) => {
       flashingTimeouts.push(timeout);
@@ -205,12 +309,19 @@ const state = (function () {
     getVisibilitySettings: () => visibilitySettings,
     setVisibilitySettings: (value) => {
       visibilitySettings = value;
+      saveToStorage();
     },
 
-    getScheduledStart: () => scheduledStart,
-    setScheduledStart: (value) => {
-      scheduledStart = value;
-    },
+    // Expose storage functions
+    loadFromStorage,
+    saveToStorage,
+    clearStorage: () => {
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+      } catch (e) {
+        console.warn('Failed to clear storage:', e);
+      }
+    }
   };
 })();
 
@@ -749,9 +860,12 @@ const uiManager = (function () {
     // Get current reminder values or defaults
     const reminders = timerData.reminders || {
       custom: [],
-      every: { minutes: 0, seconds: 0 },
+      every: { minutes: 0, seconds: 0, flash: true, sound: true, message: false, messageText: "" },
       duration: 5,
+      isCollapsed: true
     };
+
+    const isCollapsed = reminders.isCollapsed !== false;
 
     // Build custom reminder rows HTML
     let customRowsHTML = "";
@@ -777,15 +891,33 @@ const uiManager = (function () {
           } style="width: 12px; height: 12px;">
                 <span>flashing</span>
               </label>
+            <label style="display: flex; align-items: center; gap: 3px; cursor: pointer; font-size: 0.65rem; margin-left: 6px;">
+                <input type="checkbox" class="sound-checkbox" data-reminder-type="custom" data-timer-index="${index}" data-reminder-index="${i}" ${
+            custom.sound !== false ? "checked" : ""
+          } style="width: 12px; height: 12px;">
+                <span>sound</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 3px; cursor: pointer; font-size: 0.65rem; margin-left: 6px;">
+                <input type="checkbox" class="message-checkbox" data-reminder-type="custom" data-timer-index="${index}" data-reminder-index="${i}" ${
+            custom.message ? "checked" : ""
+          } style="width: 12px; height: 12px;">
+                <span>message</span>
+              </label>
             </div>
+            ${custom.message ? `<div class="reminder-message-row" data-timer-index="${index}" data-reminder-index="${i}">
+              <textarea class="reminder-message-input" data-timer-index="${index}" data-reminder-index="${i}" placeholder="Enter reminder message..." maxlength="200">${custom.messageText || ""}</textarea>
+            </div>` : ""}
           `
         )
         .join("");
     }
 
-    soundReminders.innerHTML = `
-                    <div class="sound-reminders">
-                        <div class="sound-reminders-title">Sound Reminders</div>
+    soundReminders.innerHTML = `                    
+                        <div class="sound-reminders-title" data-timer-index="${index}">
+                          <span>Reminders Section (Sound/Message)</span>
+                          <span class="sound-reminders-toggle${isCollapsed ? ' collapsed' : ''}">▼</span>
+                        </div>
+                        <div class="sound-reminders-content${isCollapsed ? ' collapsed' : ''}">
                         <div class="sound-reminders-row">
                             <button class="add-custom-reminder" data-timer-index="${index}" aria-label="Add custom sound reminder">+</button>
                             <input type="number" min="0" class="custom-hour" value="00" placeholder="00"><span>h&nbsp;</span>
@@ -794,7 +926,7 @@ const uiManager = (function () {
                             <span>before end</span>
                         </div>
                         ${customRowsHTML}
-                        <div class="sound-reminders-row">
+                        <div class="sound-reminders-row every-reminder-row">
                           <span>every</span>
                           <input type="number" min="0" class="every-min" value="${
                             reminders.every.minutes
@@ -808,15 +940,30 @@ const uiManager = (function () {
     } style="width: 12px; height: 12px;">
                             <span>flashing</span>
                           </label>
+                          <label style="display: flex; align-items: center; gap: 3px; cursor: pointer; font-size: 0.65rem; margin-left: 6px;">
+                            <input type="checkbox" class="sound-checkbox" data-reminder-type="every" data-timer-index="${index}" ${
+      reminders.every.sound !== false ? "checked" : ""
+    } style="width: 12px; height: 12px;">
+                            <span>sound</span>
+                          </label>
+                          <label style="display: flex; align-items: center; gap: 3px; cursor: pointer; font-size: 0.65rem; margin-left: 6px;">
+                            <input type="checkbox" class="message-checkbox" data-reminder-type="every" data-timer-index="${index}" ${
+      reminders.every.message ? "checked" : ""
+    } style="width: 12px; height: 12px;">
+                            <span>message</span>
+                          </label>
                         </div>
+                        ${reminders.every.message ? `<div class="reminder-message-row every-message-row" data-timer-index="${index}">
+                          <textarea class="reminder-message-input" data-timer-index="${index}" data-reminder-type="every" placeholder="Enter reminder message..." maxlength="200">${reminders.every.messageText || ""}</textarea>
+                        </div>` : ""}
                         <div class="sound-reminders-row">
                             <span>for</span>
                             <input type="number" min="1" class="reminder-duration" value="${
                               reminders.duration
                             }" placeholder="5">
                             <span>seconds</span>
-                        </div>
-                    </div>
+                            
+                        </div>                    
                 `;
 
     wrapper.appendChild(soundReminders);
@@ -966,6 +1113,14 @@ const colorPickerManager = (function () {
   let currentColor = "#3498db";
   let currentAlpha = 0.5;
 
+  // Helper to convert hex to rgba
+  function hexToRgba(hex, alpha) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+
   // Initialize simple color picker
   function initColorPicker(element) {
     const type = element.dataset.type;
@@ -993,6 +1148,14 @@ const colorPickerManager = (function () {
     if (colorInput) colorInput.value = color;
     if (alphaInput) alphaInput.value = currentAlpha;
     if (alphaValue) alphaValue.textContent = `${currentAlpha}%`;
+
+     // Set initial preview color
+    if (preview) {
+      const r = parseInt(color.slice(1, 3), 16);
+      const g = parseInt(color.slice(3, 5), 16);
+      const b = parseInt(color.slice(5, 7), 16);
+      preview.style.backgroundColor = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
   }
 
   // Set up simple color picker interactions
@@ -1005,6 +1168,15 @@ const colorPickerManager = (function () {
     if (colorInput) {
       colorInput.addEventListener("input", (e) => {
         currentColor = e.target.value;
+        
+        // Update preview rectangle
+        const preview = document.getElementById('color-preview');
+        if (preview) {
+          const r = parseInt(currentColor.slice(1, 3), 16);
+          const g = parseInt(currentColor.slice(3, 5), 16);
+          const b = parseInt(currentColor.slice(5, 7), 16);
+          preview.style.backgroundColor = `rgba(${r}, ${g}, ${b}, ${currentAlpha / 100})`;
+        }
       });
     }
 
@@ -1012,6 +1184,15 @@ const colorPickerManager = (function () {
       alphaInput.addEventListener("input", (e) => {
         currentAlpha = e.target.value;
         alphaValue.textContent = `${currentAlpha}%`;
+        
+        // Update preview rectangle
+        const preview = document.getElementById('color-preview');
+        if (preview) {
+          const r = parseInt(currentColor.slice(1, 3), 16);
+          const g = parseInt(currentColor.slice(3, 5), 16);
+          const b = parseInt(currentColor.slice(5, 7), 16);
+          preview.style.backgroundColor = `rgba(${r}, ${g}, ${b}, ${currentAlpha / 100})`;
+        }
       });
     }
 
@@ -1029,6 +1210,8 @@ const colorPickerManager = (function () {
       });
     }
   }
+
+  
 
   return {
     initColorPicker,
@@ -1732,7 +1915,7 @@ const settingsManager = (function () {
       color: timerColor,
       direction: "right",
       orientation: "horizontal",
-      alpha: 0.8,
+      alpha: 0.9,
       beepAt: 5,
       name: `Timer ${newTimerIndex + 1}`,
       notes: "",
@@ -1740,8 +1923,9 @@ const settingsManager = (function () {
       imageName: null,
       reminders: {
         custom: [],
-        every: { minutes: 0, seconds: 0 },
+        every: { minutes: 0, seconds: 0, flash: true, sound: true, message: false, messageText: "" },
         duration: 5,
+        isCollapsed: true
       },
     });
 
@@ -2835,17 +3019,13 @@ const eventHandlers = (function () {
       }
     });
 
-    // Scheduled start functionality
-    const scheduledCheckbox = document.getElementById(
-      "scheduled-start-checkbox"
-    );
-    const scheduledPeriod = document.getElementById("scheduled-period");
-
-    // Click on time units to edit
-    document.querySelectorAll(".scheduled-time-unit").forEach((unit) => {
-      unit.addEventListener("click", function () {
-        const currentValue = parseInt(this.textContent);
-        const unitType = this.dataset.unit;
+  // Scheduled start - use event delegation for all timers
+    document.addEventListener("click", (e) => {
+      // Click on time units to edit
+      if (e.target.classList.contains("scheduled-time-unit")) {
+        const timerIndex = parseInt(e.target.dataset.timerIndex);
+        const currentValue = parseInt(e.target.textContent);
+        const unitType = e.target.dataset.unit;
         const input = document.createElement("input");
         input.type = "text";
         input.value = "";
@@ -2856,7 +3036,7 @@ const eventHandlers = (function () {
         input.addEventListener("blur", () => {
           let value = parseInt(input.value);
           if (isNaN(value) || input.value.trim() === "") {
-            this.textContent = currentValue.toString().padStart(2, "0");
+            e.target.textContent = currentValue.toString().padStart(2, "0");
           } else {
             if (unitType === "hours") {
               if (value < 1) value = 1;
@@ -2865,98 +3045,132 @@ const eventHandlers = (function () {
               if (value < 0) value = 0;
               if (value > 59) value = 59;
             }
-            this.textContent = value.toString().padStart(2, "0");
+            e.target.textContent = value.toString().padStart(2, "0");
           }
-          updateScheduledTime();
+          updateScheduledTime(timerIndex);
         });
 
-        input.addEventListener("keyup", (e) => {
-          if (e.key === "Enter") input.blur();
+        input.addEventListener("keyup", (ev) => {
+          if (ev.key === "Enter") input.blur();
         });
 
-        this.textContent = "";
-        this.appendChild(input);
+        e.target.textContent = "";
+        e.target.appendChild(input);
         input.focus();
         input.select();
-      });
+      }
+
+      // Toggle AM/PM
+      if (e.target.classList.contains("scheduled-period")) {
+        const timerIndex = parseInt(e.target.dataset.timerIndex);
+        e.target.textContent = e.target.textContent === "AM" ? "PM" : "AM";
+        updateScheduledTime(timerIndex);
+      }
     });
 
-    // Toggle AM/PM
-    scheduledPeriod.addEventListener("click", function () {
-      this.textContent = this.textContent === "AM" ? "PM" : "AM";
-      updateScheduledTime();
+    // Checkbox change
+    document.addEventListener("change", (e) => {
+      if (e.target.classList.contains("scheduled-checkbox")) {
+        const timerIndex = parseInt(e.target.dataset.timerIndex);
+        const timers = state.getTimers();
+        if (!timers[timerIndex].scheduledStart) {
+          timers[timerIndex].scheduledStart = { enabled: false, time: null, checkInterval: null };
+        }
+        timers[timerIndex].scheduledStart.enabled = e.target.checked;
+        
+        if (e.target.checked) {
+          updateScheduledTime(timerIndex);
+          startScheduledCheck(timerIndex);
+        } else {
+          stopScheduledCheck(timerIndex);
+        }
+        state.setTimers(timers);
+      }
     });
 
-    function updateScheduledTime() {
-      const hoursSpan = document.querySelector(
-        '.scheduled-time-unit[data-unit="hours"]'
-      );
-      const minutesSpan = document.querySelector(
-        '.scheduled-time-unit[data-unit="minutes"]'
-      );
-      const secondsSpan = document.querySelector(
-        '.scheduled-time-unit[data-unit="seconds"]'
-      );
+    function updateScheduledTime(timerIndex) {
+      const timerBox = document.querySelector(`[data-timer-index="${timerIndex}"]`);
+      if (!timerBox) return;
+      
+      const hoursSpan = timerBox.querySelector('.scheduled-time-unit[data-unit="hours"]');
+      const minutesSpan = timerBox.querySelector('.scheduled-time-unit[data-unit="minutes"]');
+      const secondsSpan = timerBox.querySelector('.scheduled-time-unit[data-unit="seconds"]');
+      const periodSpan = timerBox.querySelector('.scheduled-period');
 
       let hours = parseInt(hoursSpan.textContent) || 1;
       const minutes = parseInt(minutesSpan.textContent) || 0;
       const seconds = parseInt(secondsSpan.textContent) || 0;
-      const period = scheduledPeriod.textContent;
+      const period = periodSpan.textContent;
 
       // Convert to 24-hour format
       if (period === "PM" && hours !== 12) hours += 12;
       if (period === "AM" && hours === 12) hours = 0;
 
-      state.getScheduledStart().time = { hours, minutes, seconds };
+      const timers = state.getTimers();
+      if (!timers[timerIndex].scheduledStart) {
+        timers[timerIndex].scheduledStart = { enabled: false, time: null, checkInterval: null };
+      }
+      timers[timerIndex].scheduledStart.time = { hours, minutes, seconds };
+      state.setTimers(timers);
     }
 
-    scheduledCheckbox.addEventListener("change", function () {
-      state.getScheduledStart().enabled = this.checked;
-      if (this.checked) {
-        updateScheduledTime();
-        startScheduledCheck();
-      } else {
-        stopScheduledCheck();
-      }
-    });
-
-    function startScheduledCheck() {
-      stopScheduledCheck();
+    function startScheduledCheck(timerIndex) {
+      stopScheduledCheck(timerIndex);
 
       const checkTime = () => {
-        if (!state.getScheduledStart().enabled || state.getIsRunning()) {
-          stopScheduledCheck();
+        const timers = state.getTimers();
+        const timer = timers[timerIndex];
+        
+        if (!timer.scheduledStart || !timer.scheduledStart.enabled || timer.isRunning) {
+          stopScheduledCheck(timerIndex);
           return;
         }
 
         const now = new Date();
-        const scheduled = state.getScheduledStart().time;
+        const scheduled = timer.scheduledStart.time;
 
         if (
           now.getHours() === scheduled.hours &&
           now.getMinutes() === scheduled.minutes &&
           now.getSeconds() === scheduled.seconds
         ) {
-          timerLogic.startTimer();
-          scheduledCheckbox.checked = false;
-          state.getScheduledStart().enabled = false;
-          stopScheduledCheck();
+          startSingleTimer(timerIndex);
+          
+          // Update individual timer buttons
+          const timerBox = document.querySelector(`[data-timer-index="${timerIndex}"]`);
+          if (timerBox) {
+            const startBtn = timerBox.querySelector('.start-btn');
+            const pauseBtn = timerBox.querySelector('.pause-btn');
+            const checkbox = timerBox.querySelector('.scheduled-checkbox');
+            if (startBtn) startBtn.style.display = 'none';
+            if (pauseBtn) pauseBtn.style.display = 'inline-block';
+            if (checkbox) checkbox.checked = false;
+          }
+          
+          timer.scheduledStart.enabled = false;
+          state.setTimers(timers);
+          stopScheduledCheck(timerIndex);
         }
       };
 
-      state.getScheduledStart().checkInterval = setInterval(checkTime, 1000);
+      const timers = state.getTimers();
+      if (!timers[timerIndex].scheduledStart) {
+        timers[timerIndex].scheduledStart = { enabled: false, time: null, checkInterval: null };
+      }
+      timers[timerIndex].scheduledStart.checkInterval = setInterval(checkTime, 1000);
+      state.setTimers(timers);
     }
 
-    function stopScheduledCheck() {
-      if (state.getScheduledStart().checkInterval) {
-        clearInterval(state.getScheduledStart().checkInterval);
-        state.getScheduledStart().checkInterval = null;
+    function stopScheduledCheck(timerIndex) {
+      const timers = state.getTimers();
+      if (timers[timerIndex].scheduledStart && timers[timerIndex].scheduledStart.checkInterval) {
+        clearInterval(timers[timerIndex].scheduledStart.checkInterval);
+        timers[timerIndex].scheduledStart.checkInterval = null;
+        state.setTimers(timers);
       }
     }
 
-    // Start/Pause button
-    elements.startBtn.addEventListener("click", timerLogic.startTimer);
-    elements.pauseBtn.addEventListener("click", timerLogic.startTimer); // Same function handles pause/resume
+    
 
     // Stop/Reset button
     elements.stopResetBtn.addEventListener("click", timerLogic.stopResetTimer);
@@ -3606,6 +3820,8 @@ const eventHandlers = (function () {
         // Create new row
         const newRow = document.createElement("div");
         newRow.className = "sound-reminders-row";
+        const timers = state.getTimers();
+        const reminderIndex = timers[index].reminders.custom.length;
         newRow.innerHTML = `
           <button class="remove-custom-reminder" data-timer-index="${index}" aria-label="Remove custom sound reminder">−</button>
           <input type="number" min="0" class="custom-hour" value="${hours}" placeholder="0"><span>h&nbsp;</span>
@@ -3613,8 +3829,16 @@ const eventHandlers = (function () {
           <input type="number" min="0" class="custom-sec" value="${seconds}" placeholder="0"><span>s&nbsp;</span>
           <span>before end</span>
           <label style="display: flex; align-items: center; gap: 3px; cursor: pointer; font-size: 0.65rem; margin-left: 6px;">
-            <input type="checkbox" class="flash-checkbox" data-reminder-type="custom" data-timer-index="${index}" checked style="width: 12px; height: 12px;">
+            <input type="checkbox" class="flash-checkbox" data-reminder-type="custom" data-timer-index="${index}" data-reminder-index="${reminderIndex}" checked style="width: 12px; height: 12px;">
             <span>flashing</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 3px; cursor: pointer; font-size: 0.65rem; margin-left: 6px;">
+            <input type="checkbox" class="sound-checkbox" data-reminder-type="custom" data-timer-index="${index}" data-reminder-index="${reminderIndex}" checked style="width: 12px; height: 12px;">
+            <span>sound</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 3px; cursor: pointer; font-size: 0.65rem; margin-left: 6px;">
+            <input type="checkbox" class="message-checkbox" data-reminder-type="custom" data-timer-index="${index}" data-reminder-index="${reminderIndex}" style="width: 12px; height: 12px;">
+            <span>message</span>
           </label>
         `;
 
@@ -3623,10 +3847,11 @@ const eventHandlers = (function () {
         minInput.value = 0;
         secInput.value = 0;
 
-        // Insert before the "every" row (second to last row)
-        const allRows = container.querySelectorAll(".sound-reminders-row");
+        // Insert before the "every" row
+        const content = container.querySelector(".sound-reminders-content");
+        const allRows = content.querySelectorAll(".sound-reminders-row");
         const everyRow = allRows[allRows.length - 2];
-        container.insertBefore(newRow, everyRow);
+        content.insertBefore(newRow, everyRow);
 
         // Update state
         updateRemindersState(index, container);
@@ -3818,7 +4043,138 @@ const eventHandlers = (function () {
       },
       true
     );
+
+    // Reminder section collapse/expand toggle
+    document.addEventListener("click", (e) => {
+      if (e.target.closest(".sound-reminders-title")) {
+        const title = e.target.closest(".sound-reminders-title");
+        const container = title.closest(".sound-reminders");
+        const content = container.querySelector(".sound-reminders-content");
+        const toggle = title.querySelector(".sound-reminders-toggle");
+        const index = parseInt(title.dataset.timerIndex);
+        
+        content.classList.toggle("collapsed");
+        toggle.classList.toggle("collapsed");
+        
+        const timers = state.getTimers();
+        if (timers[index] && timers[index].reminders) {
+          timers[index].reminders.isCollapsed = content.classList.contains("collapsed");
+          state.setTimers(timers);
+        }
+      }
+    });
+
+    // Message checkbox handler
+    document.addEventListener("change", (e) => {
+      if (e.target.classList.contains("message-checkbox")) {
+        const reminderType = e.target.dataset.reminderType;
+        const index = parseInt(e.target.dataset.timerIndex);
+        const timers = state.getTimers();
+        
+        if (reminderType === "custom") {
+          const reminderIndex = parseInt(e.target.dataset.reminderIndex);
+          const row = e.target.closest(".sound-reminders-row");
+          const container = row.closest(".sound-reminders-content");
+          const nextEl = row.nextElementSibling;
+          
+          if (e.target.checked) {
+            // Add message row if not exists
+            if (!nextEl || !nextEl.classList.contains("reminder-message-row")) {
+              const messageRow = document.createElement("div");
+              messageRow.className = "reminder-message-row";
+              messageRow.dataset.timerIndex = index;
+              messageRow.dataset.reminderIndex = reminderIndex;
+              messageRow.innerHTML = `
+                <textarea class="reminder-message-input" data-timer-index="${index}" data-reminder-index="${reminderIndex}" placeholder="Enter reminder message..." maxlength="200"></textarea>
+              `;
+              row.after(messageRow);
+            }
+            timers[index].reminders.custom[reminderIndex].message = true;
+          } else {
+            // Remove message row
+            if (nextEl && nextEl.classList.contains("reminder-message-row")) {
+              nextEl.remove();
+            }
+            timers[index].reminders.custom[reminderIndex].message = false;
+            timers[index].reminders.custom[reminderIndex].messageText = "";
+          }
+        } else if (reminderType === "every") {
+          const row = e.target.closest(".every-reminder-row");
+          const nextEl = row.nextElementSibling;
+          
+          if (e.target.checked) {
+            // Add message row if not exists
+            if (!nextEl || !nextEl.classList.contains("every-message-row")) {
+              const messageRow = document.createElement("div");
+              messageRow.className = "reminder-message-row every-message-row";
+              messageRow.dataset.timerIndex = index;
+              messageRow.innerHTML = `
+                <textarea class="reminder-message-input" data-timer-index="${index}" data-reminder-type="every" placeholder="Enter reminder message..." maxlength="200"></textarea>
+              `;
+              row.after(messageRow);
+            }
+            timers[index].reminders.every.message = true;
+          } else {
+            // Remove message row
+            if (nextEl && nextEl.classList.contains("every-message-row")) {
+              nextEl.remove();
+            }
+            timers[index].reminders.every.message = false;
+            timers[index].reminders.every.messageText = "";
+          }
+        }
+        
+        state.setTimers(timers);
+      }
+    });
+
+    // Message textarea input handler
+    document.addEventListener("input", (e) => {
+      if (e.target.classList.contains("reminder-message-input")) {
+        const index = parseInt(e.target.dataset.timerIndex);
+        const timers = state.getTimers();
+        
+        if (e.target.dataset.reminderType === "every") {
+          timers[index].reminders.every.messageText = e.target.value;
+        } else {
+          const reminderIndex = parseInt(e.target.dataset.reminderIndex);
+          timers[index].reminders.custom[reminderIndex].messageText = e.target.value;
+        }
+        
+        state.setTimers(timers);
+      }
+    });
+
+    // Flash and Sound checkbox handlers
+    document.addEventListener("change", (e) => {
+      if (e.target.classList.contains("flash-checkbox") || e.target.classList.contains("sound-checkbox")) {
+        const reminderType = e.target.dataset.reminderType;
+        const index = parseInt(e.target.dataset.timerIndex);
+        const timers = state.getTimers();
+        const isFlash = e.target.classList.contains("flash-checkbox");
+        
+        if (reminderType === "custom") {
+          const reminderIndex = parseInt(e.target.dataset.reminderIndex);
+          if (isFlash) {
+            timers[index].reminders.custom[reminderIndex].flash = e.target.checked;
+          } else {
+            timers[index].reminders.custom[reminderIndex].sound = e.target.checked;
+          }
+        } else if (reminderType === "every") {
+          if (isFlash) {
+            timers[index].reminders.every.flash = e.target.checked;
+          } else {
+            timers[index].reminders.every.sound = e.target.checked;
+          }
+        }
+        
+        state.setTimers(timers);
+      }
+    });
+
   }
+
+  
 
   // Color indicator - use event delegation for all timers
   document.addEventListener("click", (e) => {
@@ -4215,7 +4571,7 @@ const timersControlPanel = (function () {
             .toString(16)
             .padStart(6, "0")}`,
           direction: "right",
-          alpha: 0.5,
+          alpha: 0.9,
           beepAt: 5,
           name: `Timer ${i + 1}`,
           notes: "",
@@ -4223,9 +4579,10 @@ const timersControlPanel = (function () {
           imageName: null,
           reminders: {
             custom: [],
-            every: { minutes: 0, seconds: 0 },
+            every: { minutes: 0, seconds: 0, flash: true, sound: true, message: false, messageText: "" },
             duration: 5,
-          },
+            isCollapsed: true
+        },
           isRunning: false,
           isPaused: false,
           remainingSeconds: 0,
@@ -4252,6 +4609,72 @@ const timersControlPanel = (function () {
   };
 })();
 
+// ===== MESSAGE DISPLAY FUNCTIONS =====
+let activeMessages = new Map(); // Map of timerIndex -> {text, timeoutId}
+
+function showMessage(timerIndex, messageText, duration) {
+  const panel = document.getElementById("message-display-panel");
+  if (!panel || !messageText) return;
+  
+  const timer = state.getTimers()[timerIndex];
+  const messageId = `msg-${timerIndex}-${Date.now()}`;
+  
+  // Create message item
+  const messageItem = document.createElement("div");
+  messageItem.className = "message-item";
+  messageItem.id = messageId;
+  messageItem.innerHTML = `
+    <div class="message-text"><strong>${timer.name}</strong> - ${messageText}</div>
+  `;
+  
+  panel.appendChild(messageItem);
+  
+  // Store reference
+  const timeoutId = setTimeout(() => {
+    messageItem.remove();
+    activeMessages.delete(messageId);
+  }, duration * 1000);
+  
+  activeMessages.set(messageId, { text: messageText, timeoutId });
+}
+
+function flashTimer(index, duration) {
+  const timerBox = document.querySelector(`[data-timer-index="${index}"]`);
+  if (!timerBox) return;
+  
+  timerBox.classList.add('flashing');
+  
+  setTimeout(() => {
+    timerBox.classList.remove('flashing');
+  }, duration * 1000);
+}
+
+function clearAllMessages() {
+  const panel = document.getElementById("message-display-panel");
+  if (!panel) return;
+  
+  // Clear all timeouts
+  activeMessages.forEach((msg) => clearTimeout(msg.timeoutId));
+  activeMessages.clear();
+  
+}
+
+function playReminderSound(duration) {
+  if (!state.getSoundEnabled()) return;
+  
+  let beepCount = 0;
+  const maxBeeps = duration;
+  
+  const beepInterval = setInterval(() => {
+    if (beepCount >= maxBeeps) {
+      clearInterval(beepInterval);
+      return;
+    }
+    state.playBeep(false);
+    beepCount++;
+  }, 1000);
+}
+
 // ===== TIMER CONTROL HELPER FUNCTIONS =====
 function startSingleTimer(index) {
   const timers = state.getTimers();
@@ -4264,12 +4687,57 @@ function startSingleTimer(index) {
   timer.isRunning = true;
   timer.isPaused = false;
 
+  timer.isPaused = false;
+
   timer.interval = setInterval(() => {
     if (timer.remainingSeconds > 0) {
       timer.remainingSeconds--;
       updateTimerDisplay(index);
       
-      // Update the time setter digits for this timer
+      const reminders = timer.reminders || {};
+      const duration = reminders.duration || 5;
+      
+      // Check custom reminders
+      if (reminders.custom && reminders.custom.length > 0) {
+        reminders.custom.forEach((rem, remIdx) => {
+          const remSec = (rem.hours || 0) * 3600 + (rem.minutes || 0) * 60 + (rem.seconds || 0);
+          if (timer.remainingSeconds === remSec) {
+            if (rem.sound !== false) {
+            playReminderSound(duration);
+}
+            if (rem.flash !== false) {
+              flashTimer(index, duration);
+            }
+            if (rem.message && rem.messageText) {
+              showMessage(index, rem.messageText, duration);
+            }
+          }
+        });
+      }
+      
+      // Check "every" reminder
+      if (reminders.every) {
+        const every = (reminders.every.minutes || 0) * 60 + (reminders.every.seconds || 0);
+        if (every > 0 && timer.remainingSeconds % every === 0 && timer.remainingSeconds > 0) {
+          if (reminders.every.sound !== false && state.getSoundEnabled()) {
+            state.playBeep(false);
+          }
+          if (reminders.every.flash !== false) {
+            flashTimer(index, duration);
+          }
+          if (reminders.every.message && reminders.every.messageText) {
+            showMessage(index, reminders.every.messageText, duration);
+          }
+        }
+      }
+      
+      // Check beepAt warning - beep every second during warning period
+      const beepAt = timer.beepAt || 0;
+      if (beepAt > 0 && timer.remainingSeconds <= beepAt && timer.remainingSeconds > 0 && state.getSoundEnabled()) {
+        state.playBeep(false);
+      }
+      
+      // Update the time setter digits
       const timerBox = document.querySelector(`[data-timer-index="${index}"]`);
       if (timerBox) {
         const hours = Math.floor(timer.remainingSeconds / 3600);
@@ -4289,6 +4757,8 @@ function startSingleTimer(index) {
       clearInterval(timer.interval);
       timer.isRunning = false;
       state.playBeep(true);
+      resetSingleTimer(index);
+      updateControlPanelButtons();
     }
   }, 1000);
 }
@@ -4309,12 +4779,57 @@ function resumeSingleTimer(index) {
   const timer = timers[index];
 
   timer.isPaused = false;
+  timer.isPaused = false;
+
   timer.interval = setInterval(() => {
     if (timer.remainingSeconds > 0) {
       timer.remainingSeconds--;
       updateTimerDisplay(index);
       
-      // Update the time setter digits for this timer
+      const reminders = timer.reminders || {};
+      const duration = reminders.duration || 5;
+      
+      // Check custom reminders
+      if (reminders.custom && reminders.custom.length > 0) {
+        reminders.custom.forEach((rem, remIdx) => {
+          const remSec = (rem.hours || 0) * 3600 + (rem.minutes || 0) * 60 + (rem.seconds || 0);
+          if (timer.remainingSeconds === remSec) {
+            if (rem.sound !== false) {
+            playReminderSound(duration);
+}
+            if (rem.flash !== false) {
+              flashTimer(index, duration);
+            }
+            if (rem.message && rem.messageText) {
+              showMessage(index, rem.messageText, duration);
+            }
+          }
+        });
+      }
+      
+      // Check "every" reminder
+      if (reminders.every) {
+        const every = (reminders.every.minutes || 0) * 60 + (reminders.every.seconds || 0);
+        if (every > 0 && timer.remainingSeconds % every === 0 && timer.remainingSeconds > 0) {
+          if (reminders.every.sound !== false && state.getSoundEnabled()) {
+            state.playBeep(false);
+          }
+          if (reminders.every.flash !== false) {
+            flashTimer(index, duration);
+          }
+          if (reminders.every.message && reminders.every.messageText) {
+            showMessage(index, reminders.every.messageText, duration);
+          }
+        }
+      }
+      
+      // Check beepAt warning - beep every second during warning period
+      const beepAt = timer.beepAt || 0;
+      if (beepAt > 0 && timer.remainingSeconds <= beepAt && timer.remainingSeconds > 0 && state.getSoundEnabled()) {
+        state.playBeep(false);
+      }
+      
+      // Update the time setter digits
       const timerBox = document.querySelector(`[data-timer-index="${index}"]`);
       if (timerBox) {
         const hours = Math.floor(timer.remainingSeconds / 3600);
@@ -4329,10 +4844,13 @@ function resumeSingleTimer(index) {
         if (minutesEl) minutesEl.textContent = `${minutes.toString().padStart(2, "0")}m`;
         if (secondsEl) secondsEl.textContent = `${seconds.toString().padStart(2, "0")}s`;
       }
+
     } else {
       clearInterval(timer.interval);
       timer.isRunning = false;
       state.playBeep(true);
+      resetSingleTimer(index);
+      updateControlPanelButtons();
     }
   }, 1000);
 }
@@ -4360,6 +4878,35 @@ function resetSingleTimer(index) {
     if (hoursEl) hoursEl.textContent = `${timer.hours}h`;
     if (minutesEl) minutesEl.textContent = `${timer.minutes.toString().padStart(2, "0")}m`;
     if (secondsEl) secondsEl.textContent = `${timer.seconds.toString().padStart(2, "0")}s`;
+    
+    // Update individual timer buttons
+    const startBtn = timerBox.querySelector('.start-btn');
+    const pauseBtn = timerBox.querySelector('.pause-btn');
+    const resetBtn = timerBox.querySelector('.stop-reset-btn');
+    if (startBtn) startBtn.style.display = 'inline-block';
+    if (pauseBtn) {
+      pauseBtn.style.display = 'none';
+      pauseBtn.textContent = 'PAUSE ||';
+    }
+    if (resetBtn) resetBtn.style.display = 'none';
+  }
+}
+
+function updateControlPanelButtons() {
+  const timers = state.getTimers();
+  const startAllBtn = document.getElementById("start-all-btn");
+  const pauseAllBtn = document.getElementById("pause-all-btn");
+  const resetAllBtn = document.getElementById("reset-all-btn");
+  
+  const anyRunning = timers.some(t => t.isRunning && !t.isPaused);
+  const anyPaused = timers.some(t => t.isPaused);
+  
+  if (!anyRunning && !anyPaused) {
+    // All timers stopped/completed
+    startAllBtn.style.display = "inline-block";
+    pauseAllBtn.style.display = "none";
+    resetAllBtn.style.display = "none";
+    pauseAllBtn.textContent = "PAUSE ALL";
   }
 }
 
@@ -4399,6 +4946,7 @@ function renderAllTimers() {
   });
 
   // Update first timer data
+  firstTimer.setAttribute("data-timer-index", 0);
   updateTimerData(firstTimer, 0);
 
   // Clone for additional timers
@@ -4461,6 +5009,43 @@ function updateTimerData(timerElement, index) {
     const s = timer.seconds.toString().padStart(2, "0");
     presetDisplay.textContent = `${h}:${m}:${s}`;
   }
+
+  // Update scheduled start controls
+  const scheduledControls = timerElement.querySelector('.scheduled-start-controls');
+  if (scheduledControls && timer.scheduledStart) {
+    const checkbox = scheduledControls.querySelector('.scheduled-checkbox');
+    const hoursSpan = scheduledControls.querySelector('.scheduled-time-unit[data-unit="hours"]');
+    const minutesSpan = scheduledControls.querySelector('.scheduled-time-unit[data-unit="minutes"]');
+    const secondsSpan = scheduledControls.querySelector('.scheduled-time-unit[data-unit="seconds"]');
+    const periodSpan = scheduledControls.querySelector('.scheduled-period');
+    
+    if (checkbox) {
+      checkbox.dataset.timerIndex = index;
+      checkbox.checked = timer.scheduledStart.enabled || false;
+    }
+    
+    const schedTime = timer.scheduledStart.time || { hours: 13, minutes: 0, seconds: 0 };
+    const displayHours = (schedTime.hours % 12) || 12;
+    const period = schedTime.hours >= 12 ? 'PM' : 'AM';
+    
+    if (hoursSpan) {
+      hoursSpan.dataset.timerIndex = index;
+      hoursSpan.textContent = displayHours.toString().padStart(2, '0');
+    }
+    if (minutesSpan) {
+      minutesSpan.dataset.timerIndex = index;
+      minutesSpan.textContent = schedTime.minutes.toString().padStart(2, '0');
+    }
+    if (secondsSpan) {
+      secondsSpan.dataset.timerIndex = index;
+      secondsSpan.textContent = schedTime.seconds.toString().padStart(2, '0');
+    }
+    if (periodSpan) {
+      periodSpan.dataset.timerIndex = index;
+      periodSpan.textContent = period;
+    }
+  }
+
   // Reset progress bar and container for this timer
   const progressBar = timerElement.querySelector(".progress-bar");
   const progressContainer = timerElement.querySelector(".progress-container");
@@ -4551,34 +5136,24 @@ function removeTimer(index) {
 
 // ===== INITIALIZATION =====
 function init() {
+  // Restore state from localStorage
+  const wasRestored = state.loadFromStorage();
+  
   // Set up event listeners
   eventHandlers.setupEventListeners();
 
   // Set up timers control panel
   timersControlPanel.setupTimersCountInput();
+  
+  // Update timers count input if restored
+  if (wasRestored) {
+    const timersCountInput = document.getElementById("timers-count-input");
+    if (timersCountInput) {
+      timersCountInput.value = state.getTimers().length;
+    }
+  }
 
-  // Initialize scheduled start time to 1 hour from now
-  const now = new Date();
-  now.setMinutes(now.getMinutes() + 5);
-  const hours = now.getHours();
-  const minutes = now.getMinutes();
-  const seconds = 0;
-
-  const displayHours = hours % 12 || 12;
-  const period = hours >= 12 ? "PM" : "AM";
-
-  document.querySelector(
-    '.scheduled-time-unit[data-unit="hours"]'
-  ).textContent = displayHours.toString().padStart(2, "0");
-  document.querySelector(
-    '.scheduled-time-unit[data-unit="minutes"]'
-  ).textContent = minutes.toString().padStart(2, "0");
-  document.querySelector(
-    '.scheduled-time-unit[data-unit="seconds"]'
-  ).textContent = seconds.toString().padStart(2, "0");
-  document.getElementById("scheduled-period").textContent = period;
-
-  state.getScheduledStart().time = { hours, minutes, seconds };
+  
 
   // Set up color picker interactions
   colorPickerManager.setupColorPickerInteractions();
@@ -4592,8 +5167,42 @@ function init() {
   // Render all timers
   renderAllTimers();
 
-  // Initialize visibility settings
-  
+  // Resume any running timers after render
+  if (wasRestored) {
+    const timers = state.getTimers();
+    let anyRunning = false;
+    
+    timers.forEach((timer, index) => {
+      if (timer.isRunning && !timer.isPaused && timer.remainingSeconds > 0) {
+        resumeSingleTimer(index);
+        anyRunning = true;
+        
+        // Update individual timer buttons
+        const timerBox = document.querySelector(`[data-timer-index="${index}"]`);
+        if (timerBox) {
+          const startBtn = timerBox.querySelector('.start-btn');
+          const pauseBtn = timerBox.querySelector('.pause-btn');
+          if (startBtn) startBtn.style.display = 'none';
+          if (pauseBtn) pauseBtn.style.display = 'inline-block';
+        }
+      }
+    });
+    
+    // Update control panel buttons
+    if (anyRunning) {
+      const startAllBtn = document.getElementById("start-all-btn");
+      const pauseAllBtn = document.getElementById("pause-all-btn");
+      const resetAllBtn = document.getElementById("reset-all-btn");
+      if (startAllBtn) startAllBtn.style.display = "none";
+      if (pauseAllBtn) {
+        pauseAllBtn.style.display = "inline-block";
+        pauseAllBtn.textContent = "PAUSE ALL";
+      }
+      if (resetAllBtn) resetAllBtn.style.display = "inline-block";
+    }
+  }
+
+  // Initialize visibility settings  
   document.getElementById("show-progress-bar").checked =
     state.getVisibilitySettings().showProgressBar;
   document.getElementById("show-notes").checked =
@@ -4601,6 +5210,54 @@ function init() {
   document.getElementById("show-image").checked =
     state.getVisibilitySettings().showImage;
 }
+
+// Save state when leaving page
+window.addEventListener("beforeunload", () => {
+  state.saveToStorage();
+});
+
+window.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") {
+    state.saveToStorage();
+  } else if (document.visibilityState === "visible") {
+    const wasRestored = state.loadFromStorage();
+    if (wasRestored) {
+      renderAllTimers();
+      
+      const timers = state.getTimers();
+      let anyRunning = false;
+      
+      timers.forEach((timer, index) => {
+        if (timer.isRunning && !timer.isPaused && timer.remainingSeconds > 0) {
+          resumeSingleTimer(index);
+          anyRunning = true;
+          
+          // Update individual timer buttons
+          const timerBox = document.querySelector(`[data-timer-index="${index}"]`);
+          if (timerBox) {
+            const startBtn = timerBox.querySelector('.start-btn');
+            const pauseBtn = timerBox.querySelector('.pause-btn');
+            if (startBtn) startBtn.style.display = 'none';
+            if (pauseBtn) pauseBtn.style.display = 'inline-block';
+          }
+        }
+      });
+      
+      // Update control panel buttons
+      if (anyRunning) {
+        const startAllBtn = document.getElementById("start-all-btn");
+        const pauseAllBtn = document.getElementById("pause-all-btn");
+        const resetAllBtn = document.getElementById("reset-all-btn");
+        if (startAllBtn) startAllBtn.style.display = "none";
+        if (pauseAllBtn) {
+          pauseAllBtn.style.display = "inline-block";
+          pauseAllBtn.textContent = "PAUSE ALL";
+        }
+        if (resetAllBtn) resetAllBtn.style.display = "inline-block";
+      }
+    }
+  }
+});
 
 // Initialize the app when DOM is loaded
 document.addEventListener("DOMContentLoaded", init);

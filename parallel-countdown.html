@@ -36,7 +36,7 @@
     </script>
   </head>
 
-  <body>
+  <body class="parallel-countdown">
     <a href="#main-page" class="skip-link">Skip to main content</a>
     
     <!-- Shared Header Navigation -->
@@ -104,6 +104,10 @@
           <button class="control-btn reset-all-btn" id="reset-all-btn" style="display: none;">RESET ALL</button>
         </div>
       </div>
+
+      <div id="message-display-panel" class="message-display-panel">
+      <div class="message-panel-title">Messages Display Panel</div>
+    </div>
 
       <h2 class="hidden">Main Timer Functions</h2> 
       <div class="container">
@@ -276,15 +280,15 @@
           <div class="scheduled-start-controls">
             <div class="scheduled-label">Start at</div>
             <div class="scheduled-inputs">
-              <input type="checkbox" id="scheduled-start-checkbox" class="scheduled-checkbox">
-              <div class="scheduled-time-display" id="scheduled-start-time">
-                <span class="scheduled-time-unit" data-unit="hours" tabindex="0">01</span>
+              <input type="checkbox" class="scheduled-checkbox" data-timer-index="0">
+              <div class="scheduled-time-display" data-timer-index="0">
+                <span class="scheduled-time-unit" data-unit="hours" data-timer-index="0" tabindex="0">01</span>
                 <span>:</span>
-                <span class="scheduled-time-unit" data-unit="minutes" tabindex="0">00</span>
+                <span class="scheduled-time-unit" data-unit="minutes" data-timer-index="0" tabindex="0">00</span>
                 <span>:</span>
-                <span class="scheduled-time-unit" data-unit="seconds" tabindex="0">00</span>
+                <span class="scheduled-time-unit" data-unit="seconds" data-timer-index="0" tabindex="0">00</span>
               </div>
-              <span class="scheduled-period" id="scheduled-period" tabindex="0">PM</span>
+              <span class="scheduled-period" data-timer-index="0" tabindex="0">PM</span>
             </div>
           </div>
           <div class="main-timer-buttons" id="main-timer-buttons-container">
@@ -427,6 +431,7 @@
       <input type="range" id="alpha-input" min="0" max="100" value="50">
       <span id="alpha-value">50%</span>
     </div>
+     <div class="color-preview" id="color-preview" style="width: 100%; height: 50px; border: 2px solid #ddd; border-radius: 5px; margin: 15px 0; background-color: rgba(52, 152, 219, 0.5);"></div>
     <button
       class="close-color-modal"
       id="close-color-modal"
