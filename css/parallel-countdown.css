@@ -164,21 +164,26 @@ body {
 
 /* Message Display Panel */
 .message-display-panel {
-  display: block;
+  display: none; /* Hidden by default */
   width: 100%;
   max-width: 500px;
   margin: 20px auto;
-  padding: 7px;
+  padding: 15px;
   background-color: #fff;
   border: 2px solid #3498db;
   border-radius: 8px;
-  min-height: 6rem; /* ~4 lines of text */
+  min-height: 6rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   font-size: 1rem;
-  font-weight: 600;
   line-height: 1.5;
   overflow-y: auto;
-  transition: all 0.3s ease;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.message-display-panel.active {
+  display: block;
+  opacity: 1;
 }
 
 .message-panel-title {
@@ -194,10 +199,6 @@ body {
 body.dark-theme .message-panel-title {
   color: #ecf0f1;
   border-bottom-color: #3498db;
-}
-
-.message-display-panel.active {
-  display: block;
 }
 
 .message-item {
@@ -1361,6 +1362,38 @@ body.dark-theme .color-modal-content h3 {
   cursor: pointer;
   color: #333;
   font-weight: 500;
+}
+
+.reminder-message-row {
+  width: 100%;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.reminder-message-input {
+  width: 100%;
+  min-height: 50px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.reminder-message-input:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+body.dark-theme .reminder-message-input {
+  background-color: #34495e;
+  color: #ecf0f1;
+  border-color: #555;
+}
+
+body.dark-theme .reminder-message-input:focus {
+  border-color: #3498db;
 }
 
 /* === Advanced Page Notes/Image Controls === */

@@ -2239,6 +2239,30 @@ function updateMainPageDisplay(timerIndex = null) {
       imageDisplay.style.display = "none";
     }
   }
+// Update sound icon to reflect current timer's beepAt setting
+  const soundIcon = document.getElementById("sound-icon");
+  if (soundIcon) {
+    if (currentTimer.beepAt > 0) {
+      soundIcon.classList.add("active");
+      soundIcon.innerHTML = `
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+        </svg>
+      `;
+      soundIcon.title = "Sound enabled - Click to mute";
+    } else {
+      soundIcon.classList.remove("active");
+      soundIcon.innerHTML = `
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <line x1="23" y1="9" x2="17" y2="15"></line>
+          <line x1="17" y1="9" x2="23" y2="15"></line>
+        </svg>
+      `;
+      soundIcon.title = "Sound muted - Click to enable";
+    }
+  }
 }
 
 // Helper functions for flashing visual alerts
@@ -4619,6 +4643,11 @@ function showMessage(timerIndex, messageText, duration) {
   const timer = state.getTimers()[timerIndex];
   const messageId = `msg-${timerIndex}-${Date.now()}`;
   
+  // Show panel with fade-in if hidden
+  if (!panel.classList.contains('active')) {
+    panel.classList.add('active');
+  }
+  
   // Create message item
   const messageItem = document.createElement("div");
   messageItem.className = "message-item";
@@ -4629,10 +4658,19 @@ function showMessage(timerIndex, messageText, duration) {
   
   panel.appendChild(messageItem);
   
-  // Store reference
+  // Store reference and set timeout to remove message
   const timeoutId = setTimeout(() => {
     messageItem.remove();
     activeMessages.delete(messageId);
+    
+    // If no messages left, wait 5 seconds then hide panel
+    if (panel.querySelectorAll('.message-item').length === 0) {
+      setTimeout(() => {
+        if (panel.querySelectorAll('.message-item').length === 0) {
+          panel.classList.remove('active');
+        }
+      }, 5000);
+    }
   }, duration * 1000);
   
   activeMessages.set(messageId, { text: messageText, timeoutId });
@@ -4927,8 +4965,18 @@ function updateTimerDisplay(index) {
       100;
 
     progressBar.style.width = `${percentage}%`;
+    
+    // Apply direction
+    if (timer.direction === "left") {
+      progressBar.style.marginLeft = "auto";
+      progressBar.style.marginRight = "0";
+    } else {
+      progressBar.style.marginLeft = "0";
+      progressBar.style.marginRight = "auto";
+    }
   }
 }
+
 // ===== RENDER TIMERS =====
 function renderAllTimers() {
   const container = document.querySelector(".container");
@@ -5091,6 +5139,77 @@ function updateTimerData(timerElement, index) {
       leftBtn.style.opacity = '1';
       leftBtn.classList.remove('selected');
     }
+  }
+  // Update sound icon
+  const soundIcon = timerElement.querySelector('.sound-icon');
+  if (soundIcon) {
+    soundIcon.id = `sound-icon-${index}`;
+    soundIcon.dataset.timerIndex = index;
+    
+    // Update icon based on timer's beepAt value
+    if (timer.beepAt > 0) {
+      soundIcon.classList.add("active");
+      soundIcon.innerHTML = `
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+        </svg>
+      `;
+      soundIcon.title = "Sound enabled - Click to mute";
+    } else {
+      soundIcon.classList.remove("active");
+      soundIcon.innerHTML = `
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <line x1="23" y1="9" x2="17" y2="15"></line>
+          <line x1="17" y1="9" x2="23" y2="15"></line>
+        </svg>
+      `;
+      soundIcon.title = "Sound muted - Click to enable";
+    }
+    
+    // Remove old event listener by cloning (if it exists)
+    const newSoundIcon = soundIcon.cloneNode(true);
+    soundIcon.parentNode.replaceChild(newSoundIcon, soundIcon);
+    
+    // Add click handler
+    newSoundIcon.addEventListener("click", () => {
+      state.initAudioContext();
+      const timers = state.getTimers();
+      
+      // Toggle this timer's beepAt
+      if (timers[index].beepAt > 0) {
+        timers[index].beepAt = 0;
+      } else {
+        timers[index].beepAt = 5;
+      }
+      state.setTimers(timers);
+      
+      // Update icon
+      if (timers[index].beepAt > 0) {
+        newSoundIcon.classList.add("active");
+        newSoundIcon.innerHTML = `
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+        `;
+        newSoundIcon.title = "Sound enabled - Click to mute";
+      } else {
+        newSoundIcon.classList.remove("active");
+        newSoundIcon.innerHTML = `
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <line x1="23" y1="9" x2="17" y2="15"></line>
+            <line x1="17" y1="9" x2="23" y2="15"></line>
+          </svg>
+        `;
+        newSoundIcon.title = "Sound muted - Click to enable";
+      }
+      
+      // Sync with advanced page
+      uiManager.renderTimerSettings();
+    });
   }
 }
 
