@@ -2154,3 +2154,215 @@ body.dark-theme .timer-example-preset:hover {
 #main-page.hidden ~ .features-section {
   display: none;
 }
+
+/* ===== FULLSCREEN MODE ===== */
+.fullscreen-btn {
+  display: none;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  z-index: 10;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.fullscreen-btn:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.fullscreen-btn svg {
+  color: #555;
+}
+
+/* Show fullscreen button on mobile - both orientations */
+@media (max-width: 900px), (max-height: 500px) and (orientation: landscape) {
+  .fullscreen-btn {
+    display: flex;
+  }
+}
+
+/* Fullscreen overlay */
+.fullscreen-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #1a1a2e;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.fullscreen-overlay.hidden {
+  display: none;
+}
+
+.fullscreen-exit-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  z-index: 100000;
+}
+
+.fullscreen-exit-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.fullscreen-exit-btn svg {
+  color: #fff;
+}
+
+.fullscreen-timer-name {
+  position: absolute;
+  top: 12px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+}
+
+.fullscreen-countdown {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 0;
+}
+
+.fullscreen-time-row {
+  font-weight: 900;
+  color: #fff;
+  font-family: 'Impact', 'Arial Black', 'Helvetica Bold', sans-serif;
+  letter-spacing: -0.02em;
+  text-align: center;
+  line-height: 0.85;
+}
+
+.fullscreen-hours {
+  display: none;
+}
+
+.fullscreen-hours.visible {
+  display: block;
+}
+
+/* Portrait - stack rows vertically */
+@media (orientation: portrait) {
+  .fullscreen-countdown {
+    flex-direction: column;
+  }
+  
+  .fullscreen-time-row {
+    font-size: 48vw;
+    transform: scaleX(0.9);
+  }
+  
+  .fullscreen-hours.visible {
+    font-size: 35vw;
+    color: rgba(255, 255, 255, 0.7);
+  }
+}
+
+/* Landscape - single row */
+@media (orientation: landscape) {
+  .fullscreen-countdown {
+    flex-direction: row;
+    justify-content: center;
+    gap: 0;
+  }
+  
+  .fullscreen-time-row {
+    font-size: 38vh;
+    transform: scaleX(0.9);
+  }
+  
+  .fullscreen-time-row::after {
+    content: ':';
+    margin: 0 -0.05em;
+  }
+  
+  .fullscreen-time-row:last-child::after {
+    content: '';
+  }
+  
+  .fullscreen-hours.visible {
+    display: block;
+    font-size: 38vh;
+  }
+}
+
+.fullscreen-progress-container {
+  position: absolute;
+  bottom: 30px;
+  left: 20px;
+  right: 20px;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 7px;
+  overflow: hidden;
+}
+
+.fullscreen-progress-bar {
+  height: 100%;
+  background: #3498db;
+  border-radius: 7px;
+  width: 0%;
+  transition: width 1s linear;
+}
+
+/* Fullscreen flash effects */
+.fullscreen-time-row.flash-warning {
+  animation: fullscreen-flash-warning 0.5s ease-in-out;
+}
+
+.fullscreen-time-row.flash-critical {
+  animation: fullscreen-flash-critical 0.3s ease-in-out;
+}
+
+@keyframes fullscreen-flash-warning {
+  0%, 100% { color: #fff; }
+  50% { color: #f39c12; }
+}
+
+@keyframes fullscreen-flash-critical {
+  0%, 100% { color: #fff; }
+  50% { color: #e74c3c; }
+}
+
+/* Dark theme adjustments */
+body.dark-theme .fullscreen-btn {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .fullscreen-btn svg {
+  color: #ccc;
+}
+
+body.dark-theme .fullscreen-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}

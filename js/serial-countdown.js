@@ -4093,13 +4093,146 @@ const eventHandlers = (function () {
       container.dataset.heightLocked = "true";
     }
 
-    // Apply draggable to all elements with the class
+    // Check if mobile device
+    const isMobile = window.matchMedia("(max-width: 768px)").matches || 
+                     ('ontouchstart' in window && window.innerWidth < 768);
+
+    // Apply draggable to all elements with the class (desktop only)
     document.querySelectorAll(".draggable-element").forEach((el) => {
-      makeDraggable(el);
+      if (!isMobile) {
+        makeDraggable(el);
+      } else {
+        // Remove drag cursor and resize handles on mobile
+        el.style.cursor = "default";
+        el.querySelectorAll(".resize-handle").forEach(handle => {
+          handle.style.display = "none";
+        });
+      }
 
       // Initial scale for countdown box
       if (el.id === "countdown-box") {
         scaleCountdownBoxText(el);
+      }
+    });
+
+    // ===== FULLSCREEN MODE =====
+    const fullscreenBtn = document.getElementById("fullscreen-btn");
+    const fullscreenOverlay = document.getElementById("fullscreen-overlay");
+    const fullscreenExitBtn = document.getElementById("fullscreen-exit-btn");
+    const fullscreenTimerName = document.getElementById("fullscreen-timer-name");
+    const fullscreenProgressBar = document.getElementById("fullscreen-progress-bar");
+
+    let fullscreenUpdateInterval = null;
+
+    function enterFullscreen() {
+      fullscreenOverlay.classList.remove("hidden");
+      
+      // Request browser fullscreen
+      const elem = document.documentElement;
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen().catch(() => {});
+      } else if (elem.webkitRequestFullscreen) {
+        elem.webkitRequestFullscreen();
+      } else if (elem.msRequestFullscreen) {
+        elem.msRequestFullscreen();
+      }
+
+      // Start updating fullscreen display
+      updateFullscreenDisplay();
+      fullscreenUpdateInterval = setInterval(updateFullscreenDisplay, 100);
+    }
+
+    function exitFullscreen() {
+      fullscreenOverlay.classList.add("hidden");
+      
+      // Exit browser fullscreen
+      if (document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {});
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      }
+
+      // Stop updating
+      if (fullscreenUpdateInterval) {
+        clearInterval(fullscreenUpdateInterval);
+        fullscreenUpdateInterval = null;
+      }
+    }
+
+    function updateFullscreenDisplay() {
+      const countdownDisplay = document.getElementById("countdown-display");
+      const currentTimerInfo = document.getElementById("current-timer-info");
+      const progressBar = document.getElementById("progress-bar");
+
+      const fullscreenHours = document.getElementById("fullscreen-hours");
+      const fullscreenMinutes = document.getElementById("fullscreen-minutes");
+      const fullscreenSeconds = document.getElementById("fullscreen-seconds");
+
+      if (countdownDisplay && fullscreenMinutes && fullscreenSeconds) {
+        const timeText = countdownDisplay.textContent;
+        const parts = timeText.split(':');
+        
+        if (parts.length === 3) {
+          const hours = parseInt(parts[0]);
+          const minutes = parts[1];
+          const seconds = parts[2];
+          
+          // Show hours only if > 0
+          if (hours > 0 && fullscreenHours) {
+            fullscreenHours.textContent = hours.toString().padStart(2, '0');
+            fullscreenHours.classList.add('visible');
+          } else if (fullscreenHours) {
+            fullscreenHours.classList.remove('visible');
+          }
+          
+          fullscreenMinutes.textContent = minutes;
+          fullscreenSeconds.textContent = seconds;
+          
+          // Copy flash classes
+          const isWarning = countdownDisplay.classList.contains("flash-warning");
+          const isCritical = countdownDisplay.classList.contains("flash-critical");
+          
+          fullscreenSeconds.classList.toggle("flash-warning", isWarning);
+          fullscreenSeconds.classList.toggle("flash-critical", isCritical);
+          fullscreenMinutes.classList.toggle("flash-warning", isWarning);
+          fullscreenMinutes.classList.toggle("flash-critical", isCritical);
+        }
+      }
+
+      if (fullscreenTimerName && currentTimerInfo) {
+        fullscreenTimerName.textContent = currentTimerInfo.textContent;
+      }
+
+      if (fullscreenProgressBar && progressBar) {
+        fullscreenProgressBar.style.width = progressBar.style.width;
+        fullscreenProgressBar.style.backgroundColor = progressBar.style.backgroundColor;
+      }
+    }
+
+    if (fullscreenBtn) {
+      fullscreenBtn.addEventListener("click", enterFullscreen);
+    }
+
+    if (fullscreenExitBtn) {
+      fullscreenExitBtn.addEventListener("click", exitFullscreen);
+    }
+
+    // Exit fullscreen on Escape key or when browser exits fullscreen
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !fullscreenOverlay.classList.contains("hidden")) {
+        exitFullscreen();
+      }
+    });
+
+    document.addEventListener("fullscreenchange", () => {
+      if (!document.fullscreenElement && !fullscreenOverlay.classList.contains("hidden")) {
+        fullscreenOverlay.classList.add("hidden");
+        if (fullscreenUpdateInterval) {
+          clearInterval(fullscreenUpdateInterval);
+          fullscreenUpdateInterval = null;
+        }
       }
     });
 
