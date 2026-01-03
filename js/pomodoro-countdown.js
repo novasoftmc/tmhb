@@ -9,7 +9,7 @@ const state = (function () {
       direction: "right",
       alpha: 0.5,
       beepAt: 5,
-      name: "Timer 1",
+      name: "Focus",
       notes: "",
       imageData: null,
       imageName: null,
@@ -4313,6 +4313,105 @@ document.querySelectorAll('.pomodoro-preset-btn').forEach(btn => {
       }
     });
 
+    // ===== FULLSCREEN MODE =====
+    const fullscreenBtn = document.getElementById("fullscreen-btn");
+    const fullscreenOverlay = document.getElementById("fullscreen-overlay");
+    const fullscreenExitBtn = document.getElementById("fullscreen-exit-btn");
+    const fullscreenCountdown = document.getElementById("fullscreen-countdown");
+    const fullscreenTimerName = document.getElementById("fullscreen-timer-name");
+    const fullscreenProgressBar = document.getElementById("fullscreen-progress-bar");
+
+    let fullscreenUpdateInterval = null;
+
+    function enterFullscreen() {
+      fullscreenOverlay.classList.remove("hidden");
+      
+      // Request browser fullscreen
+      const elem = document.documentElement;
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen().catch(() => {});
+      } else if (elem.webkitRequestFullscreen) {
+        elem.webkitRequestFullscreen();
+      } else if (elem.msRequestFullscreen) {
+        elem.msRequestFullscreen();
+      }
+
+      // Start updating fullscreen display
+      updateFullscreenDisplay();
+      fullscreenUpdateInterval = setInterval(updateFullscreenDisplay, 100);
+    }
+
+    function exitFullscreen() {
+      fullscreenOverlay.classList.add("hidden");
+      
+      // Exit browser fullscreen
+      if (document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {});
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      }
+
+      // Stop updating
+      if (fullscreenUpdateInterval) {
+        clearInterval(fullscreenUpdateInterval);
+        fullscreenUpdateInterval = null;
+      }
+    }
+
+    function updateFullscreenDisplay() {
+      // Get current countdown text
+      const countdownDisplay = document.getElementById("countdown-display");
+      const currentTimerInfo = document.getElementById("current-timer-info");
+      const progressBar = document.getElementById("progress-bar");
+
+      if (fullscreenCountdown && countdownDisplay) {
+        fullscreenCountdown.textContent = countdownDisplay.textContent;
+        
+        // Copy flash classes
+        fullscreenCountdown.classList.toggle("flash-warning", 
+          countdownDisplay.classList.contains("flash-warning"));
+        fullscreenCountdown.classList.toggle("flash-critical", 
+          countdownDisplay.classList.contains("flash-critical"));
+      }
+
+      if (fullscreenTimerName && currentTimerInfo) {
+        fullscreenTimerName.textContent = currentTimerInfo.textContent;
+      }
+
+      if (fullscreenProgressBar && progressBar) {
+        fullscreenProgressBar.style.transform = progressBar.style.transform;
+        fullscreenProgressBar.style.backgroundColor = progressBar.style.backgroundColor;
+      }
+    }
+
+    if (fullscreenBtn) {
+      fullscreenBtn.addEventListener("click", enterFullscreen);
+    }
+
+    if (fullscreenExitBtn) {
+      fullscreenExitBtn.addEventListener("click", exitFullscreen);
+    }
+
+    // Exit fullscreen on Escape key or when browser exits fullscreen
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !fullscreenOverlay.classList.contains("hidden")) {
+        exitFullscreen();
+      }
+    });
+
+    document.addEventListener("fullscreenchange", () => {
+      if (!document.fullscreenElement && !fullscreenOverlay.classList.contains("hidden")) {
+        fullscreenOverlay.classList.add("hidden");
+        if (fullscreenUpdateInterval) {
+          clearInterval(fullscreenUpdateInterval);
+          fullscreenUpdateInterval = null;
+        }
+      }
+    });
+
+
     // === SOUND REMINDER INPUT HANDLING ===
     document.addEventListener("click", (e) => {
       if (e.target.classList.contains("add-custom-reminder")) {
@@ -4880,10 +4979,15 @@ function init() {
 
   // Set up color picker interactions
   colorPickerManager.setupColorPickerInteractions();
-
-  if (wasRestored) {
+if (wasRestored) {
     const timer1 = state.getTimers()[0];
     uiManager.updateMainTimeDisplay(timer1.hours, timer1.minutes, timer1.seconds);
+    
+    // Update timer name in countdown box
+    const currentTimerInfo = document.getElementById("current-timer-info");
+    if (currentTimerInfo) {
+      currentTimerInfo.textContent = timer1.name || "Focus";
+    }
   }
 
   // If timer was running or paused, resume UI state

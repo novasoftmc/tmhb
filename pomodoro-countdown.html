@@ -373,7 +373,12 @@
         </div> 
 
         <div class="countdown-box draggable-element" id="countdown-box">
-          <div class="current-timer-info" id="current-timer-info">Timer 1</div>
+          <div class="fullscreen-btn" id="fullscreen-btn" title="Enter fullscreen">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+            </svg>
+          </div>
+          <div class="current-timer-info" id="current-timer-info">Focus</div>
           <div class="countdown-display" id="countdown-display">00:00:00</div>
           <div class="reminder-message-display" id="reminder-message-display"></div>
           <div class="resize-handle top"></div>
@@ -420,6 +425,20 @@
         </div>
       </div>
     </main>
+
+    <!-- Fullscreen Timer Overlay -->
+    <div id="fullscreen-overlay" class="fullscreen-overlay hidden">
+      <div class="fullscreen-exit-btn" id="fullscreen-exit-btn">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6L6 18M6 6l12 12"></path>
+        </svg>
+      </div>
+      <div class="fullscreen-timer-name" id="fullscreen-timer-name">Focus</div>
+      <div class="fullscreen-countdown" id="fullscreen-countdown">00:00:00</div>
+      <div class="fullscreen-progress-container">
+        <div class="fullscreen-progress-bar" id="fullscreen-progress-bar"></div>
+      </div>
+    </div>
 
     <!-- Advanced Settings Page -->
     <section id="settings-page" class="page hidden">

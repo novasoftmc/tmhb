@@ -2522,3 +2522,170 @@ body.dark-theme .back-to-top-btn:hover {
     display: table;
     clear: both;
 }
+
+/* ===== FULLSCREEN MODE ===== */
+.fullscreen-btn {
+  display: none;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  z-index: 10;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.fullscreen-btn:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.fullscreen-btn svg {
+  color: #555;
+}
+
+/* Show fullscreen button only on mobile */
+@media (max-width: 768px) {
+  .fullscreen-btn {
+    display: flex;
+  }
+}
+
+/* Fullscreen overlay */
+.fullscreen-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #1a1a2e;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.fullscreen-overlay.hidden {
+  display: none;
+}
+
+.fullscreen-exit-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  z-index: 100000;
+}
+
+.fullscreen-exit-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.fullscreen-exit-btn svg {
+  color: #fff;
+}
+
+.fullscreen-timer-name {
+  position: absolute;
+  top: 20px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 1.5rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+}
+
+.fullscreen-countdown {
+  font-size: 28vw;
+  font-weight: 700;
+  color: #fff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  letter-spacing: 0.02em;
+  text-align: center;
+  line-height: 1;
+  margin-top: -5vh;
+}
+
+/* Landscape orientation - even bigger digits */
+@media (orientation: landscape) {
+  .fullscreen-countdown {
+    font-size: 22vh;
+  }
+}
+
+/* Portrait - optimize for vertical space */
+@media (orientation: portrait) {
+  .fullscreen-countdown {
+    font-size: 18vw;
+  }
+}
+
+.fullscreen-progress-container {
+  position: absolute;
+  bottom: 30px;
+  left: 20px;
+  right: 20px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.fullscreen-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #3498db, #2ecc71);
+  border-radius: 6px;
+  width: 100%;
+  transform-origin: left;
+  transition: transform 0.3s linear;
+}
+
+/* Fullscreen flash effects */
+.fullscreen-countdown.flash-warning {
+  animation: fullscreen-flash-warning 0.5s ease-in-out;
+}
+
+.fullscreen-countdown.flash-critical {
+  animation: fullscreen-flash-critical 0.3s ease-in-out;
+}
+
+@keyframes fullscreen-flash-warning {
+  0%, 100% { color: #fff; }
+  50% { color: #f39c12; }
+}
+
+@keyframes fullscreen-flash-critical {
+  0%, 100% { color: #fff; }
+  50% { color: #e74c3c; }
+}
+
+/* Dark theme adjustments */
+body.dark-theme .fullscreen-btn {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .fullscreen-btn svg {
+  color: #ccc;
+}
+
+body.dark-theme .fullscreen-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
