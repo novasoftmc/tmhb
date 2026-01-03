@@ -2602,41 +2602,44 @@ body.dark-theme .back-to-top-btn:hover {
 
 .fullscreen-timer-name {
   position: absolute;
-  top: 20px;
+  top: 12px;
   left: 0;
   right: 0;
   text-align: center;
-  font-size: 1.5rem;
-  color: rgba(255, 255, 255, 0.8);
-  font-weight: 500;
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 3px;
+  letter-spacing: 4px;
 }
 
 .fullscreen-countdown {
-  font-weight: 700;
+  font-weight: 900;
   color: #fff;
-  font-family: 'Arial Black', 'Helvetica Bold', sans-serif;
-  letter-spacing: -0.02em;
+  font-family: 'Impact', 'Arial Black', 'Helvetica Bold', sans-serif;
+  letter-spacing: -0.03em;
   text-align: center;
-  line-height: 0.85;
-  transform: scaleY(1.4);
+  line-height: 0.9;
+  transform: scaleX(0.85);
   transform-origin: center;
+  width: 100%;
+  padding: 0 10px;
+  box-sizing: border-box;
 }
 
-/* Portrait - maximize vertical space */
+/* Portrait - massive digits */
 @media (orientation: portrait) {
   .fullscreen-countdown {
-    font-size: 25vw;
-    transform: scaleY(1.5);
+    font-size: 32vw;
+    transform: scaleX(0.8) scaleY(1.15);
   }
 }
 
-/* Landscape - fill horizontal space */
+/* Landscape - fill the screen width */
 @media (orientation: landscape) {
   .fullscreen-countdown {
-    font-size: 28vh;
-    transform: scaleY(1.3);
+    font-size: 38vh;
+    transform: scaleX(0.85) scaleY(1.1);
   }
 }
 
