@@ -4381,7 +4381,7 @@ document.querySelectorAll('.pomodoro-preset-btn').forEach(btn => {
       }
 
       if (fullscreenProgressBar && progressBar) {
-        fullscreenProgressBar.style.transform = progressBar.style.transform;
+        fullscreenProgressBar.style.width = progressBar.style.width;
         fullscreenProgressBar.style.backgroundColor = progressBar.style.backgroundColor;
       }
     }
