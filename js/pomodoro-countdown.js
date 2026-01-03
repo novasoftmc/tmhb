@@ -4291,9 +4291,21 @@ document.querySelectorAll('.pomodoro-preset-btn').forEach(btn => {
       countdown.style.fontSize = 2.0 * scale + "rem";
     }
 
-    // Apply draggable to all elements with the class
+    // Check if mobile device
+    const isMobile = window.matchMedia("(max-width: 768px)").matches || 
+                     ('ontouchstart' in window && window.innerWidth < 768);
+
+    // Apply draggable to all elements with the class (desktop only)
     document.querySelectorAll(".draggable-element").forEach((el) => {
-      makeDraggable(el);
+      if (!isMobile) {
+        makeDraggable(el);
+      } else {
+        // Remove drag cursor and resize handles on mobile
+        el.style.cursor = "default";
+        el.querySelectorAll(".resize-handle").forEach(handle => {
+          handle.style.display = "none";
+        });
+      }
 
       // Initial scale for countdown box
       if (el.id === "countdown-box") {
