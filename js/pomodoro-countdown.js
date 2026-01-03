@@ -3949,6 +3949,12 @@ document.querySelectorAll('.pomodoro-preset-btn').forEach(btn => {
         dragStartX = e.clientX;
         dragStartY = e.clientY;
 
+        // Lock main-page height to prevent layout shift
+        const mainPage = document.getElementById("main-page");
+        if (mainPage && !mainPage.style.minHeight) {
+          mainPage.style.minHeight = mainPage.offsetHeight + "px";
+        }
+
         const rect = element.getBoundingClientRect();
         dragStartLeft = rect.left + window.pageXOffset;
         dragStartTop = rect.top + window.pageYOffset;
@@ -4094,6 +4100,12 @@ document.querySelectorAll('.pomodoro-preset-btn').forEach(btn => {
         isDragging = true;
         dragStartX = e.touches[0].clientX;
         dragStartY = e.touches[0].clientY;
+
+        // Lock main-page height to prevent layout shift
+        const mainPage = document.getElementById("main-page");
+        if (mainPage && !mainPage.style.minHeight) {
+          mainPage.style.minHeight = mainPage.offsetHeight + "px";
+        }
 
         const rect = element.getBoundingClientRect();
         dragStartLeft = rect.left;

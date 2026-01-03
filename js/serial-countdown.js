@@ -3744,6 +3744,12 @@ const eventHandlers = (function () {
         dragStartX = e.clientX;
         dragStartY = e.clientY;
 
+        // Lock main-page height to prevent layout shift
+        const mainPage = document.getElementById("main-page");
+        if (mainPage && !mainPage.style.minHeight) {
+          mainPage.style.minHeight = mainPage.offsetHeight + "px";
+        }
+
         const rect = element.getBoundingClientRect();
         dragStartLeft = rect.left + window.pageXOffset;
         dragStartTop = rect.top + window.pageYOffset;
@@ -3889,6 +3895,12 @@ const eventHandlers = (function () {
         isDragging = true;
         dragStartX = e.touches[0].clientX;
         dragStartY = e.touches[0].clientY;
+
+        // Lock main-page height to prevent layout shift
+        const mainPage = document.getElementById("main-page");
+        if (mainPage && !mainPage.style.minHeight) {
+          mainPage.style.minHeight = mainPage.offsetHeight + "px";
+        }
 
         const rect = element.getBoundingClientRect();
         dragStartLeft = rect.left;
@@ -4072,6 +4084,13 @@ const eventHandlers = (function () {
 
       timerInfo.style.fontSize = 1.0 * scale + "rem";
       countdown.style.fontSize = 2.0 * scale + "rem";
+    }
+
+    // Lock container height before any dragging to prevent layout shift
+    const container = document.querySelector("#main-page .container");
+    if (container && !container.dataset.heightLocked) {
+      container.style.minHeight = container.offsetHeight + "px";
+      container.dataset.heightLocked = "true";
     }
 
     // Apply draggable to all elements with the class
@@ -4655,6 +4674,57 @@ function init() {
       const m = timer1.minutes.toString().padStart(2, "0");
       const s = timer1.seconds.toString().padStart(2, "0");
       presetDisplay.textContent = `${h}:${m}:${s}`;
+    }
+    
+    // Update main color indicator
+    const colorIndicator = document.getElementById("main-color-indicator");
+    if (colorIndicator) {
+      colorIndicator.style.backgroundColor = timer1.color;
+      colorIndicator.style.opacity = timer1.alpha || 0.5;
+    }
+    
+    // Update direction buttons
+    const leftBtn = document.getElementById("main-dir-left");
+    const rightBtn = document.getElementById("main-dir-right");
+    if (leftBtn && rightBtn) {
+      if (timer1.direction === "left") {
+        leftBtn.classList.add("selected");
+        rightBtn.classList.remove("selected");
+        leftBtn.style.backgroundColor = timer1.color;
+        leftBtn.style.opacity = timer1.alpha || 0.5;
+        rightBtn.style.backgroundColor = "#eee";
+        rightBtn.style.opacity = "1";
+      } else {
+        rightBtn.classList.add("selected");
+        leftBtn.classList.remove("selected");
+        rightBtn.style.backgroundColor = timer1.color;
+        rightBtn.style.opacity = timer1.alpha || 0.5;
+        leftBtn.style.backgroundColor = "#eee";
+        leftBtn.style.opacity = "1";
+      }
+    }
+    
+    // Update sound icon
+    const soundIcon = document.getElementById("sound-icon");
+    if (soundIcon) {
+      if (timer1.beepAt > 0) {
+        soundIcon.classList.add("active");
+        soundIcon.innerHTML = `
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>`;
+        soundIcon.title = "Sound enabled - Click to mute";
+      } else {
+        soundIcon.classList.remove("active");
+        soundIcon.innerHTML = `
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <line x1="23" y1="9" x2="17" y2="15"></line>
+            <line x1="17" y1="9" x2="23" y2="15"></line>
+          </svg>`;
+        soundIcon.title = "Sound muted - Click to enable";
+      }
     }
   }
 

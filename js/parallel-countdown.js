@@ -190,7 +190,7 @@ const state = (function () {
             color: t.color || '#3498db',
             direction: t.direction || 'right',
             alpha: t.alpha || 0.9,
-            beepAt: t.beepAt || 5,
+            beepAt: t.beepAt !== undefined ? t.beepAt : 5,
             name: t.name || `Timer ${i + 1}`,
             notes: t.notes || '',
             imageData: t.imageData || null,
@@ -498,6 +498,11 @@ const uiManager = (function () {
   function showSettingsPage() {
     elements.mainPage.classList.add("hidden");
     elements.settingsPage.classList.remove("hidden");
+     // Hide the features section on settings page
+  const featuresSection = document.getElementById("features-section");
+  if (featuresSection) featuresSection.classList.add("hidden");
+  const spacer = document.querySelector(".spacer-big");
+  if (spacer) spacer.classList.add("hidden");
     renderTimerSettings();
   }
 
@@ -505,6 +510,11 @@ const uiManager = (function () {
   function showMainPage() {
     elements.settingsPage.classList.add("hidden");
     elements.mainPage.classList.remove("hidden");
+    // Show the features section on main page
+  const featuresSection = document.getElementById("features-section");
+  if (featuresSection) featuresSection.classList.remove("hidden");
+  const spacer = document.querySelector(".spacer-big");
+  if (spacer) spacer.classList.remove("hidden");
 
     // Scroll to top of page
     window.scrollTo(0, 0);
@@ -2180,48 +2190,20 @@ function updateMainPageDisplay(timerIndex = null) {
   const currentTimer = timers[currentTimerIndex];
   if (!currentTimer) return;
 
-  // Update notes display (read-only)
-  const notesDisplay = document.getElementById("timer-notes-display");
-  if (notesDisplay) {
-    const shouldShow =
-      currentTimer.notes && currentTimer.notes.trim() && settings.showNotes;
-    if (shouldShow) {
-      notesDisplay.innerHTML = currentTimer.notes;
-      notesDisplay.style.backgroundColor =
-        currentTimer.notesStyle?.backgroundColor || "#fffcf1";
-      notesDisplay.style.display = "block";
-
-      // Auto-resize height to fit content
-      // notesDisplay.style.height = "auto";
-
-      // Get the actual content height
-      // const contentHeight = notesDisplay.scrollHeight;
-
-      // Set height to fit content (with min/max constraints)
-      // notesDisplay.style.height =
-      //  Math.max(50, Math.min(400, contentHeight + 20)) + "px";
-
-      // Ensure resize handles exist
-      if (!notesDisplay.querySelector(".resize-handle")) {
-        [
-          "top",
-          "bottom",
-          "left",
-          "right",
-          "top-left",
-          "top-right",
-          "bottom-left",
-          "bottom-right",
-        ].forEach((pos) => {
-          const handle = document.createElement("div");
-          handle.className = `resize-handle ${pos}`;
-          notesDisplay.appendChild(handle);
-        });
+  // Update notes displays for ALL timers
+  timers.forEach((timer, idx) => {
+    const notesEl = document.getElementById(`timer-notes-display-${idx}`);
+    if (notesEl) {
+      const shouldShow = timer.notes && timer.notes.trim() && settings.showNotes;
+      if (shouldShow) {
+        notesEl.innerHTML = timer.notes;
+        notesEl.style.backgroundColor = timer.notesStyle?.backgroundColor || "#fffcf1";
+        notesEl.style.display = "block";
+      } else {
+        notesEl.style.display = "none";
       }
-    } else {
-      notesDisplay.style.display = "none";
     }
-  }
+  });
 
   // Update image display
   const imageDisplay = document.getElementById("timer-image-display");
@@ -2397,8 +2379,16 @@ function initializeToolbarListeners() {
       } else {
       }
 
-      if (index === 0) {
-        updateMainPageDisplay();
+      // Update this timer's notes display on main page
+      const notesEl = document.getElementById(`timer-notes-display-${index}`);
+      if (notesEl) {
+        const settings = state.getVisibilitySettings();
+        if (timers[index].notes && timers[index].notes.trim() && settings.showNotes) {
+          notesEl.innerHTML = timers[index].notes;
+          notesEl.style.display = "block";
+        } else {
+          notesEl.style.display = "none";
+        }
       }
     });
 
@@ -4794,7 +4784,7 @@ function startSingleTimer(index) {
     } else {
       clearInterval(timer.interval);
       timer.isRunning = false;
-      state.playBeep(true);
+      if (state.getSoundEnabled() && timer.beepAt > 0) state.playBeep(true);
       resetSingleTimer(index);
       updateControlPanelButtons();
     }
@@ -4886,7 +4876,7 @@ function resumeSingleTimer(index) {
     } else {
       clearInterval(timer.interval);
       timer.isRunning = false;
-      state.playBeep(true);
+      if (state.getSoundEnabled() && timer.beepAt > 0) state.playBeep(true);
       resetSingleTimer(index);
       updateControlPanelButtons();
     }
@@ -4987,6 +4977,11 @@ function renderAllTimers() {
   const firstTimer = document.getElementById("main-timer");
   if (!firstTimer) return;
 
+  // Remove all notes displays first
+  container.querySelectorAll(".timer-notes-display").forEach((notes) => {
+    notes.remove();
+  });
+
   // Remove all timers except the first one
   const existingTimers = container.querySelectorAll(".time-setter");
   existingTimers.forEach((timer, index) => {
@@ -5006,10 +5001,9 @@ function renderAllTimers() {
     // Add remove button for timer index > 1
     if (i > 0) {
       addRemoveButton(clonedTimer, i);
-    }
-
-    updateTimerData(clonedTimer, i);
+    }    
     container.appendChild(clonedTimer);
+    updateTimerData(clonedTimer, i);
   }
 }
 
@@ -5211,6 +5205,34 @@ function updateTimerData(timerElement, index) {
       uiManager.renderTimerSettings();
     });
   }
+  // Create/update notes display for this timer (positioned AFTER the timer box)
+  let notesDisplay = document.getElementById(`timer-notes-display-${index}`);
+  if (!notesDisplay) {
+    notesDisplay = document.createElement('div');
+    notesDisplay.className = 'timer-notes-display';
+    notesDisplay.id = `timer-notes-display-${index}`;
+    notesDisplay.style.display = 'none';
+    notesDisplay.style.width = timerElement.offsetWidth + 'px';
+    notesDisplay.style.marginTop = '-20px';
+    notesDisplay.style.marginBottom = '5px';
+    notesDisplay.style.minHeight = '12px';
+    notesDisplay.style.padding = '5px 10px';
+    notesDisplay.style.borderRadius = '5px';
+    notesDisplay.style.backgroundColor = '#fffcf1';
+    notesDisplay.style.boxSizing = 'border-box';
+    // Insert AFTER the timer element, not inside it
+    timerElement.parentNode.insertBefore(notesDisplay, timerElement.nextSibling);
+  }
+  
+  // Update notes content and visibility
+  const settings = state.getVisibilitySettings();
+  if (timer.notes && timer.notes.trim() && settings.showNotes) {
+    notesDisplay.innerHTML = timer.notes;
+    notesDisplay.style.backgroundColor = timer.notesStyle?.backgroundColor || '#fffcf1';
+    notesDisplay.style.display = 'block';
+  } else {
+    notesDisplay.style.display = 'none';
+  }
 }
 
 function addRemoveButton(timerElement, index) {
@@ -5282,6 +5304,29 @@ function init() {
 
   // Initialize main page display
   updateMainPageDisplay();
+
+  // Update sound icon based on restored state
+  const soundIcon = document.getElementById("sound-icon");
+  if (soundIcon) {
+    if (state.getSoundEnabled()) {
+      soundIcon.classList.add("active");
+      soundIcon.innerHTML = `
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+        </svg>`;
+      soundIcon.title = "Sound enabled - Click to mute";
+    } else {
+      soundIcon.classList.remove("active");
+      soundIcon.innerHTML = `
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <line x1="23" y1="9" x2="17" y2="15"></line>
+          <line x1="17" y1="9" x2="23" y2="15"></line>
+        </svg>`;
+      soundIcon.title = "Sound muted - Click to enable";
+    }
+  }
 
   // Render all timers
   renderAllTimers();
