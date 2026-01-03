@@ -4366,14 +4366,39 @@ document.querySelectorAll('.pomodoro-preset-btn').forEach(btn => {
       const currentTimerInfo = document.getElementById("current-timer-info");
       const progressBar = document.getElementById("progress-bar");
 
-      if (fullscreenCountdown && countdownDisplay) {
-        fullscreenCountdown.textContent = countdownDisplay.textContent;
+      const fullscreenHours = document.getElementById("fullscreen-hours");
+      const fullscreenMinutes = document.getElementById("fullscreen-minutes");
+      const fullscreenSeconds = document.getElementById("fullscreen-seconds");
+
+      if (countdownDisplay && fullscreenMinutes && fullscreenSeconds) {
+        const timeText = countdownDisplay.textContent;
+        const parts = timeText.split(':');
         
-        // Copy flash classes
-        fullscreenCountdown.classList.toggle("flash-warning", 
-          countdownDisplay.classList.contains("flash-warning"));
-        fullscreenCountdown.classList.toggle("flash-critical", 
-          countdownDisplay.classList.contains("flash-critical"));
+        if (parts.length === 3) {
+          const hours = parseInt(parts[0]);
+          const minutes = parts[1];
+          const seconds = parts[2];
+          
+          // Show hours only if > 0
+          if (hours > 0 && fullscreenHours) {
+            fullscreenHours.textContent = hours.toString().padStart(2, '0');
+            fullscreenHours.classList.add('visible');
+          } else if (fullscreenHours) {
+            fullscreenHours.classList.remove('visible');
+          }
+          
+          fullscreenMinutes.textContent = minutes;
+          fullscreenSeconds.textContent = seconds;
+          
+          // Copy flash classes to seconds (most visible)
+          const isWarning = countdownDisplay.classList.contains("flash-warning");
+          const isCritical = countdownDisplay.classList.contains("flash-critical");
+          
+          fullscreenSeconds.classList.toggle("flash-warning", isWarning);
+          fullscreenSeconds.classList.toggle("flash-critical", isCritical);
+          fullscreenMinutes.classList.toggle("flash-warning", isWarning);
+          fullscreenMinutes.classList.toggle("flash-critical", isCritical);
+        }
       }
 
       if (fullscreenTimerName && currentTimerInfo) {
