@@ -1623,7 +1623,7 @@ body.dark-theme .reminder-message-input:focus {
 }
 
 .timer-image-display {
-  width: 100%;
+  max-width: 100%;
   margin: 0px 0;
   overflow: hidden;
   border: 1px solid #ddd;

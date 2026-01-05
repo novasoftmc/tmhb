@@ -555,13 +555,15 @@ const uiManager = (function () {
         settings.showNotes && hasNotes ? "block" : "none";
     }
 
-    const imageDisplay = document.getElementById("timer-image-display");
-    if (imageDisplay) {
-      const timers = state.getTimers();
-      const hasImage = timers[0].imageData;
-      imageDisplay.style.display =
-        settings.showImage && hasImage ? "block" : "none";
-    }
+    const timers = state.getTimers();
+    timers.forEach((timer, idx) => {
+      const imageDisplay = document.getElementById(`timer-image-display-${idx}`);
+      if (imageDisplay) {
+        const hasImage = timer.imageData;
+        imageDisplay.style.display =
+          settings.showImage && hasImage ? "block" : "none";
+      }
+    });
   }
 
   // Show color picker modal
@@ -1042,8 +1044,7 @@ const uiManager = (function () {
     }
 
     // Notes and image visibility
-    const notesDisplay = document.getElementById("notes-content-editable");
-    const imageDisplay = document.getElementById("timer-image-display");
+    const notesDisplay = document.getElementById("notes-content-editable");    
 
     if (notesDisplay) {
       const timers = state.getTimers();
@@ -1068,12 +1069,15 @@ const uiManager = (function () {
       }
     }
 
-    if (imageDisplay) {
-      const timers = state.getTimers();
-      const hasImage = timers[0].imageData;
-      imageDisplay.style.display =
-        settings.showImage && hasImage ? "block" : "none";
-    }
+    const timersForImage = state.getTimers();
+    timersForImage.forEach((timer, idx) => {
+      const imgDisplay = document.getElementById(`timer-image-display-${idx}`);
+      if (imgDisplay) {
+        const hasImage = timer.imageData;
+        imgDisplay.style.display =
+          settings.showImage && hasImage ? "block" : "none";
+      }
+    });
 
     // Start/Stop buttons visibility
     const buttonContainer = document.getElementById(
@@ -2205,22 +2209,23 @@ function updateMainPageDisplay(timerIndex = null) {
     }
   });
 
-  // Update image display
-  const imageDisplay = document.getElementById("timer-image-display");
-  const imageMain = document.getElementById("timer-image-main");
-  if (imageDisplay && imageMain) {
-    if (currentTimer.imageData && settings.showImage) {
-      imageMain.src = currentTimer.imageData;
-      // Set descriptive alt text based on timer name and filename
-      const altText = currentTimer.imageName
-        ? `${currentTimer.name} - ${currentTimer.imageName}`
-        : `${currentTimer.name} reference image`;
-      imageMain.alt = altText;
-      imageDisplay.style.display = "block";
-    } else {
-      imageDisplay.style.display = "none";
+  // Update image display for each timer
+  timers.forEach((timer, idx) => {
+    const imageDisplay = document.getElementById(`timer-image-display-${idx}`);
+    const imageEl = document.getElementById(`timer-image-main-${idx}`);
+    if (imageDisplay && imageEl) {
+      if (timer.imageData && settings.showImage) {
+        imageEl.src = timer.imageData;
+        imageEl.alt = timer.imageName
+          ? `${timer.name} - ${timer.imageName}`
+          : `${timer.name} reference image`;
+        imageDisplay.style.display = 'block';
+      } else {
+        imageDisplay.style.display = 'none';
+      }
     }
-  }
+  });
+
 // Update sound icon to reflect current timer's beepAt setting
   const soundIcon = document.getElementById("sound-icon");
   if (soundIcon) {
@@ -3149,6 +3154,11 @@ const eventHandlers = (function () {
           now.getSeconds() === scheduled.seconds
         ) {
           startSingleTimer(timerIndex);
+
+          // Play 3 beeps to alert user that scheduled timer has started
+          state.playBeep();
+          setTimeout(() => state.playBeep(), 300);
+          setTimeout(() => state.playBeep(), 600);
           
           // Update individual timer buttons
           const timerBox = document.querySelector(`[data-timer-index="${timerIndex}"]`);
@@ -4977,9 +4987,12 @@ function renderAllTimers() {
   const firstTimer = document.getElementById("main-timer");
   if (!firstTimer) return;
 
-  // Remove all notes displays first
+  // Remove all notes and image displays first
   container.querySelectorAll(".timer-notes-display").forEach((notes) => {
     notes.remove();
+  });
+  container.querySelectorAll(".timer-image-display").forEach((img) => {
+    img.remove();
   });
 
   // Remove all timers except the first one
@@ -5232,6 +5245,39 @@ function updateTimerData(timerElement, index) {
     notesDisplay.style.display = 'block';
   } else {
     notesDisplay.style.display = 'none';
+  }
+
+  // Create/update image display for this timer (positioned AFTER notes)
+  let imageDisplay = document.getElementById(`timer-image-display-${index}`);
+  if (!imageDisplay) {
+    imageDisplay = document.createElement('div');
+    imageDisplay.className = 'timer-image-display';
+    imageDisplay.id = `timer-image-display-${index}`;
+    imageDisplay.style.display = 'none';
+    imageDisplay.style.width = timerElement.offsetWidth + 'px';
+    imageDisplay.style.marginTop = '5px';
+    imageDisplay.style.marginBottom = '5px';
+    imageDisplay.style.boxSizing = 'border-box';
+    
+    const img = document.createElement('img');
+    img.id = `timer-image-main-${index}`;
+    img.alt = `${timer.name} reference image`;
+    imageDisplay.appendChild(img);
+    
+    // Insert after notes display
+    notesDisplay.parentNode.insertBefore(imageDisplay, notesDisplay.nextSibling);
+  }
+  
+  // Update image content and visibility
+  const imageEl = document.getElementById(`timer-image-main-${index}`);
+  if (timer.imageData && settings.showImage) {
+    imageEl.src = timer.imageData;
+    imageEl.alt = timer.imageName 
+      ? `${timer.name} - ${timer.imageName}` 
+      : `${timer.name} reference image`;
+    imageDisplay.style.display = 'block';
+  } else {
+    imageDisplay.style.display = 'none';
   }
 }
 

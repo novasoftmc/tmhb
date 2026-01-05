@@ -100,6 +100,7 @@ const state = (function () {
     showNotes: true,
     showImage: true,
     showProgressBar: true,
+    showPresets: true,
   };
 
   // === localStorage persistence ===
@@ -144,7 +145,7 @@ const state = (function () {
       totalSeconds = data.totalSeconds || 0;
       currentSequenceItem = data.currentSequenceItem || 0;
       sequence = data.sequence || [];
-      visibilitySettings = data.visibilitySettings || visibilitySettings;
+      visibilitySettings = { ...visibilitySettings, ...data.visibilitySettings };
       soundEnabled = data.soundEnabled !== undefined ? data.soundEnabled : true;
       pauses = data.pauses || [];
       
@@ -515,10 +516,24 @@ const uiManager = (function () {
       imageDisplay.style.display =
         settings.showImage && hasImage ? "block" : "none";
     }
+    // Apply all visibility settings
+    applyVisibilitySettings();
+
+    // Time setter visibility
+    elements.mainTimer.style.display = settings.showTimeSetter
+      ? "flex"
+      : "none";
+
     // Progress bar visibility
     elements.progressContainer.style.display = settings.showProgressBar
       ? "block"
       : "none";
+
+    // Quick timer presets visibility
+    const quickPresets = document.getElementById("quick-timer-presets");
+    if (quickPresets) {
+      quickPresets.style.visibility = settings.showPresets ? "visible" : "hidden";
+    }
   }
 
   // Show color picker modal
@@ -1021,6 +1036,12 @@ const uiManager = (function () {
       ? "block"
       : "none";
 
+    // Quick timer presets visibility
+    const quickPresets = document.getElementById("quick-timer-presets");
+    if (quickPresets) {
+      quickPresets.style.visibility = settings.showPresets ? "visible" : "hidden";
+    }
+
     // Notes and image visibility
     const notesDisplay = document.getElementById("notes-content-editable");
     const imageDisplay = document.getElementById("timer-image-display");
@@ -1078,6 +1099,7 @@ const uiManager = (function () {
     elements.progressContainer.style.display = settings.showProgressBar
       ? "block"
       : "none";
+     
   }
 
   return {
@@ -1720,10 +1742,11 @@ const timerLogic = (function () {
       if (mainMinutes) mainMinutes.classList.remove("timer-running");
       if (mainSeconds) mainSeconds.classList.remove("timer-running");
 
-      // Restore all UI elements
-      elements.mainTimer.style.display = "flex";
-      elements.countdownDisplay.style.display = "flex";
-      elements.currentTimerInfo.style.display = "block";
+      // Restore UI elements based on visibility settings
+      const resetSettings = state.getVisibilitySettings();
+      elements.mainTimer.style.display = resetSettings.showTimeSetter ? "flex" : "none";
+      elements.countdownDisplay.style.display = resetSettings.showCountdown ? "flex" : "none";
+      elements.currentTimerInfo.style.display = resetSettings.showTimerInfo ? "block" : "none";
 
       // Re-enable transition after a tiny delay
       setTimeout(() => {
@@ -1807,10 +1830,11 @@ const timerLogic = (function () {
 
     uiManager.updateButtonVisibility(false, false);
 
-    // Restore all UI elements
-    elements.mainTimer.style.display = "flex";
-    elements.countdownDisplay.style.display = "flex";
-    elements.currentTimerInfo.style.display = "block";
+    // Restore UI elements based on visibility settings
+    const settings = state.getVisibilitySettings();
+    elements.mainTimer.style.display = settings.showTimeSetter ? "flex" : "none";
+    elements.countdownDisplay.style.display = settings.showCountdown ? "flex" : "none";
+    elements.currentTimerInfo.style.display = settings.showTimerInfo ? "block" : "none";
   }
 
   // Run the current timer
@@ -2411,6 +2435,13 @@ const settingsManager = (function () {
     settings.showImage = document.getElementById("show-image").checked;
     settings.showProgressBar =
       document.getElementById("show-progress-bar").checked;
+    settings.showPresets = document.getElementById("show-presets").checked;
+
+  // Update quick timer presets visibility immediately
+    const quickPresets = document.getElementById("quick-timer-presets");
+    if (quickPresets) {
+      quickPresets.style.visibility = settings.showPresets ? "visible" : "hidden";
+    }
 
     state.setVisibilitySettings(settings);
   }
@@ -3323,6 +3354,12 @@ const eventHandlers = (function () {
             now.getMinutes() === scheduled.minutes && 
             now.getSeconds() === scheduled.seconds) {
           timerLogic.startTimer();
+
+          // Play 3 beeps to alert user that scheduled timer has started
+          state.playBeep();
+          setTimeout(() => state.playBeep(), 300);
+          setTimeout(() => state.playBeep(), 600);   
+
           scheduledCheckbox.checked = false;
           state.getScheduledStart().enabled = false;
           stopScheduledCheck();
@@ -3411,10 +3448,17 @@ const eventHandlers = (function () {
         const minutes = parseInt(e.target.dataset.minutes) || 0;
         const seconds = parseInt(e.target.dataset.seconds) || 0;
         
+        // Extract timer name from button text (after "—" or use full text)
+        const buttonText = e.target.textContent;
+        const namePart = buttonText.includes('—') 
+          ? buttonText.split('—')[1].trim() 
+          : buttonText.trim();
+        
         const timers = state.getTimers();
         timers[0].hours = Math.floor(minutes / 60);
         timers[0].minutes = minutes % 60;
         timers[0].seconds = seconds;
+        timers[0].name = namePart;
         state.setTimers(timers);
         
         // Update main display
@@ -3431,6 +3475,12 @@ const eventHandlers = (function () {
           const s = timers[0].seconds.toString().padStart(2, '0');
           presetDisplay.textContent = `${h}:${m}:${s}`;
         }
+        
+        // Update timer name input and info display
+        const timerLabelInput = document.getElementById('timer-label-input');
+        const currentTimerInfo = document.getElementById('current-timer-info');
+        if (timerLabelInput) timerLabelInput.value = namePart;
+        if (currentTimerInfo) currentTimerInfo.textContent = namePart;
         
         // Scroll to top smoothly
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -3505,6 +3555,9 @@ const eventHandlers = (function () {
       .addEventListener("change", handleVisibilityChange);
     document
       .getElementById("show-progress-bar")
+      .addEventListener("change", handleVisibilityChange);
+    document
+      .getElementById("show-presets")
       .addEventListener("change", handleVisibilityChange);
 
     // Delegated event listeners for dynamically created elements in advanced settings
@@ -3829,6 +3882,10 @@ const eventHandlers = (function () {
           if (element.id === "countdown-box") {
             scaleCountdownBoxText(element);
           }
+          // Scale notes box content
+          if (element.id === "timer-notes-display") {
+            scaleNotesBoxContent(element);
+          }
           return;
         }
 
@@ -3960,6 +4017,10 @@ const eventHandlers = (function () {
           if (element.id === "countdown-box") {
             scaleCountdownBoxText(element);
           }
+          // Scale notes box content
+          if (element.id === "timer-notes-display") {
+            scaleNotesBoxContent(element);
+          }
           e.preventDefault();
           return;
         }
@@ -4080,10 +4141,21 @@ const eventHandlers = (function () {
       // Scale font sizes based on container size
       // Base sizes: timerInfo = 1.2rem (19.2px), countdown = 2.5rem (40px)
       const baseWidth = 270; // Match the default CSS width
-      const scale = Math.max(0.5, Math.min(2, width / baseWidth));
+      const scale = Math.max(0.5, width / baseWidth);
+      
+      // Title scales slower (cap at 2x), digits scale more (cap at 5x)
+      const titleScale = Math.min(2, scale);
+      const digitScale = Math.min(5, scale);
 
-      timerInfo.style.fontSize = 1.0 * scale + "rem";
-      countdown.style.fontSize = 2.0 * scale + "rem";
+      timerInfo.style.fontSize = 1.0 * titleScale + "rem";
+      countdown.style.fontSize = 2.0 * digitScale + "rem";
+    }
+
+    function scaleNotesBoxContent(element) {
+      const baseWidth = 500;
+      const width = element.offsetWidth;
+      const scale = Math.max(0.5, Math.min(3, width / baseWidth));
+      element.style.zoom = scale;
     }
 
     // Lock container height before any dragging to prevent layout shift
@@ -4808,6 +4880,12 @@ function init() {
       const s = timer1.seconds.toString().padStart(2, "0");
       presetDisplay.textContent = `${h}:${m}:${s}`;
     }
+
+    // Update timer name
+    const timerLabelInput = document.getElementById("timer-label-input");
+    const currentTimerInfo = document.getElementById("current-timer-info");
+    if (timerLabelInput) timerLabelInput.value = timer1.name || "Timer 1";
+    if (currentTimerInfo) currentTimerInfo.textContent = timer1.name || "Timer 1";
     
     // Update main color indicator
     const colorIndicator = document.getElementById("main-color-indicator");
@@ -4921,6 +4999,8 @@ function init() {
     state.getVisibilitySettings().showImage;
   document.getElementById("show-progress-bar").checked =
     state.getVisibilitySettings().showProgressBar;
+  document.getElementById("show-presets").checked =
+    state.getVisibilitySettings().showPresets;
 }
 
 // Initialize the app when DOM is loaded
