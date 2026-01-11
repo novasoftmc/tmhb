@@ -10,6 +10,7 @@ const state = (function () {
       alpha: 0.5,
       beepAt: 5,
       name: "Focus",
+      isBreak: false,
       notes: "",
       imageData: null,
       imageName: null,
@@ -104,6 +105,66 @@ const state = (function () {
     showProgressBar: true,
   };
 
+  // === Stats tracking ===
+  const STATS_KEY = 'pomodoroStats';
+  let stats = {
+    totalFocusSeconds: 0,
+    totalBreakSeconds: 0,
+    sessionsCompleted: 0,
+    history: [] // Array of {date, focusSeconds, breakSeconds, sessions}
+  };
+
+  function loadStats() {
+    try {
+      const saved = localStorage.getItem(STATS_KEY);
+      if (saved) {
+        stats = JSON.parse(saved);
+      }
+    } catch (e) {
+      console.warn('Failed to load stats:', e);
+    }
+  }
+
+  function saveStats() {
+    try {
+      localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+    } catch (e) {
+      console.warn('Failed to save stats:', e);
+    }
+  }
+
+  function recordCompletedTimer(timerIndex, durationSeconds) {
+    const timer = timers[timerIndex];
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Find or create today's entry
+    let todayEntry = stats.history.find(h => h.date === today);
+    if (!todayEntry) {
+      todayEntry = { date: today, focusSeconds: 0, breakSeconds: 0, sessions: 0 };
+      stats.history.push(todayEntry);
+      // Keep only last 30 days
+      if (stats.history.length > 30) {
+        stats.history.shift();
+      }
+    }
+    
+    const isBreak = timer.isBreak || timer.name.toLowerCase().includes('break');
+    if (isBreak) {
+      stats.totalBreakSeconds += durationSeconds;
+      todayEntry.breakSeconds += durationSeconds;
+    } else {
+      stats.totalFocusSeconds += durationSeconds;
+      todayEntry.focusSeconds += durationSeconds;
+      stats.sessionsCompleted++;
+      todayEntry.sessions++;
+    }
+    
+    saveStats();
+  }
+
+  // Load stats on init
+  loadStats();
+
   // === localStorage persistence ===
   const STORAGE_KEY = 'pomodoroCountdownState';
   
@@ -181,6 +242,17 @@ const state = (function () {
   }
 
   return {
+    getStats: () => stats,
+    recordCompletedTimer,
+    resetStats: () => {
+      stats = {
+        totalFocusSeconds: 0,
+        totalBreakSeconds: 0,
+        sessionsCompleted: 0,
+        history: []
+      };
+      saveStats();
+    },
     getActivePreset: () => activePreset,
     setActivePreset: (value) => {
       activePreset = value;
@@ -2057,6 +2129,11 @@ const timerLogic = (function () {
   // Move to the next item in the sequence
   function nextSequenceItem() {
     const sequence = state.getSequence();
+    // Record completed timer stats
+    const completedItem = sequence[state.getCurrentSequenceItem()];
+    if (completedItem && completedItem.type === "timer") {
+      state.recordCompletedTimer(completedItem.index, completedItem.totalSeconds);
+    }
     let nextIndex = state.getCurrentSequenceItem() + 1;
 
     if (nextIndex < sequence.length) {
@@ -2244,42 +2321,42 @@ function createPomodoroPreset(presetType) {
   switch(presetType) {
     case "25+5":
       newTimers = [
-        { name: "Focus", minutes: 25, color: classicColors[0] },
-        { name: "Break", minutes: 5, color: classicColors[0] }
+        { name: "Focus", minutes: 25, color: classicColors[0], isBreak: false },
+        { name: "Break", minutes: 5, color: classicColors[0], isBreak: true }
       ];
       break;
       
     case "(25+5)*2":
       newTimers = [
-        { name: "Focus 1", minutes: 25, color: classicColors[0] },
-        { name: "Break 1", minutes: 5, color: classicColors[0] },
-        { name: "Focus 2", minutes: 25, color: classicColors[1] },
-        { name: "Break 2", minutes: 5, color: classicColors[1] }
+        { name: "Focus 1", minutes: 25, color: classicColors[0], isBreak: false },
+        { name: "Break 1", minutes: 5, color: classicColors[0], isBreak: true },
+        { name: "Focus 2", minutes: 25, color: classicColors[1], isBreak: false },
+        { name: "Break 2", minutes: 5, color: classicColors[1], isBreak: true }
       ];
       break;
       
     case "(25+5)*3":
       newTimers = [
-        { name: "Focus 1", minutes: 25, color: classicColors[0] },
-        { name: "Break 1", minutes: 5, color: classicColors[0] },
-        { name: "Focus 2", minutes: 25, color: classicColors[1] },
-        { name: "Break 2", minutes: 5, color: classicColors[1] },
-        { name: "Focus 3", minutes: 25, color: classicColors[2] },
-        { name: "Break 3", minutes: 5, color: classicColors[2] }
+        { name: "Focus 1", minutes: 25, color: classicColors[0], isBreak: false },
+        { name: "Break 1", minutes: 5, color: classicColors[0], isBreak: true },
+        { name: "Focus 2", minutes: 25, color: classicColors[1], isBreak: false },
+        { name: "Break 2", minutes: 5, color: classicColors[1], isBreak: true },
+        { name: "Focus 3", minutes: 25, color: classicColors[2], isBreak: false },
+        { name: "Break 3", minutes: 5, color: classicColors[2], isBreak: true }
       ];
       break;
       
     case "(25+5)*4+20":
       newTimers = [
-        { name: "Focus 1", minutes: 25, color: classicColors[0] },
-        { name: "Break 1", minutes: 5, color: classicColors[0] },
-        { name: "Focus 2", minutes: 25, color: classicColors[1] },
-        { name: "Break 2", minutes: 5, color: classicColors[1] },
-        { name: "Focus 3", minutes: 25, color: classicColors[2] },
-        { name: "Break 3", minutes: 5, color: classicColors[2] },
-        { name: "Focus 4", minutes: 25, color: classicColors[3] },
-        { name: "Break 4", minutes: 5, color: classicColors[3] },
-        { name: "Long Break", minutes: 20, color: longBreakColor }
+        { name: "Focus 1", minutes: 25, color: classicColors[0], isBreak: false },
+        { name: "Break 1", minutes: 5, color: classicColors[0], isBreak: true },
+        { name: "Focus 2", minutes: 25, color: classicColors[1], isBreak: false },
+        { name: "Break 2", minutes: 5, color: classicColors[1], isBreak: true },
+        { name: "Focus 3", minutes: 25, color: classicColors[2], isBreak: false },
+        { name: "Break 3", minutes: 5, color: classicColors[2], isBreak: true },
+        { name: "Focus 4", minutes: 25, color: classicColors[3], isBreak: false },
+        { name: "Break 4", minutes: 5, color: classicColors[3], isBreak: true },
+        { name: "Long Break", minutes: 20, color: longBreakColor, isBreak: true }
       ];
       break;
     
@@ -2288,8 +2365,8 @@ function createPomodoroPreset(presetType) {
       for (let i = 0; i < multiplier; i++) {
         const colorIndex = i % modifiedColors.length;
         newTimers.push(
-          { name: multiplier > 1 ? `Focus ${i+1}` : "Focus", minutes: 45, color: modifiedColors[colorIndex] },
-          { name: multiplier > 1 ? `Break ${i+1}` : "Break", minutes: 15, color: modifiedColors[colorIndex] }
+          { name: multiplier > 1 ? `Focus ${i+1}` : "Focus", minutes: 45, color: modifiedColors[colorIndex], isBreak: false },
+          { name: multiplier > 1 ? `Break ${i+1}` : "Break", minutes: 15, color: modifiedColors[colorIndex], isBreak: true }
         );
       }
       break;
@@ -2298,8 +2375,8 @@ function createPomodoroPreset(presetType) {
       for (let i = 0; i < multiplier; i++) {
         const colorIndex = i % modifiedColors.length;
         newTimers.push(
-          { name: multiplier > 1 ? `Focus ${i+1}` : "Focus", minutes: 60, color: modifiedColors[colorIndex] },
-          { name: multiplier > 1 ? `Break ${i+1}` : "Break", minutes: 10, color: modifiedColors[colorIndex] }
+          { name: multiplier > 1 ? `Focus ${i+1}` : "Focus", minutes: 60, color: modifiedColors[colorIndex], isBreak: false },
+          { name: multiplier > 1 ? `Break ${i+1}` : "Break", minutes: 10, color: modifiedColors[colorIndex], isBreak: true }
         );
       }
       break;
@@ -2308,8 +2385,8 @@ function createPomodoroPreset(presetType) {
       for (let i = 0; i < multiplier; i++) {
         const colorIndex = i % modifiedColors.length;
         newTimers.push(
-          { name: multiplier > 1 ? `Focus ${i+1}` : "Focus", minutes: 90, color: modifiedColors[colorIndex] },
-          { name: multiplier > 1 ? `Break ${i+1}` : "Break", minutes: 20, color: modifiedColors[colorIndex] }
+          { name: multiplier > 1 ? `Focus ${i+1}` : "Focus", minutes: 90, color: modifiedColors[colorIndex], isBreak: false },
+          { name: multiplier > 1 ? `Break ${i+1}` : "Break", minutes: 20, color: modifiedColors[colorIndex], isBreak: true }
         );
       }
       break;
@@ -2318,8 +2395,8 @@ function createPomodoroPreset(presetType) {
       for (let i = 0; i < multiplier; i++) {
         const colorIndex = i % modifiedColors.length;
         newTimers.push(
-          { name: multiplier > 1 ? `Focus ${i+1}` : "Focus", minutes: 52, color: modifiedColors[colorIndex] },
-          { name: multiplier > 1 ? `Break ${i+1}` : "Break", minutes: 17, color: modifiedColors[colorIndex] }
+          { name: multiplier > 1 ? `Focus ${i+1}` : "Focus", minutes: 52, color: modifiedColors[colorIndex], isBreak: false },
+          { name: multiplier > 1 ? `Break ${i+1}` : "Break", minutes: 17, color: modifiedColors[colorIndex], isBreak: true }
         );
       }
       break;
@@ -2329,8 +2406,8 @@ function createPomodoroPreset(presetType) {
       for (let i = 0; i < baseMultiplier; i++) {
         const colorIndex = i % modifiedColors.length;
         newTimers.push(
-          { name: `Focus ${i+1}`, minutes: 10, color: modifiedColors[colorIndex] },
-          { name: `Break ${i+1}`, minutes: 2, color: modifiedColors[colorIndex] }
+          { name: `Focus ${i+1}`, minutes: 10, color: modifiedColors[colorIndex], isBreak: false },
+          { name: `Break ${i+1}`, minutes: 2, color: modifiedColors[colorIndex], isBreak: true }
         );
       }
       break;
@@ -2339,8 +2416,8 @@ function createPomodoroPreset(presetType) {
       for (let i = 0; i < multiplier; i++) {
         const colorIndex = i % modifiedColors.length;
         newTimers.push(
-          { name: multiplier > 1 ? `Focus ${i+1}` : "Focus", minutes: 30, color: modifiedColors[colorIndex] },
-          { name: multiplier > 1 ? `Break ${i+1}` : "Break", minutes: 10, color: modifiedColors[colorIndex] }
+          { name: multiplier > 1 ? `Focus ${i+1}` : "Focus", minutes: 30, color: modifiedColors[colorIndex], isBreak: false },
+          { name: multiplier > 1 ? `Break ${i+1}` : "Break", minutes: 10, color: modifiedColors[colorIndex], isBreak: true }
         );
       }
       break;
@@ -2357,6 +2434,7 @@ function createPomodoroPreset(presetType) {
     alpha: 0.8,
     beepAt: 5,
     name: t.name,
+    isBreak: t.isBreak || false,
     notes: "",
     imageData: null,
     imageName: null,
@@ -3685,24 +3763,6 @@ document.querySelectorAll('.pomodoro-preset-btn').forEach(btn => {
 
     // Visibility settings
     document
-      .getElementById("show-main-title")
-      .addEventListener("change", handleVisibilityChange);
-    document
-      .getElementById("show-time-setter")
-      .addEventListener("change", handleVisibilityChange);
-    document
-      .getElementById("show-advanced-btn")
-      .addEventListener("change", handleVisibilityChange);
-    document
-      .getElementById("show-countdown")
-      .addEventListener("change", handleVisibilityChange);
-    document
-      .getElementById("show-timer-info")
-      .addEventListener("change", handleVisibilityChange);
-    document
-      .getElementById("show-start-btn")
-      .addEventListener("change", handleVisibilityChange);
-    document
       .getElementById("show-notes")
       .addEventListener("change", handleVisibilityChange);
     document
@@ -3711,6 +3771,7 @@ document.querySelectorAll('.pomodoro-preset-btn').forEach(btn => {
     document
       .getElementById("show-progress-bar")
       .addEventListener("change", handleVisibilityChange);
+
 
     // Delegated event listeners for dynamically created elements in advanced settings
     document
@@ -4981,6 +5042,102 @@ document.querySelectorAll('.pomodoro-preset-btn').forEach(btn => {
   // Initialize toolbar listeners on page load
   initializeToolbarListeners();
 
+  // Stats modal handlers
+  const statsBtn = document.getElementById('stats-btn');
+  const statsModal = document.getElementById('stats-modal');
+  const closeStatsModal = document.getElementById('close-stats-modal');
+  const resetStatsBtn = document.getElementById('reset-stats-btn');
+
+  if (statsBtn) {
+    statsBtn.addEventListener('click', () => {
+      updateStatsDisplay();
+      statsModal.classList.remove('hidden');
+    });
+  }
+
+  if (closeStatsModal) {
+    closeStatsModal.addEventListener('click', () => {
+      statsModal.classList.add('hidden');
+    });
+  }
+
+  if (statsModal) {
+    statsModal.addEventListener('click', (e) => {
+      if (e.target === statsModal) {
+        statsModal.classList.add('hidden');
+      }
+    });
+  }
+
+  if (resetStatsBtn) {
+    resetStatsBtn.addEventListener('click', () => {
+      if (confirm('Reset all statistics? This cannot be undone.')) {
+        state.resetStats();
+        updateStatsDisplay();
+      }
+    });
+  }
+
+  function updateStatsDisplay() {
+    const stats = state.getStats();
+    const today = new Date().toISOString().split('T')[0];
+    const todayEntry = stats.history.find(h => h.date === today) || { focusSeconds: 0, breakSeconds: 0 };
+
+    const formatTime = (seconds) => {
+      const totalMinutes = Math.round(seconds / 60);
+      const h = Math.floor(totalMinutes / 60);
+      const m = totalMinutes % 60;
+      if (h > 0) return `${h}h ${m}m`;
+      return `${m}m`;
+    };
+
+    document.getElementById('stat-focus-time').textContent = formatTime(stats.totalFocusSeconds);
+    document.getElementById('stat-break-time').textContent = formatTime(stats.totalBreakSeconds);
+    document.getElementById('stat-sessions').textContent = stats.sessionsCompleted;
+    document.getElementById('stat-today-focus').textContent = formatTime(todayEntry.focusSeconds);
+    document.getElementById('stat-today-break').textContent = formatTime(todayEntry.breakSeconds);
+
+    // Render chart
+    renderStatsChart(stats);
+  }
+
+  function renderStatsChart(stats) {
+    const container = document.getElementById('stats-chart-container');
+    if (!container) return;
+
+    // Get last 7 days
+    const days = [];
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      const dateStr = date.toISOString().split('T')[0];
+      const dayName = date.toLocaleDateString('en', { weekday: 'short' });
+      const entry = stats.history.find(h => h.date === dateStr) || { focusSeconds: 0, breakSeconds: 0 };
+      days.push({ dateStr, dayName, ...entry });
+    }
+
+    // Find max for scaling
+    const maxSeconds = Math.max(...days.map(d => d.focusSeconds + d.breakSeconds), 60);
+
+    // Build chart HTML
+    container.innerHTML = days.map(day => {
+      const focusHeight = (day.focusSeconds / maxSeconds) * 100;
+      const breakHeight = (day.breakSeconds / maxSeconds) * 100;
+      const totalMins = Math.round((day.focusSeconds + day.breakSeconds) / 60);
+      
+      return `
+        <div class="chart-bar-wrapper">
+          <div style="display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; width: 100%;">
+            <div class="chart-bar break-bar" style="height: ${breakHeight}%;"></div>
+            <div class="chart-bar" style="height: ${focusHeight}%;"></div>
+          </div>
+          <div class="chart-label">${day.dayName}</div>
+          <div class="chart-value">${totalMins}m</div>
+        </div>
+      `;
+    }).join('');
+  }
+
   return {
     setupEventListeners,
   };
@@ -5057,18 +5214,6 @@ if (wasRestored) {
   }
 
   // Initialize visibility settings checkboxes from state
-  document.getElementById("show-main-title").checked =
-    state.getVisibilitySettings().showMainTitle;
-  document.getElementById("show-time-setter").checked =
-    state.getVisibilitySettings().showTimeSetter;
-  document.getElementById("show-advanced-btn").checked =
-    state.getVisibilitySettings().showAdvancedBtn;
-  document.getElementById("show-countdown").checked =
-    state.getVisibilitySettings().showCountdown;
-  document.getElementById("show-timer-info").checked =
-    state.getVisibilitySettings().showTimerInfo;
-  document.getElementById("show-start-btn").checked =
-    state.getVisibilitySettings().showStartBtn;
   document.getElementById("show-notes").checked =
     state.getVisibilitySettings().showNotes;
   document.getElementById("show-image").checked =
