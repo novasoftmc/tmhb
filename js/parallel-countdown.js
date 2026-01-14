@@ -5471,3 +5471,6 @@ window.addEventListener("visibilitychange", () => {
 
 // Initialize the app when DOM is loaded
 document.addEventListener("DOMContentLoaded", init);
+
+// Initialize header sound button
+sharedSound.initHeaderBtn();

@@ -14,6 +14,7 @@
     <title>Countdown Timers with Progress Bar and Sound Alerts - Audio Visual Timer Tool</title>
     
     <link rel="stylesheet" href="css/shared-nav.css" />
+    <link rel="stylesheet" href="css/shared-sound.css" />
     <link rel="stylesheet" href="css/serial-countdown.css" />
     <link rel="stylesheet" href="css/shared-footer.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
@@ -70,7 +71,8 @@
                 <svg class="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                 </svg>
-            </div>
+            </div> <!-- Theme toggle end -->
+            <button class="header-sound-btn" id="header-sound-btn" title="Sound Settings">Sound</button>
         </div>
         
         <!-- Row 2: Sub-tabs (Countdown options) -->
@@ -637,6 +639,7 @@
         </div>
     </footer>
 
+    <script src="js/shared-sound.js"></script>
     <script src="js/serial-countdown.js"></script>
     <script src="js/shared-nav.js"></script>
   </body>

@@ -1921,7 +1921,7 @@ const timerLogic = (function () {
                 for (let i = 0; i < r.duration; i++) {
                   const beepTimeout = setTimeout(() => {
                     if (state.getIsRunning() && !state.getIsPaused() && src.beepAt > 0) {
-                      state.playBeep(false);
+                      sharedSound.playSound();
                     }
                   }, i * 1000);
                   state.addFlashingTimeout(beepTimeout);
@@ -1979,7 +1979,7 @@ const timerLogic = (function () {
               for (let i = 0; i < r.duration; i++) {
                 const beepTimeout = setTimeout(() => {
                   if (state.getIsRunning() && !state.getIsPaused() && src.beepAt > 0) {
-                    state.playBeep(false);
+                    sharedSound.playSound();
                   }
                 }, i * 1000);
                 state.addFlashingTimeout(beepTimeout);
@@ -2007,7 +2007,7 @@ const timerLogic = (function () {
         if (isVeryEnd) {
           // Final beep at 0 seconds
           if (beepAt > 0) {
-            if (state.getSoundEnabled()) state.playBeep(true);
+           if (state.getSoundEnabled()) sharedSound.playSound('synth-alarm');
             // Clear any warning flashing and start critical
             stopFlashing();
             startFlashing(true);
@@ -2024,7 +2024,7 @@ const timerLogic = (function () {
             startFlashing(true);
           }
 
-          if (state.getSoundEnabled()) state.playBeep(false);
+          if (state.getSoundEnabled()) sharedSound.playSound();
         } else if (beepAt === 0 || newRemaining > beepAt) {
           // Not in any beepAt warning period
           // Check if we should stop flashing (no active custom reminders)
@@ -3356,9 +3356,9 @@ const eventHandlers = (function () {
           timerLogic.startTimer();
 
           // Play 3 beeps to alert user that scheduled timer has started
-          state.playBeep();
-          setTimeout(() => state.playBeep(), 300);
-          setTimeout(() => state.playBeep(), 600);   
+          sharedSound.playSound();
+          setTimeout(() => sharedSound.playSound(), 300);
+          setTimeout(() => sharedSound.playSound(), 600);   
 
           scheduledCheckbox.checked = false;
           state.getScheduledStart().enabled = false;
@@ -5005,3 +5005,6 @@ function init() {
 
 // Initialize the app when DOM is loaded
 document.addEventListener("DOMContentLoaded", init);
+
+// Initialize header sound button
+sharedSound.initHeaderBtn();
