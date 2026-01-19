@@ -276,8 +276,8 @@ const sharedSound = (function () {
 
     if (timerSound.useGlobal !== false) {
       // Using global
-      useGlobalCheckbox.checked = true;
-      timerSettings.classList.add('disabled');
+      useGlobalCheckbox.checked = false;
+      timerSettings.classList.remove('disabled');
       soundSelect.value = global.soundType;
       volumeSlider.value = Math.round(global.volume * 100);
     } else {
@@ -322,6 +322,21 @@ const sharedSound = (function () {
           callbacks.setTimerSoundSettings(currentTimerIndex, { useGlobal: true });
         } else {
           callbacks.setTimerSoundSettings(currentTimerIndex, { soundType, volume, useGlobal: false });
+        }
+      }
+    }
+
+    // Update button text if it's a timer modal
+    if (currentTimerIndex !== null) {
+      const btn = document.querySelector(`.advanced-sound-btn[data-timer-index="${currentTimerIndex}"]`);
+      if (btn) {
+        if (useGlobalCheckbox.checked) {
+          btn.textContent = `Timer ${currentTimerIndex + 1} Sound ▼`;
+        } else {
+          // Find label for selected sound
+          const selectedOption = SOUND_OPTIONS.find(opt => opt.value === soundType);
+          const label = selectedOption ? selectedOption.label : soundType;
+          btn.textContent = `${label} ▼`;
         }
       }
     }

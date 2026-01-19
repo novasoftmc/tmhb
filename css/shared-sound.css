@@ -75,7 +75,7 @@
   height: 6px;
   -webkit-appearance: none;
   appearance: none;
-  background: #ddd;
+  background: #cce5f5;
   border-radius: 3px;
   cursor: pointer;
 }
@@ -112,7 +112,7 @@
   align-items: center;
   gap: 8px;
   padding: 10px 12px;
-  background: #f8f9fa;
+  background: #e8f4fc;
   border-radius: 6px;
   margin-bottom: 16px;
 }
@@ -147,7 +147,7 @@
   gap: 6px;
   width: 100%;
   padding: 10px;
-  background: #ecf0f1;
+  background: #e8f4fc;
   border: 1px solid #ddd;
   border-radius: 6px;
   cursor: pointer;
@@ -192,7 +192,7 @@
 }
 
 .sound-modal-btn.cancel {
-  background: #ecf0f1;
+  background: #e8f4fc;
   color: #444;
 }
 
@@ -203,8 +203,9 @@
 /* Global mode indicator */
 .sound-modal-mode {
   text-align: center;
-  font-size: 0.8rem;
-  color: #888;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #3e3e3e;
   margin-bottom: 12px;
   padding-bottom: 12px;
   border-bottom: 1px solid #eee;
@@ -216,11 +217,12 @@
 }
 
 [data-theme="dark"] .sound-modal-content h3 {
-  color: #ecf0f1;
+  color: #ffffff;
 }
 
 [data-theme="dark"] .sound-modal-row label {
-  color: #bdc3c7;
+  color: #000000;
+  font-weight: 600;
 }
 
 [data-theme="dark"] .sound-modal-row select {
@@ -234,7 +236,7 @@
 }
 
 [data-theme="dark"] .use-global-row label {
-  color: #bdc3c7;
+  color: #ffffff;
 }
 
 [data-theme="dark"] .preview-sound-btn {
@@ -293,4 +295,41 @@
 
 [data-theme="dark"] .header-sound-icon:hover {
   color: #3498db;
+}
+
+/* Dark theme fix for body.dark-theme */
+body.dark-theme .sound-modal-content h3 {
+  color: #000000 !important;
+}
+
+body.dark-theme .use-global-row label {
+  color: #060606;
+}
+
+/* Advanced page timer sound button */
+.advanced-sound-btn {
+  padding: 2px 4px;
+  font-size: 0.7rem;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.advanced-sound-btn:hover {
+  background: #e8f4fc;
+  border-color: #3498db;
+}
+
+body.dark-theme .advanced-sound-btn {
+  background: #34495e;
+  border-color: #4a6278;
+  color: #ecf0f1;
+}
+
+body.dark-theme .advanced-sound-btn:hover {
+  background: #3d566e;
+  border-color: #3498db;
 }

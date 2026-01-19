@@ -9,7 +9,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 63px;
+    gap: 36px;
     padding: 5px 20px;
     background: linear-gradient(135deg, #3498db 0%, #2ecc71 100%);
     transition: background 0.3s ease;
@@ -51,11 +51,11 @@
 
 .header-main-tabs {
     display: flex;
-    gap: 10px;
+    gap: 8px;
 }
 
 .header-main-tab {
-    padding: 8px 20px;
+    padding: 8px 14px;
     background: rgba(255, 255, 255, 0.2);
     color: white;
     border: none;
@@ -327,4 +327,8 @@ body.dark-theme.parallel-countdown .header-sub-tab.active {
 body.dark-theme.parallel-countdown .header-sub-tab:hover {
   background: #3a2a3d;
   color: #bb8fce;
+}
+
+#stopwatchMainTab {
+  display: none;
 }

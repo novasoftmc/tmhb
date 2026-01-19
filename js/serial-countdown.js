@@ -18,6 +18,11 @@ const state = (function () {
         every: { minutes: 0, seconds: 0 },
         duration: 5,
       },
+      soundSettings: {
+        useGlobal: true,
+        soundType: null,
+        volume: null
+      },
     },
   ];
 
@@ -289,6 +294,22 @@ const state = (function () {
     }
   };
 })();
+
+// Helper to get sound settings for a timer
+function getTimerSoundSettings(timerIndex) {
+  const timers = state.getTimers();
+  const timer = timers[timerIndex];
+  const settings = timer?.soundSettings;
+  
+  if (!settings || settings.useGlobal !== false) {
+    return sharedSound.getGlobalSettings();
+  }
+  return {
+    soundType: settings.soundType,
+    volume: settings.volume
+  };
+}
+
 
 // ===== UI MANAGEMENT MODULE =====
 const uiManager = (function () {
@@ -715,7 +736,7 @@ const uiManager = (function () {
                     </div>
                     
                     <!-- Sound icon and beep settings on RIGHT -->
-                    <div style="position: absolute; right: 10px; top: 72%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: center; gap: 6px;">
+                    <div style="position: absolute; right: 10px; top: 70%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: center; gap: 1px;">
                         <div style="font-size: 0.65rem; text-align: center; line-height: 1.1;">
                             <div style="font-weight: bold; margin-bottom: 2px;">Final beeps:</div>
                             <div style="display: flex; flex-direction: row; gap: 2px; align-items: center;">
@@ -729,9 +750,7 @@ const uiManager = (function () {
                                 </label>
                             </div>
                         </div>
-                        <div class="sound-icon advanced-sound-icon ${timerData.beepAt > 0 ? "active" : ""}" data-timer-index="${index}" title="Sound ${timerData.beepAt > 0 ? "enabled" : "muted"}" style="cursor: pointer; flex-shrink: 0; margin-top: 4px;">
-                            ${timerData.beepAt > 0 ? `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>` : `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>`}
-                        </div>
+                        <button class="advanced-sound-btn advanced-sound-icon" data-timer-index="${index}" title="Click to change sound" style="margin-top: -4px;">Timer ${index + 1} Sound ▼</button>
                     </div>
                     
                     <!-- Bottom control container -->
@@ -1920,8 +1939,9 @@ const timerLogic = (function () {
               if (c.sound !== false) {
                 for (let i = 0; i < r.duration; i++) {
                   const beepTimeout = setTimeout(() => {
-                    if (state.getIsRunning() && !state.getIsPaused() && src.beepAt > 0) {
-                      sharedSound.playSound();
+                    if (state.getIsRunning() && !state.getIsPaused()) {
+                      const snd = getTimerSoundSettings(currentItem.index);
+                      sharedSound.playSound(snd.soundType, snd.volume);
                     }
                   }, i * 1000);
                   state.addFlashingTimeout(beepTimeout);
@@ -1978,8 +1998,9 @@ const timerLogic = (function () {
             if (r.every.sound !== false) {
               for (let i = 0; i < r.duration; i++) {
                 const beepTimeout = setTimeout(() => {
-                  if (state.getIsRunning() && !state.getIsPaused() && src.beepAt > 0) {
-                    sharedSound.playSound();
+                  if (state.getIsRunning() && !state.getIsPaused()) {
+                    const snd = getTimerSoundSettings(currentItem.index);
+                    sharedSound.playSound(snd.soundType, snd.volume);
                   }
                 }, i * 1000);
                 state.addFlashingTimeout(beepTimeout);
@@ -2007,7 +2028,10 @@ const timerLogic = (function () {
         if (isVeryEnd) {
           // Final beep at 0 seconds
           if (beepAt > 0) {
-           if (state.getSoundEnabled()) sharedSound.playSound('synth-alarm');
+           if (state.getSoundEnabled()) {
+              const snd = getTimerSoundSettings(currentItem.index);
+              sharedSound.playSound('synth-alarm', snd.volume);
+            }
             // Clear any warning flashing and start critical
             stopFlashing();
             startFlashing(true);
@@ -2024,7 +2048,10 @@ const timerLogic = (function () {
             startFlashing(true);
           }
 
-          if (state.getSoundEnabled()) sharedSound.playSound();
+          if (state.getSoundEnabled()) {
+            const snd = getTimerSoundSettings(currentItem.index);
+            sharedSound.playSound(snd.soundType, snd.volume);
+          }
         } else if (beepAt === 0 || newRemaining > beepAt) {
           // Not in any beepAt warning period
           // Check if we should stop flashing (no active custom reminders)
@@ -3683,48 +3710,26 @@ const eventHandlers = (function () {
           return;
         }
 
-        // Handle sound icon toggle on advanced page
+        // Handle sound icon click on advanced page - open sound modal
         if (e.target.closest(".advanced-sound-icon")) {
           const soundIcon = e.target.closest(".advanced-sound-icon");
           const index = parseInt(soundIcon.dataset.timerIndex);
-          const timers = state.getTimers();
-
-          // Toggle sound on/off
-          if (timers[index].beepAt > 0) {
-            timers[index].beepAt = 0;
-          } else {
-            timers[index].beepAt = 5; // Default to 5s when enabling
-          }
-
-          state.setTimers(timers);
-          uiManager.renderTimerSettings();
-
-          // If this is Timer 1, update main screen sound icon
-          if (index === 0) {
-            const mainSoundIcon = document.getElementById("sound-icon");
-            if (mainSoundIcon) {
-              if (timers[0].beepAt > 0) {
-                mainSoundIcon.classList.add("active");
-                mainSoundIcon.innerHTML = `
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-                                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-                                        </svg>
-                                    `;
-                mainSoundIcon.title = "Sound enabled - Click to mute";
-              } else {
-                mainSoundIcon.classList.remove("active");
-                mainSoundIcon.innerHTML = `
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-                                            <line x1="23" y1="9" x2="17" y2="15"></line>
-                                            <line x1="17" y1="9" x2="23" y2="15"></line>
-                                        </svg>
-                                    `;
-                mainSoundIcon.title = "Sound muted - Click to enable";
-              }
+          
+          sharedSound.initAudioContext();
+          sharedSound.openTimerModal(
+            index,
+            // getter
+            (i) => {
+              const timer = state.getTimers()[i];
+              return timer.soundSettings || { useGlobal: true };
+            },
+            // setter
+            (i, settings) => {
+              const timers = state.getTimers();
+              timers[i].soundSettings = settings;
+              state.setTimers(timers);
             }
-          }
+          );
           return;
         }
       });

@@ -278,14 +278,14 @@ body.dark-theme .message-text {
   left: 0;
   right: 0;
   width: 100%;
-  min-height: 28px;
+  min-height: 6pxpx;
   border-top: 2px solid #ddd;
   background-color: white;
   display: flex;
   align-items: center;
   justify-content: center; /* centers the start buttons */
   gap: 8px;
-  padding: 4px 5px; /* add small padding */
+  padding: 2px 5px; /* add small padding */
 }
 
 .scheduled-start-controls {
@@ -382,6 +382,7 @@ body.dark-theme .message-text {
 
 .timer-box-wrapper .time-setter {
   margin-bottom: 0;
+  padding-bottom: 30px;
 }
 
 .timer-box-wrapper .sound-reminders {
